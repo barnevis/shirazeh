@@ -2,20 +2,15 @@
  * @file Main entry point for PWiki. Initializes and starts the application.
  */
 import { App } from './core/app.js';
-
-const PWIKI_CONFIG = {
-    contentElementId: '.content',
-    sidebarNavElementId: '.sidebar-nav',
-    sidebarToggleId: '.sidebar-toggle',
-    sidebarFile: 'config/sidebar.md',
-    defaultPage: 'README.md'
-};
+import { getConfig } from './core/configManager.js';
 
 /**
  * Initializes the application.
  */
-function main() {
-    const pwikiApp = new App(PWIKI_CONFIG);
+async function main() {
+    // Get the final configuration by merging user settings with defaults.
+    const config = await getConfig();
+    const pwikiApp = new App(config);
     pwikiApp.start();
 }
 

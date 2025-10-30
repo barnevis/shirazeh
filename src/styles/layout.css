@@ -36,3 +36,9 @@ body.sidebar-collapsed .sidebar {
     /* سایدبار را با مارجین منفی به سمت راست بیرون از صفحه می‌برد */
     margin-right: calc(-1 * var(--sidebar-width));
 }
+
+/* --- حالت غیرفعال سایدبار --- */
+body.sidebar-disabled .sidebar,
+body.sidebar-disabled .sidebar-toggle {
+    display: none;
+}

@@ -12,7 +12,7 @@ import { Sidebar } from './sidebar.js';
  */
 export class App {
     /**
-     * @param {object} config - The application configuration.
+     * @param {object} config - The application configuration from configManager.
      */
     constructor(config) {
         this.config = config;
@@ -26,17 +26,25 @@ export class App {
      */
     async start() {
         try {
-            this.contentElement = getElement(this.config.contentElementId);
+            this._applyTheme();
+            this.contentElement = getElement(this.config.selectors.content);
             
-            this.sidebar = new Sidebar({
-                navElementId: this.config.sidebarNavElementId,
-                toggleId: this.config.sidebarToggleId,
-                sidebarFile: this.config.sidebarFile,
-            });
-            await this.sidebar.init();
+            if (this.config.sidebar && this.config.sidebar.enabled) {
+                const resolvedSidebarFile = this.resolvePath(this.config.files.sidebar);
+
+                this.sidebar = new Sidebar({
+                    navElementId: this.config.selectors.sidebarNav,
+                    toggleId: this.config.selectors.sidebarToggle,
+                    sidebarFile: resolvedSidebarFile,
+                });
+                await this.sidebar.init();
+            } else {
+                this._disableSidebar();
+                this.sidebar = null; // Ensure sidebar object is null
+            }
 
             this.router = new Router({
-                defaultPage: this.config.defaultPage,
+                defaultPage: this.config.files.defaultPage,
                 onNavigate: (filePath, path) => this.loadPage(filePath, path),
             });
             this.router.init();
@@ -44,6 +52,29 @@ export class App {
         } catch (error) {
             this.handleError(error);
         }
+    }
+    
+    /**
+     * Applies custom theme properties from config as CSS variables.
+     * @private
+     */
+    _applyTheme() {
+        if (!this.config.theme) return;
+        
+        const root = document.documentElement;
+        for (const [key, value] of Object.entries(this.config.theme)) {
+            // Convert camelCase key (e.g., primaryColor) to kebab-case CSS variable (e.g., --primary-color)
+            const cssVarName = `--${key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)}`;
+            root.style.setProperty(cssVarName, value);
+        }
+    }
+
+    /**
+     * Adds a class to the body to disable the sidebar via CSS.
+     * @private
+     */
+    _disableSidebar() {
+        document.body.classList.add('sidebar-disabled');
     }
 
     /**
@@ -55,15 +86,34 @@ export class App {
         try {
             renderLoading(this.contentElement);
 
-            const markdown = await fetchContent(filePath);
+            const resolvedPath = this.resolvePath(filePath);
+            const markdown = await fetchContent(resolvedPath);
             const html = parse(markdown);
             renderContent(this.contentElement, html);
 
-            this.sidebar.setActiveLink(currentPath);
-            this.sidebar.closeMobileSidebar();
+            if (this.sidebar) {
+                this.sidebar.setActiveLink(currentPath);
+                this.sidebar.closeMobileSidebar();
+            }
         } catch (error) {
             this.handleError(error);
         }
+    }
+
+    /**
+     * Resolves a relative path against the configured base path.
+     * @param {string} relativePath - The path relative to the base path.
+     * @returns {string} The fully resolved path.
+     */
+    resolvePath(relativePath) {
+        // Simple path join, removes leading slash from relativePath if basePath is not empty.
+        if (this.config.basePath && relativePath.startsWith('/')) {
+            relativePath = relativePath.substring(1);
+        }
+        return [this.config.basePath, relativePath]
+            .filter(Boolean) // Remove empty parts
+            .join('/')
+            .replace(/\/\//g, '/'); // Avoid double slashes
     }
 
     /**
