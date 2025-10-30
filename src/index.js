@@ -1,5 +1,5 @@
 /**
- * @file Main entry point for PWiki. Initializes and starts the application.
+ * @file Main entry point for Shirazeh. Initializes and starts the application.
  */
 import { App } from './core/app.js';
 import { getConfig } from './core/configManager.js';
@@ -10,8 +10,8 @@ import { getConfig } from './core/configManager.js';
 async function main() {
     // Get the final configuration by merging user settings with defaults.
     const config = await getConfig();
-    const pwikiApp = new App(config);
-    pwikiApp.start();
+    const shirazehApp = new App(config);
+    shirazehApp.start();
 }
 
 // Run the main function after the DOM is fully loaded.

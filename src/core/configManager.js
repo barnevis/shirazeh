@@ -67,7 +67,7 @@ function isObject(item) {
 export async function getConfig() {
     try {
         // Dynamically import the user config file. This executes the script
-        // and populates window.PWIKI_USER_CONFIG if the file exists.
+        // and populates window.shirazeh if the file exists.
         // The path is relative to this module's location.
         await import('../../config/config.js');
     } catch (e) {
@@ -76,6 +76,6 @@ export async function getConfig() {
         console.info('Optional user config file (config/config.js) not found or failed to load. Using default configuration.');
     }
 
-    const userConfig = window.PWIKI_USER_CONFIG || {};
+    const userConfig = window.shirazeh || {};
     return deepMerge(DEFAULT_CONFIG, userConfig);
 }

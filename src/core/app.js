@@ -1,5 +1,5 @@
 /**
- * @file The main application orchestrator for PWiki.
+ * @file The main application orchestrator for Shirazeh.
  */
 import { getElement, renderLoading, renderError, renderContent } from './domRenderer.js';
 import { fetchContent } from './fileReader.js';
@@ -8,7 +8,7 @@ import { Router } from './router.js';
 import { Sidebar } from './sidebar.js';
 
 /**
- * Represents the main PWiki application.
+ * Represents the main Shirazeh application.
  */
 export class App {
     /**
@@ -150,7 +150,7 @@ export class App {
      */
     handleError(error) {
         const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-        console.error("PWiki encountered an error:", message);
+        console.error("Shirazeh encountered an error:", message);
 
         let userMessage = 'در بارگذاری محتوا خطایی رخ داد. لطفاً اتصال اینترنت خود را بررسی کنید.';
         if (message.includes('not found')) {
