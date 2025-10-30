@@ -11,7 +11,8 @@ const DEFAULT_CONFIG = {
     basePath: '.',
     files: {
         sidebar: 'config/sidebar.md',
-        defaultPage: 'README.md'
+        defaultPage: 'README.md',
+        notFoundPage: 'config/404.md'
     },
     selectors: {
         content: '.content',

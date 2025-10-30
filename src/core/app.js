@@ -96,7 +96,35 @@ export class App {
                 this.sidebar.closeMobileSidebar();
             }
         } catch (error) {
-            this.handleError(error);
+            if (error.message.includes('not found')) {
+                this._loadNotFoundPage(error);
+            } else {
+                this.handleError(error);
+            }
+        }
+    }
+
+    /**
+     * Loads the configured 404 "Not Found" page.
+     * If the 404 page itself is not found, it falls back to the default error handler.
+     * @param {Error} originalError - The original error that triggered the 404.
+     * @private
+     */
+    async _loadNotFoundPage(originalError) {
+        console.warn(`Content not found, attempting to load custom 404 page. Original error: ${originalError.message}`);
+        try {
+            const notFoundPagePath = this.resolvePath(this.config.files.notFoundPage);
+            const markdown = await fetchContent(notFoundPagePath);
+            const html = parse(markdown);
+            renderContent(this.contentElement, html);
+
+            if (this.sidebar) {
+                this.sidebar.setActiveLink(null); // Clear active link
+                this.sidebar.closeMobileSidebar();
+            }
+        } catch (notFoundError) {
+            console.error(`Failed to load custom 404 page: ${notFoundError.message}. Falling back to default error display.`);
+            this.handleError(originalError);
         }
     }
 
@@ -123,8 +151,14 @@ export class App {
     handleError(error) {
         const message = error instanceof Error ? error.message : 'An unknown error occurred.';
         console.error("PWiki encountered an error:", message);
+
+        let userMessage = 'در بارگذاری محتوا خطایی رخ داد. لطفاً اتصال اینترنت خود را بررسی کنید.';
+        if (message.includes('not found')) {
+            userMessage = 'فایل درخواست شده پیدا نشد. ممکن است لینک شکسته باشد یا فایل حذف شده باشد.';
+        }
+
         if (this.contentElement) {
-            renderError(this.contentElement, message);
+            renderError(this.contentElement, userMessage);
         }
     }
 }

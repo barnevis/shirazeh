@@ -30,7 +30,12 @@ window.PWIKI_USER_CONFIG = {
     /**
      * @property {string} defaultPage - فایلی که به عنوان صفحه اصلی (/) نمایش داده می‌شود.
      */
-    defaultPage: 'README.md'
+    defaultPage: 'README.md',
+
+    /**
+     * @property {string} notFoundPage - فایلی که در صورت پیدا نشدن یک صفحه (خطای 404) نمایش داده می‌شود.
+     */
+    notFoundPage: 'config/404.md'
   },
 
   /**

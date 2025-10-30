@@ -1,9 +1,6 @@
 - [صفحه اصلی](/)
-- [راهنمای نصب](/guide)
-- [درباره ما](/about)
-- سندها
-    - [مقدمه](/docs/intro)
-- [منابع](/resources/home)
-    - [مقالات](/resources/articles)
-    - [ویدیوها](/resources/videos)
-        - [آزمون](/resources/videos)
+- [آغاز](/docs/gettingStarted)
+- [پیکربندی](/docs/configuration)
+- فنی
+    - [معماری](/docs/architecture)
+- [آموزش](/docs/writingContent)
