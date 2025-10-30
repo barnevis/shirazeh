@@ -1,0 +1,36 @@
+/*
+ * ==========================================
+ *  استایل‌های پایه و تایپوگرافی
+ * ==========================================
+ * این فایل شامل ریست کردن استایل‌های پیش‌فرض،
+ * تعریف فونت و استایل‌های اصلی تگ‌های html و body است.
+ */
+
+/* 1. تعریف فونت */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('') format('woff2'); /* Placeholder for local font files */
+  font-weight: 300 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* 2. ریست کردن استایل‌ها */
+html {
+  box-sizing: border-box;
+  direction: rtl;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+/* 3. استایل‌های اصلی بدنه */
+body {
+  margin: 0;
+  font-family: 'Vazirmatn', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.7;
+  overflow-x: hidden; /* جلوگیری از اسکرول افقی ناخواسته */
+}

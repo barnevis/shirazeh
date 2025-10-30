@@ -1,0 +1,97 @@
+/*
+ * ==========================================
+ *  استایل‌های محتوای مارک‌داون (Prose)
+ * ==========================================
+ * این فایل استایل‌های مربوط به خروجی HTML
+ * تبدیل شده از مارک‌داون را مدیریت می‌کند.
+ */
+
+.prose {
+  max-width: 800px;
+  margin: 0 auto; /* محتوا را در مرکز قرار می‌دهد */
+}
+.prose h1, .prose h2, .prose h3 {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.prose h1 {
+  font-size: 2.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.prose h2 {
+  font-size: 1.875rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose p {
+  margin-bottom: 1.25rem;
+  font-size: 1.125rem;
+}
+
+.prose ul, .prose ol {
+  padding-right: 1.5rem; /* تورفتگی برای لیست‌ها در حالت راست‌چین */
+  margin-bottom: 1.25rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose a {
+  color: var(--secondary-color);
+  text-decoration: none;
+}
+
+.prose a:hover {
+  text-decoration: underline;
+}
+
+.prose strong {
+  color: var(--text-color-strong);
+}
+
+.prose blockquote {
+  border-right: 4px solid var(--quote-border);
+  padding-right: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--quote-text);
+}
+
+.prose code {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9em;
+  font-family: monospace;
+}
+
+.prose pre {
+  background-color: rgba(31, 41, 55, 0.7); /* bg-gray-800/70 */
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9em;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.prose pre code {
+  padding: 0;
+  background-color: transparent;
+  border-radius: 0;
+  color: inherit;
+}

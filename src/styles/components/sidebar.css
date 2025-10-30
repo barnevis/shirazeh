@@ -1,0 +1,119 @@
+/*
+ * ==========================================
+ *  استایل‌های کامپوننت سایدبار
+ * ==========================================
+ * این فایل شامل تمام استایل‌های مربوط به
+ * هدر، نویگیشن، آیتم‌های منو و دکمه باز و بست سایدبار است.
+ */
+
+/* --- هدر سایدبار --- */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: var(--header-height);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-color-strong);
+  white-space: nowrap;
+}
+
+/* --- نویگیشن و آیتم‌های منو --- */
+.sidebar-nav {
+  padding: 1rem 0;
+  overflow-y: auto;
+  flex-grow: 1; /* فضای باقی‌مانده را پر می‌کند */
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav a,
+.sidebar-nav .submenu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  border-right: 3px solid transparent;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.sidebar-nav .submenu-toggle {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav .submenu-toggle:hover {
+  background-color: var(--border-color);
+}
+
+.sidebar-nav a.active {
+  color: var(--primary-color);
+  border-right-color: var(--primary-color);
+  background-color: rgba(110, 231, 183, 0.1);
+}
+
+/* --- زیرمنوهای تو در تو --- */
+.sidebar-nav .has-submenu.open > .submenu-toggle {
+    color: var(--text-color-strong);
+}
+
+.submenu-arrow {
+  margin-left: 0.5rem;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+.submenu-arrow::before {
+  content: '›';
+  display: inline-block;
+  font-weight: bold;
+}
+.has-submenu.open > .submenu-toggle .submenu-arrow {
+  transform: rotate(-90deg);
+}
+
+.sidebar-nav .submenu {
+  background-color: rgba(0,0,0,0.15);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  padding-right: 1rem; /* ایجاد تورفتگی برای هر سطح از زیرمنو */
+}
+.has-submenu.open > .submenu {
+  max-height: 1000px; /* یک مقدار بزرگ برای نمایش کامل محتوا */
+}
+
+/* --- دکمه باز و بست کردن سایدبار --- */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.75rem;
+  cursor: pointer;
+  /* padding: 0.5rem; */
+  position: fixed;
+  top: 10px;
+  right: 15px; /* موقعیت پیش‌فرض در موبایل و حالت جمع‌شده */
+  z-index: 101;
+  transition: right 0.3s ease;
+}

@@ -1,0 +1,26 @@
+/*
+ * ==========================================
+ *  فایل اصلی استایل‌های PWiki
+ * ==========================================
+ * این فایل به عنوان نقطه ورود اصلی عمل کرده و
+ * تمام فایل‌های استایل دیگر را به ترتیب وارد می‌کند.
+ * از ویرایش مستقیم این فایل خودداری کنید.
+ */
+
+/* 1. متغیرهای اصلی پروژه */
+@import url('variables.css');
+
+/* 2. استایل‌های پایه و ریست */
+@import url('base.css');
+
+/* 3. چیدمان اصلی صفحه */
+@import url('layout.css');
+
+/* 4. استایل‌های کامپوننت‌ها */
+@import url('components/sidebar.css');
+@import url('components/content.css');
+@import url('components/prose.css');
+@import url('components/messages.css');
+
+/* 5. استایل‌های واکنش‌گرا */
+@import url('utilities/responsive.css');

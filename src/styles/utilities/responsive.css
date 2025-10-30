@@ -1,0 +1,64 @@
+/*
+ * ==========================================
+ *  استایل‌های واکنش‌گرا (Responsive)
+ * ==========================================
+ * این فایل شامل تمام Media Query ها برای
+ * تطبیق چیدمان با اندازه‌های مختلف صفحه است.
+ */
+
+/* --- استایل‌های دسکتاپ (از عرض 768 پیکسل به بالا) --- */
+@media (min-width: 768px) {
+  /*
+   * در حالت باز، دکمه به داخل سایدبار منتقل می‌شود تا یکپارچه به نظر برسد.
+   */
+  body:not(.sidebar-collapsed) .sidebar-toggle {
+    right: calc(var(--sidebar-width) - 50px);
+  }
+}
+
+
+/* --- استایل‌های موبایل (تا عرض 767 پیکسل) --- */
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    margin-right: 0; /* لغو کردن مارجین دسکتاپ */
+    transform: translateX(100%); /* منو به صورت پیش‌فرض خارج از صفحه است */
+    transition: transform 0.3s ease;
+  }
+
+  body:not(.sidebar-collapsed) .sidebar {
+    transform: translateX(0); /* نمایش منو با بازگشت به موقعیت اصلی */
+  }
+
+  /* لغو کردن انیمیشن مارجین در حالت بسته برای موبایل */
+  body.sidebar-collapsed .sidebar {
+    margin-right: 0;
+  }
+  
+  .content {
+    margin-right: 0; /* محتوا همیشه تمام عرض صفحه است */
+    max-width: 100%;
+    padding: 2.5rem 1rem; /* پدینگ بیشتر برای موبایل */
+    transition: none; /* غیرفعال کردن انیمیشن در موبایل */
+  }
+
+  /* ایجاد یک لایه تیره در پس‌زمینه هنگام باز بودن منو */
+  .app-container::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99; /* زیر منو، روی محتوا */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  body:not(.sidebar-collapsed) .app-container::after {
+    opacity: 1;
+    visibility: visible;
+  }
+}

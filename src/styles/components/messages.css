@@ -1,0 +1,26 @@
+/*
+ * ==========================================
+ *  استایل‌های پیام‌های وضعیت
+ * ==========================================
+ * این فایل استایل‌های مربوط به پیام‌های
+ * "در حال بارگذاری" و "خطا" را تعریف می‌کند.
+ */
+
+.loading-message {
+  text-align: center;
+  color: var(--quote-text);
+  padding: 2rem 0;
+}
+
+.error-message {
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.error-message strong {
+  font-weight: 700;
+}
