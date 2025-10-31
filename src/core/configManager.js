@@ -8,6 +8,7 @@
  * @type {object}
  */
 const DEFAULT_CONFIG = {
+    appName: 'شیرازه',
     basePath: '.',
     files: {
         sidebar: 'config/sidebar.md',
@@ -15,6 +16,7 @@ const DEFAULT_CONFIG = {
         notFoundPage: 'config/404.md'
     },
     selectors: {
+        root: '#app',
         content: '.content',
         sidebarNav: '.sidebar-nav',
         sidebarToggle: '.sidebar-toggle',

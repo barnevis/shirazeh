@@ -26,7 +26,9 @@ export class App {
      */
     async start() {
         try {
+            this._createLayout(); // Create the DOM structure first
             this._applyTheme();
+            
             this.contentElement = getElement(this.config.selectors.content);
             
             if (this.config.sidebar && this.config.sidebar.enabled) {
@@ -52,6 +54,53 @@ export class App {
         } catch (error) {
             this.handleError(error);
         }
+    }
+
+    /**
+     * Creates the main application layout dynamically.
+     * @private
+     */
+    _createLayout() {
+        const rootElement = getElement(this.config.selectors.root);
+        if (!rootElement) return;
+
+        rootElement.innerHTML = ''; // Clear any existing content
+
+        const appContainer = document.createElement('div');
+        appContainer.className = 'app-container';
+
+        // Always create the content area
+        const content = document.createElement('main');
+        content.className = 'content';
+
+        if (this.config.sidebar && this.config.sidebar.enabled) {
+            // Create Sidebar
+            const sidebar = document.createElement('aside');
+            sidebar.className = 'sidebar';
+
+            const sidebarHeader = document.createElement('div');
+            sidebarHeader.className = 'sidebar-header';
+            const appTitle = document.createElement('h2');
+            appTitle.textContent = this.config.appName;
+            sidebarHeader.appendChild(appTitle);
+
+            const sidebarNav = document.createElement('nav');
+            sidebarNav.className = 'sidebar-nav';
+
+            sidebar.appendChild(sidebarHeader);
+            sidebar.appendChild(sidebarNav);
+            appContainer.appendChild(sidebar);
+
+            // Create Toggle Button, append to root so it's a sibling of app-container
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'sidebar-toggle';
+            toggleButton.setAttribute('aria-label', 'باز و بسته کردن منو');
+            toggleButton.innerHTML = '☰';
+            rootElement.appendChild(toggleButton);
+        }
+        
+        appContainer.appendChild(content);
+        rootElement.appendChild(appContainer);
     }
     
     /**

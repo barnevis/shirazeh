@@ -10,6 +10,12 @@
 
 window.shirazeh = {
   /**
+   * @property {string} appName
+   * نام ویکی شما که در هدر سایدبار نمایش داده می‌شود.
+   */
+  appName: 'شیرازه',
+  
+  /**
    * @property {string} basePath
    * مسیر پایه ویکی شما. اگر پروژه شما در یک زیرپوشه (مثلاً 'docs/') قرار دارد،
    * این مقدار را روی آن پوشه تنظیم کنید. برای حالت عادی، '.' کافیست.
@@ -44,6 +50,7 @@ window.shirazeh = {
    * که ساختار فایل `index.html` را ویرایش کرده باشید.
    */
   selectors: {
+    root: '#app',
     content: '.content',
     sidebarNav: '.sidebar-nav',
     sidebarToggle: '.sidebar-toggle',
