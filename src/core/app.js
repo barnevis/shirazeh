@@ -6,6 +6,7 @@ import { fetchContent } from './fileReader.js';
 import { parse } from './markdownParser.js';
 import { Router } from './router.js';
 import { Sidebar } from './sidebar.js';
+import { ThemeManager } from './themeManager.js';
 
 /**
  * Represents the main Shirazeh application.
@@ -19,6 +20,7 @@ export class App {
         this.contentElement = null;
         this.sidebar = null;
         this.router = null;
+        this.themeManager = new ThemeManager(this.config);
     }
 
     /**
@@ -27,7 +29,7 @@ export class App {
     async start() {
         try {
             this._createLayout(); // Create the DOM structure first
-            this._applyTheme();
+            this.themeManager.init(); // Initialize the theme manager
             
             this.contentElement = getElement(this.config.selectors.content);
             
@@ -103,21 +105,6 @@ export class App {
         rootElement.appendChild(appContainer);
     }
     
-    /**
-     * Applies custom theme properties from config as CSS variables.
-     * @private
-     */
-    _applyTheme() {
-        if (!this.config.theme) return;
-        
-        const root = document.documentElement;
-        for (const [key, value] of Object.entries(this.config.theme)) {
-            // Convert camelCase key (e.g., primaryColor) to kebab-case CSS variable (e.g., --primary-color)
-            const cssVarName = `--${key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)}`;
-            root.style.setProperty(cssVarName, value);
-        }
-    }
-
     /**
      * Adds a class to the body to disable the sidebar via CSS.
      * @private

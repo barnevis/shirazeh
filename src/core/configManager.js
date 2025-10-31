@@ -24,7 +24,9 @@ const DEFAULT_CONFIG = {
     sidebar: {
       enabled: true,
     },
-    theme: {}
+    theme: {
+        default: 'auto', // 'light', 'dark', or 'auto'
+    }
 };
 
 /**

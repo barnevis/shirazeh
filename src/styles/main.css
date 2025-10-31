@@ -7,20 +7,24 @@
  * از ویرایش مستقیم این فایل خودداری کنید.
  */
 
-/* 1. متغیرهای اصلی پروژه */
+/* 1. متغیرهای ساختاری و مشترک */
 @import url('variables.css');
 
-/* 2. استایل‌های پایه و ریست */
+/* 2. تعریف متغیرهای رنگی تم‌ها */
+@import url('themes/light.css');
+@import url('themes/dark.css');
+
+/* 3. استایل‌های پایه و ریست */
 @import url('base.css');
 
-/* 3. چیدمان اصلی صفحه */
+/* 4. چیدمان اصلی صفحه */
 @import url('layout.css');
 
-/* 4. استایل‌های کامپوننت‌ها */
+/* 5. استایل‌های کامپوننت‌ها */
 @import url('components/sidebar.css');
 @import url('components/content.css');
 @import url('components/prose.css');
 @import url('components/messages.css');
 
-/* 5. استایل‌های واکنش‌گرا */
+/* 6. استایل‌های واکنش‌گرا */
 @import url('utilities/responsive.css');

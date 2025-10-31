@@ -1,0 +1,23 @@
+/*
+ * ==========================================
+ *  متغیرهای تم تاریک
+ * ==========================================
+ */
+
+[data-theme="dark"] {
+  --bg-color: #111827; /* Gray 900 */
+  --sidebar-bg: #1f2937; /* Gray 800 */
+  --content-bg: #111827; /* Gray 900 */
+  --text-color: #d1d5db; /* Gray 300 */
+  --text-color-strong: #f9fafb; /* Gray 50 */
+  --primary-color: #6ee7b7; /* Teal 300 */
+  --secondary-color: #22d3ee; /* Cyan 400 */
+  --border-color: #374151; /* Gray 700 */
+  --code-bg: #374151; /* Gray 700 */
+  --code-text: #fcd34d; /* Amber 300 */
+  --quote-border: #14b8a6; /* Teal 500 */
+  --quote-text: #9ca3af; /* Gray 400 */
+  --error-bg: rgba(127, 29, 29, 0.5); /* Red 900 with 50% opacity */
+  --error-border: #b91c1c; /* Red 700 */
+  --error-text: #fca5a5; /* Red 300 */
+}

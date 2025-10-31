@@ -1,0 +1,23 @@
+/*
+ * ==========================================
+ *  متغیرهای تم روشن
+ * ==========================================
+ */
+
+[data-theme="light"] {
+  --bg-color: #f9fafb; /* Gray 50 */
+  --sidebar-bg: #f3f4f6; /* Gray 100 */
+  --content-bg: #f9fafb; /* Gray 50 */
+  --text-color: #374151; /* Gray 700 */
+  --text-color-strong: #111827; /* Gray 900 */
+  --primary-color: #10b981; /* Emerald 500 */
+  --secondary-color: #0ea5e9; /* Sky 500 */
+  --border-color: #e5e7eb; /* Gray 200 */
+  --code-bg: #e5e7eb; /* Gray 200 */
+  --code-text: #1d4ed8; /* Blue 700 */
+  --quote-border: #14b8a6; /* Teal 500 */
+  --quote-text: #4b5563; /* Gray 600 */
+  --error-bg: #fee2e2; /* Red 100 */
+  --error-border: #fca5a5; /* Red 300 */
+  --error-text: #b91c1c; /* Red 700 */
+}
