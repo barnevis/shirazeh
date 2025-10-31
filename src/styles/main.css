@@ -25,6 +25,7 @@
 @import url('components/content.css');
 @import url('components/prose.css');
 @import url('components/messages.css');
+@import url('components/themeToggle.css'); /*  <-- این خط اضافه شده */
 
 /* 6. استایل‌های واکنش‌گرا */
 @import url('utilities/responsive.css');

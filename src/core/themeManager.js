@@ -73,13 +73,10 @@ export class ThemeManager {
     }
 
     /**
-     * Creates and appends the theme toggle button to the sidebar header.
+     * Creates and appends the theme toggle button.
      * @private
      */
     _setupToggleButton() {
-        const sidebarHeader = document.querySelector('.sidebar-header');
-        if (!sidebarHeader) return;
-
         this.toggleButton = document.createElement('button');
         this.toggleButton.className = 'theme-toggle';
         this.toggleButton.setAttribute('type', 'button');
@@ -94,7 +91,10 @@ export class ThemeManager {
             </span>
         `;
         
-        sidebarHeader.appendChild(this.toggleButton);
+        // ===================================
+        //     ↓↓↓ فقط این خط تغییر کرده ↓↓↓
+        // ===================================
+        document.body.appendChild(this.toggleButton);
 
         this.toggleButton.addEventListener('click', () => this.toggleTheme());
     }

@@ -24,39 +24,6 @@
   white-space: nowrap;
 }
 
-/* --- دکمه جابجایی تم --- */
-.theme-toggle {
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text-color);
-  transition: background-color 0.2s, border-color 0.2s;
-  padding: 0;
-  margin-right: -10px; /* برای هم‌ترازی بهتر */
-}
-
-.theme-toggle:hover {
-  background-color: var(--border-color);
-}
-
-.theme-toggle svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* نمایش آیکون مناسب بر اساس تم فعال */
-[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
-[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
-[data-theme="light"] .theme-toggle .icon-sun { display: none; }
-[data-theme="light"] .theme-toggle .icon-moon { display: block; }
-
-
 /* --- نویگیشن و آیتم‌های منو --- */
 .sidebar-nav {
   padding: 1rem 0;
