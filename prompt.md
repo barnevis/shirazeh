@@ -545,3 +545,6 @@ Loading module from “http://127.0.0.1:8000/core/pluginManager.js” was blocke
 127.0.0.1:8000
 Failed to load plugin: src/plugins/hello.js TypeError: error loading dynamically imported module: http://127.0.0.1:8000/src/plugins/hello.js
 ```
+
+## پرامپت ۳۱
+برای سیستم افزونه نویسی یک سند کامل و جامع بنویس.

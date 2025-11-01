@@ -3,4 +3,5 @@
 - [پیکربندی](/docs/configuration)
 - فنی
     - [معماری](/docs/architecture)
+    - [افزونه‌نویسی](/docs/plugins)
 - [آموزش](/docs/writingContent)
