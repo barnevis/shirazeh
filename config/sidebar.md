@@ -5,3 +5,5 @@
     - [معماری](/docs/architecture)
     - [افزونه‌نویسی](/docs/plugins)
 - [آموزش](/docs/writingContent)
+- افزونه‌ها
+    - [افزونه فهرست مطالب](/docs/plugins/toc)
