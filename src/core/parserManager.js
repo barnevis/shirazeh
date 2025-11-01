@@ -17,13 +17,13 @@ export class ParserManager {
      * Initializes the parser manager by loading the configured parser.
      */
     async init() {
-        const parserConfig = this.config.parser || 'marked';
+        const parserConfig = this.config.parser || 'parsneshan';
         let ParserClass;
 
         try {
-            if (typeof parserConfig === 'string' && parserConfig === 'marked') {
-                // Load built-in 'marked' parser
-                const module = await import('../parsers/marked.js');
+            if (typeof parserConfig === 'string' && parserConfig === 'parsneshan') {
+                // Load built-in 'parsneshan' parser
+                const module = await import('../parsers/parsneshan.js');
                 ParserClass = module.default;
             } else if (typeof parserConfig === 'object' && parserConfig.path) {
                 // Load custom parser from a given path
@@ -39,7 +39,9 @@ export class ParserManager {
                 throw new Error('The specified parser module does not export a default class.');
             }
             
-            this.parserInstance = new ParserClass();
+            // Pass the options to the parser's constructor
+            const options = this.config.parserOptions || {};
+            this.parserInstance = new ParserClass(options);
             console.info(`Markdown parser loaded successfully.`);
 
         } catch (error) {
@@ -61,8 +63,6 @@ export class ParserManager {
         if (!this.parserInstance) {
             throw new Error('Parser has not been initialized.');
         }
-
-        const options = (typeof this.config.parser === 'object') ? this.config.parser.options : {};
-        return this.parserInstance.parse(markdown, options);
+        return this.parserInstance.parse(markdown);
     }
 }

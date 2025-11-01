@@ -17,7 +17,10 @@ const DEFAULT_CONFIG = {
     },
     plugins: [],
     markdown: {
-        parser: 'marked', // The default built-in parser
+        parser: 'parsneshan', // The default built-in parser
+        parserOptions: {
+            plugins: []
+        }
     },
     toc: {
         enabled: false,

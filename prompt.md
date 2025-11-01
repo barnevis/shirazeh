@@ -641,3 +641,18 @@ Failed to initialize markdown parser: Error: Invalid parser configuration: {"0":
 parserManager.js:46:21
 Shirazeh encountered an error: Markdown parser could not be loaded. Please check your 'markdown.parser' configuration. Invalid parser configuration: {"0":"m","1":"a","2":"r","3":"k","4":"e","5":"d"}
 ```
+
+## پرامپت ۴۰
+من می‌خوام مفسر پیش‌فرض شیرازه به «پارس‌نشان» که یک مفسر سفارشی‌سازی شده براساس `markdown-it` است جایگزین بشه.
+1. من فایل‌های `parsneshan.js` و `parsneshan.css` بارگذاری کردم.
+2. دقت کن که احتمال زیاد استایل‌های این کتابخانه با استایل‌های پروژه همپوشانی داشته باشه، مراقب باشه استایل تکراری در کد درج نکنی.
+3. این مفسر سفارشی به کتابخانه `markdown-it` نیاز داره
+4. از اونجایی که `markdown-it` قابلیت اضافه شدن افزونه داره، در فایل پیکربندی اجازه بده کاربر افزونه اضافه کنه.
+
+دقت کن که با افزودن پارس‌نشان هیچ بخشی از پروژه از کار نیافته.
+
+## پرامپت ۴۱
+در کنسول خطای زیر نمایش داده می‌شه:
+```js    
+Shirazeh encountered an error: can't access property "push", this.tokens is null
+```  

@@ -45,21 +45,31 @@
     ```
 
 ### `markdown`
-این بخش به شما اجازه می‌دهد تا مفسر مارک‌داون مورد استفاده در پروژه را تعیین کنید.
+این بخش به شما اجازه می‌دهد تا مفسر مارک‌داون مورد استفاده در پروژه را تعیین و شخصی‌سازی کنید.
 
--   `parser`: نام یک مفسر داخلی (مانند `'marked'`) یا یک آبجکت برای تعریف یک مفسر سفارشی.
+-   `parser`: نام یک مفسر داخلی (مانند `'parsneshan'`) یا یک آبجکت برای تعریف یک مفسر سفارشی.
+-   `parserOptions`: یک آبجکت برای ارسال تنظیمات به مفسر. این بخش برای افزودن افزونه به مفسر پیش‌فرض (پارس‌نشان) بسیار کاربردی است.
+
 -   **مقدار پیش‌فرض:**
     ```javascript
     markdown: {
-      parser: 'marked'
+      parser: 'parsneshan',
+      parserOptions: {
+        plugins: []
+      }
     }
     ```
--   **مثال (برای استفاده از یک مفسر سفارشی):**
+-   **مثال (برای افزودن افزونه‌های markdown-it):**
     ```javascript
+    // توجه: ابتدا باید فایل CDN افزونه‌ها را در index.html اضافه کنید
     markdown: {
-      parser: {
-        path: 'config/parsers/my-parser.js',
-        options: { gfm: true }
+      parser: 'parsneshan',
+      parserOptions: {
+        linkify: true, // فعال کردن لینک خودکار
+        plugins: [
+          window.markdownitFootnote, // افزونه پاورقی
+          [window.markdownitSub, {}] // افزونه زیرنویس با تنظیمات
+        ]
       }
     }
     ```
