@@ -8,12 +8,9 @@
     width: 240px;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
-    background-color: var(--sidebar-bg);
-    border-radius: 8px;
-    padding: 1rem;
+    padding: 1rem 1rem 1rem 0; /* T R B L */
     z-index: 50;
-    border: 1px solid var(--border-color);
-    transition: background-color 0.3s, border-color 0.3s;
+    border-right: 1px solid var(--border-color);
 }
 
 .toc-title {
@@ -36,6 +33,32 @@
     margin-bottom: 0.25rem;
 }
 
+.toc-item-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.toc-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.5rem; /* Space on the left (visual right in RTL) */
+    color: var(--text-color);
+    line-height: 1;
+}
+
+.toc-toggle-icon {
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+    font-weight: bold;
+}
+
+.toc-item--parent.is-open .toc-toggle-icon {
+    transform: rotate(90deg); /* Points down */
+}
+
 .toc-container a {
     display: block;
     color: var(--text-color);
@@ -49,6 +72,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    /* Make link take up available space */
+    flex-grow: 1;
+    min-width: 0; /* Important for text-overflow in flexbox */
 }
 
 .toc-container a:hover {
@@ -61,11 +88,21 @@
     font-weight: 600;
 }
 
-/* Indentation for nested lists */
+/* Indentation for nested lists and collapsing */
 .toc-container ul ul {
     margin-top: 0.25rem;
-    padding-right: 1rem;
+    padding-right: 1.25rem; /* Increased indentation */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    width: 100%; /* Ensure it takes full width of parent li */
 }
+
+/* Open state for nested list */
+.toc-item--parent.is-open > ul {
+    max-height: 1000px; /* A large enough value to show content */
+}
+
 
 /* Hide on smaller screens where there's not enough space */
 @media (max-width: 1200px) {
