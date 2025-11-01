@@ -655,4 +655,40 @@ Shirazeh encountered an error: Markdown parser could not be loaded. Please check
 در کنسول خطای زیر نمایش داده می‌شه:
 ```js    
 Shirazeh encountered an error: can't access property "push", this.tokens is null
-```  
+```
+
+## پرامپت ۴۰
+تابع `deepMerge` در فایل `src/core/configManager.js` دوباره به نسخه باگ‌دار قبلی برگشته. این نسخه نمی‌تونه یک مقدار رشته‌ای (مثل `'parsneshan'`) رو با یک شیء (مثل `{ path: '...' }`) جایگزین کنه.
+
+**درخواست:**
+لطفاً تابع `deepMerge` رو با نسخه صحیح و اصلاح شده زیر جایگزین کن:
+
+```javascript
+function deepMerge(target, source) {
+    const output = { ...target };
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach(key => {
+            const sourceValue = source[key];
+            const targetValue = target[key];
+
+            // اگر هر دو مقدار شیء باشن (و آرایه نباشن)، به صورت بازگشتی ادغام کن
+            if (isObject(sourceValue) && isObject(targetValue) && !Array.isArray(sourceValue)) {
+                output[key] = deepMerge(targetValue, sourceValue);
+            } else {
+                // در غیر این صورت (اگر نوع‌ها متفاوت باشن یا یکی از اونها شیء نباشه)،
+                // مقدار جدید (source) رو جایگزین قبلی کن.
+                output[key] = sourceValue;
+            }
+        });
+    }
+    return output;
+}
+```
+و مطمئن شو که تابع `isObject` هم به درستی آرایه‌ها رو چک می‌کنه:
+```javascript
+function isObject(item) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+}
+```
+
+لطفاً فقط فایل `configManager.js` رو با این دو تابع اصلاح شده بهم بده.

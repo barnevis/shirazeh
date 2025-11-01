@@ -54,11 +54,12 @@ function deepMerge(target, source) {
             const sourceValue = source[key];
             const targetValue = target[key];
 
-            if (isObject(sourceValue) && isObject(targetValue)) {
-                // If both values are objects, merge them recursively.
+            // اگر هر دو مقدار شیء باشن (و آرایه نباشن)، به صورت بازگشتی ادغام کن
+            if (isObject(sourceValue) && isObject(targetValue) && !Array.isArray(sourceValue)) {
                 output[key] = deepMerge(targetValue, sourceValue);
             } else {
-                // Otherwise, the source value (primitive or object) overwrites the target value.
+                // در غیر این صورت (اگر نوع‌ها متفاوت باشن یا یکی از اونها شیء نباشه)،
+                // مقدار جدید (source) رو جایگزین قبلی کن.
                 output[key] = sourceValue;
             }
         });
