@@ -16,6 +16,9 @@ const DEFAULT_CONFIG = {
         notFoundPage: 'config/404.md'
     },
     plugins: [],
+    markdown: {
+        parser: 'marked', // The default built-in parser
+    },
     toc: {
         enabled: false,
         maxDepth: 3,
@@ -45,14 +48,15 @@ function deepMerge(target, source) {
     const output = { ...target };
     if (isObject(target) && isObject(source)) {
         Object.keys(source).forEach(key => {
-            if (isObject(source[key])) {
-                if (!(key in target)) {
-                    Object.assign(output, { [key]: source[key] });
-                } else {
-                    output[key] = deepMerge(target[key], source[key]);
-                }
+            const sourceValue = source[key];
+            const targetValue = target[key];
+
+            if (isObject(sourceValue) && isObject(targetValue)) {
+                // If both values are objects, merge them recursively.
+                output[key] = deepMerge(targetValue, sourceValue);
             } else {
-                Object.assign(output, { [key]: source[key] });
+                // Otherwise, the source value (primitive or object) overwrites the target value.
+                output[key] = sourceValue;
             }
         });
     }

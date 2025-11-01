@@ -599,3 +599,45 @@ Failed to load plugin: src/plugins/hello.js TypeError: error loading dynamically
 
 ## پرامپت ۳۷
 خب حالا ازت می‌خوام برای این افزونه‌ای که نوشته در پوشه سندها در پوشه‌ای با نام `plugins` یک سند کامل بنویسی.
+
+## پرامپت ۳۸
+می‌خوام معماری شیرازه رو طوری بازسازی کنی که کاربر بتونه به راحتی از طریق فایل پیکربندی، مفسر مارک‌دان مورد نظرش رو انتخاب کنه. حتی باید بتونه مفسر مارک‌داون سفارشی خودش را اضافه کنه.
+
+برای پیاده‌سازی حتما به موارد زیر دقت کن:
+1. معماری ماژولار پروژه را حفظ کن.
+2. کاربر باید بتونه بدون تغییر در هسته شیرازه و به راحتی مفسر خودش را اضافه کنه.
+3. کاربر مفسر خودش را در پوشه `config/parser` قرار بده.
+
+## پرامپت ۳۹
+من برای بررسی افزودن مفسر مارک‌داون سفارشی کارهای زیر را انجام دادم:
+1.  یک فایل جدید به نام `myParser.js` در پوشه `config/parsers/` ساختم.
+2.  کد زیر رو داخلش کپی کردم:
+    ```javascript
+    // config/parsers/myParser.js
+    export default class MyParser {
+      parse(text) {
+        return `<h1>این یک مفسر سفارشی است!</h1><p>${text}</p>`;
+      }
+    }
+    ```
+3.  در `config.js`، بخش `markdown` رو به این صورت تغییر دادم:
+    ```javascript
+    markdown: {
+      parser: {
+        path: 'config/parsers/myParser.js'
+      }
+    },
+    ```
+4.  صفحه رو رفرش کردم.
+5.  **نتیجه مورد انتظار:** تمام صفحه‌ها باید با تیتر "این یک مفسر سفارشی است!" نمایش داده بشن.
+
+اما در کنسول خطای زیر نمایش داده می‌شه:
+
+```js
+Failed to initialize markdown parser: Error: Invalid parser configuration: {"0":"m","1":"a","2":"r","3":"k","4":"e","5":"d"}
+    init http://127.0.0.1:8000/src/core/parserManager.js:35
+    start http://127.0.0.1:8000/src/core/app.js:38
+    main http://127.0.0.1:8000/src/index.js:14
+parserManager.js:46:21
+Shirazeh encountered an error: Markdown parser could not be loaded. Please check your 'markdown.parser' configuration. Invalid parser configuration: {"0":"m","1":"a","2":"r","3":"k","4":"e","5":"d"}
+```

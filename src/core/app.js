@@ -3,11 +3,11 @@
  */
 import { getElement, renderLoading, renderError, renderContent } from './domRenderer.js';
 import { fetchContent } from './fileReader.js';
-import { parse } from './markdownParser.js';
 import { Router } from './router.js';
 import { Sidebar } from './sidebar.js';
 import { ThemeManager } from './themeManager.js';
 import { PluginManager } from './pluginManager.js';
+import { ParserManager } from './parserManager.js';
 
 /**
  * Represents the main Shirazeh application.
@@ -23,6 +23,7 @@ export class App {
         this.router = null;
         this.themeManager = new ThemeManager(this.config);
         this.pluginManager = new PluginManager(this); // Pass the app instance
+        this.parserManager = new ParserManager(this.config.markdown, this);
     }
 
     /**
@@ -32,6 +33,9 @@ export class App {
         try {
             this._createLayout(); // Create the DOM structure first
             this.themeManager.init(); // Initialize the theme manager
+            
+            // Initialize the parser before any content is loaded
+            await this.parserManager.init();
             
             // Load plugins using the new manager
             await this.pluginManager.loadPlugins(this.config.plugins);
@@ -45,6 +49,7 @@ export class App {
                     navElementId: this.config.selectors.sidebarNav,
                     toggleId: this.config.selectors.sidebarToggle,
                     sidebarFile: resolvedSidebarFile,
+                    parser: this.parserManager, // Pass parser manager
                 });
                 await this.sidebar.init();
             } else {
@@ -129,7 +134,7 @@ export class App {
 
             const resolvedPath = this.resolvePath(filePath);
             const markdown = await fetchContent(resolvedPath);
-            const html = parse(markdown);
+            const html = this.parserManager.parse(markdown);
             renderContent(this.contentElement, html);
 
             // Notify plugins that a new page has been loaded
@@ -159,7 +164,7 @@ export class App {
         try {
             const notFoundPagePath = this.resolvePath(this.config.files.notFoundPage);
             const markdown = await fetchContent(notFoundPagePath);
-            const html = parse(markdown);
+            const html = this.parserManager.parse(markdown);
             renderContent(this.contentElement, html);
 
             // Also notify plugins on 404 page load

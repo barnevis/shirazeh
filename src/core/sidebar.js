@@ -3,7 +3,6 @@
  */
 import { getElement } from './domRenderer.js';
 import { fetchContent } from './fileReader.js';
-import { parse } from './markdownParser.js';
 
 export class Sidebar {
     /**
@@ -11,11 +10,16 @@ export class Sidebar {
      * @param {string} config.navElementId - The ID of the navigation container element.
      * @param {string} config.toggleId - The ID of the toggle button.
      * @param {string} config.sidebarFile - The path to the sidebar markdown file.
+     * @param {object} config.parser - The application's parser manager instance.
      */
-    constructor({ navElementId, toggleId, sidebarFile }) {
+    constructor({ navElementId, toggleId, sidebarFile, parser }) {
         this.navElement = getElement(navElementId);
         this.toggle = getElement(toggleId);
         this.sidebarFile = sidebarFile;
+        this.parser = parser;
+        if (!this.parser) {
+            throw new Error('Sidebar requires a parser instance.');
+        }
     }
 
     /**
@@ -36,7 +40,7 @@ export class Sidebar {
     async load() {
         try {
             const markdown = await fetchContent(this.sidebarFile);
-            const html = parse(markdown);
+            const html = this.parser.parse(markdown);
             this.navElement.innerHTML = html;
             this._initializeNestedMenu();
             // Convert relative links to hash-based links

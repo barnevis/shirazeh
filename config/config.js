@@ -54,6 +54,26 @@ window.shirazeh = {
   ],
 
   /**
+   * @property {object} markdown
+   * تنظیمات مربوط به مفسر مارک‌داون.
+   */
+  markdown: {
+    /**
+     * @property {string|object} parser
+     * مفسر مارک‌داون مورد استفاده را مشخص می‌کند.
+     * - برای استفاده از مفسر داخلی، نام آن را به صورت رشته وارد کنید (مثلاً 'marked').
+     * - برای استفاده از مفسر سفارشی، یک آبجکت با کلید `path` حاوی مسیر فایل مفسر ارائه دهید.
+     * 
+     * مثال برای مفسر سفارشی:
+     * parser: {
+     *   path: 'config/parsers/myCustomParser.js',
+     *   options: { gfm: true } // گزینه‌هایی که به متد parse پاس داده می‌شوند
+     * }
+     */
+    parser: 'marked',
+  },
+
+  /**
    * @property {object} toc
    * تنظیمات مربوط به افزونه فهرست مطالب (Table of Contents).
    */

@@ -4,6 +4,7 @@
 - فنی
     - [معماری](/docs/architecture)
     - [افزونه‌نویسی](/docs/plugins)
+    - [مفسر مارک‌داون](/docs/parsers)
 - [آموزش](/docs/writingContent)
 - افزونه‌ها
     - [افزونه فهرست مطالب](/docs/plugins/toc)
