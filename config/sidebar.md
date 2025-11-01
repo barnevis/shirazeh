@@ -1,10 +1,11 @@
 - [صفحه اصلی](/)
-- [آغاز](/docs/gettingStarted)
+- [شروع سریع](/docs/gettingStarted)
 - [پیکربندی](/docs/configuration)
 - فنی
     - [معماری](/docs/architecture)
     - [افزونه‌نویسی](/docs/plugins)
     - [مفسر مارک‌داون](/docs/parsers)
+    - [تم](/docs/theming)
 - [آموزش](/docs/writingContent)
 - افزونه‌ها
     - [افزونه فهرست مطالب](/docs/plugins/toc)
