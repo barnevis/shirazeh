@@ -48,17 +48,18 @@ export default class TocPlugin {
         // Clean up from previous page
         this.container.innerHTML = '';
         this.observer.disconnect();
-        this.lastActiveLink = null; // Reset for the new page
+        this.lastActiveLink = null;
+        document.body.classList.remove('toc-active'); // Always reset on page load
 
         const headings = this._getHeadings(contentElement);
 
-        // Hide TOC if there are not enough headings
+        // Hide TOC and remove body class if there are not enough headings
         if (headings.length < 2) {
-            this.container.style.display = 'none';
             return;
         }
         
-        this.container.style.display = 'block';
+        // Add class to body to enable layout adjustments via CSS
+        document.body.classList.add('toc-active');
         this._buildToc(headings);
         this._initializeToggles(); // Add toggles after building
     }
@@ -236,5 +237,6 @@ export default class TocPlugin {
         if (this.container && this.container.parentNode) {
             this.container.parentNode.removeChild(this.container);
         }
+        document.body.classList.remove('toc-active');
     }
 }

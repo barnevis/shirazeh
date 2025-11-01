@@ -13,6 +13,12 @@
     border-right: 1px solid var(--border-color);
 }
 
+/* Base state: hidden until proven useful */
+.toc-container,
+body:not(.toc-active) .toc-container {
+    display: none;
+}
+
 .toc-title {
     font-size: 0.9rem;
     font-weight: 700;
@@ -103,10 +109,28 @@
     max-height: 1000px; /* A large enough value to show content */
 }
 
+/* Adjust layout only on large screens when TOC is active */
+@media (min-width: 1201px) {
+    /* Show TOC container only if it is active */
+    body.toc-active .toc-container {
+        display: block;
+    }
 
-/* Hide on smaller screens where there's not enough space */
-@media (max-width: 1200px) {
-    .toc-container {
-        display: none;
+    /* Add padding to the main content to avoid overlap with the fixed TOC */
+    body.toc-active .content {
+        /* This value ensures the content's inner box starts after the TOC,
+           while maintaining its original padding for visual consistency. */
+        padding-left: calc(240px + 20px + 1.5rem);
+    }
+    
+    /*
+     * ==========================================
+     *     ↓↓↓ The fix for content width ↓↓↓
+     * ==========================================
+     * Increase the max-width of the prose area when the TOC is visible.
+     * This makes the content column wider and better utilizes the available space.
+     */
+    body.toc-active .prose {
+        max-width: 960px;
     }
 }
