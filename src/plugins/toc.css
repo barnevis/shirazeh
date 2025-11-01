@@ -1,0 +1,75 @@
+/*
+ * Styles for the Table of Contents (TOC) plugin.
+ */
+.toc-container {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    width: 240px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    background-color: var(--sidebar-bg);
+    border-radius: 8px;
+    padding: 1rem;
+    z-index: 50;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.toc-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--text-color-strong);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.toc-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-container li {
+    margin-bottom: 0.25rem;
+}
+
+.toc-container a {
+    display: block;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+    
+    /* For long titles */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toc-container a:hover {
+    background-color: var(--border-color);
+}
+
+.toc-container a.active {
+    color: var(--primary-color);
+    background-color: hsla(var(--primary-color-hsl, 158, 64%, 67%), 0.1);
+    font-weight: 600;
+}
+
+/* Indentation for nested lists */
+.toc-container ul ul {
+    margin-top: 0.25rem;
+    padding-right: 1rem;
+}
+
+/* Hide on smaller screens where there's not enough space */
+@media (max-width: 1200px) {
+    .toc-container {
+        display: none;
+    }
+}

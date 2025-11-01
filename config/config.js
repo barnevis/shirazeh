@@ -50,8 +50,29 @@ window.shirazeh = {
    * مسیرها نسبت به `basePath` سنجیده می‌شوند.
    */
   plugins: [
-    'src/plugins/hello.js' // مثال: فعال‌سازی افزونه نمونه
+    'src/plugins/toc.js' // فعال‌سازی افزونه فهرست مطالب
   ],
+
+  /**
+   * @property {object} toc
+   * تنظیمات مربوط به افزونه فهرست مطالب (Table of Contents).
+   */
+  toc: {
+    /**
+     * @property {boolean} enabled - آیا افزونه فعال باشد؟
+     */
+    enabled: true,
+    
+    /**
+     * @property {number} maxDepth - حداکثر عمق تیترهایی که نمایش داده می‌شوند (مثلاً 3 یعنی h1, h2, h3).
+     */
+    maxDepth: 3,
+    
+    /**
+     * @property {string} title - عنوانی که بالای فهرست مطالب نمایش داده می‌شود.
+     */
+    title: 'در این صفحه',
+  },
 
   /**
    * @property {object} selectors

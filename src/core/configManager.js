@@ -16,6 +16,11 @@ const DEFAULT_CONFIG = {
         notFoundPage: 'config/404.md'
     },
     plugins: [],
+    toc: {
+        enabled: false,
+        maxDepth: 3,
+        title: 'فهرست مطالب',
+    },
     selectors: {
         root: '#app',
         content: '.content',
