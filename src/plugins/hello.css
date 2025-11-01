@@ -1,0 +1,8 @@
+/*
+ * Sample CSS file for HelloPlugin.
+ * This adds a noticeable border to the body to confirm the plugin loaded its styles.
+ */
+body {
+    /* Use a theme variable for consistency */
+    border: 4px solid var(--primary-color);
+}

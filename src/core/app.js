@@ -7,6 +7,7 @@ import { parse } from './markdownParser.js';
 import { Router } from './router.js';
 import { Sidebar } from './sidebar.js';
 import { ThemeManager } from './themeManager.js';
+import { PluginManager } from './pluginManager.js';
 
 /**
  * Represents the main Shirazeh application.
@@ -21,6 +22,7 @@ export class App {
         this.sidebar = null;
         this.router = null;
         this.themeManager = new ThemeManager(this.config);
+        this.pluginManager = new PluginManager(this); // Pass the app instance
     }
 
     /**
@@ -31,6 +33,9 @@ export class App {
             this._createLayout(); // Create the DOM structure first
             this.themeManager.init(); // Initialize the theme manager
             
+            // Load plugins using the new manager
+            await this.pluginManager.loadPlugins(this.config.plugins);
+
             this.contentElement = getElement(this.config.selectors.content);
             
             if (this.config.sidebar && this.config.sidebar.enabled) {
@@ -127,6 +132,9 @@ export class App {
             const html = parse(markdown);
             renderContent(this.contentElement, html);
 
+            // Notify plugins that a new page has been loaded
+            this.pluginManager.notify('onPageLoad', this.contentElement);
+
             if (this.sidebar) {
                 this.sidebar.setActiveLink(currentPath);
                 this.sidebar.closeMobileSidebar();
@@ -153,6 +161,9 @@ export class App {
             const markdown = await fetchContent(notFoundPagePath);
             const html = parse(markdown);
             renderContent(this.contentElement, html);
+
+            // Also notify plugins on 404 page load
+            this.pluginManager.notify('onPageLoad', this.contentElement);
 
             if (this.sidebar) {
                 this.sidebar.setActiveLink(null); // Clear active link

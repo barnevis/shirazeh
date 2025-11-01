@@ -45,6 +45,15 @@ window.shirazeh = {
   },
 
   /**
+   * @property {Array<string>} plugins
+   * لیستی از مسیر فایل‌های افزونه‌هایی که باید بارگذاری شوند.
+   * مسیرها نسبت به `basePath` سنجیده می‌شوند.
+   */
+  plugins: [
+    'src/plugins/hello.js' // مثال: فعال‌سازی افزونه نمونه
+  ],
+
+  /**
    * @property {object} selectors
    * شناسه‌های CSS برای المان‌های اصلی HTML. تنها در صورتی این مقادیر را تغییر دهید
    * که ساختار فایل `index.html` را ویرایش کرده باشید.

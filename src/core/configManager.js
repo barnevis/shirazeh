@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
         defaultPage: 'README.md',
         notFoundPage: 'config/404.md'
     },
+    plugins: [],
     selectors: {
         root: '#app',
         content: '.content',
