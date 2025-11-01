@@ -23,6 +23,9 @@ export default class TocPlugin {
         this.container.className = 'toc-container';
         document.body.appendChild(this.container);
 
+        // Keep track of the last active link for scrollspy
+        this.lastActiveLink = null;
+
         // Observer for scrollspy functionality
         this.observer = new IntersectionObserver(this._onObserve.bind(this), {
             // Trigger when a heading is in the top 25% of the viewport
@@ -45,6 +48,7 @@ export default class TocPlugin {
         // Clean up from previous page
         this.container.innerHTML = '';
         this.observer.disconnect();
+        this.lastActiveLink = null; // Reset for the new page
 
         const headings = this._getHeadings(contentElement);
 
@@ -56,6 +60,7 @@ export default class TocPlugin {
         
         this.container.style.display = 'block';
         this._buildToc(headings);
+        this._initializeToggles(); // Add toggles after building
     }
     
     /**
@@ -128,18 +133,63 @@ export default class TocPlugin {
     }
     
     /**
+     * Post-processes the TOC to add toggle buttons for collapsible sections.
+     * @private
+     */
+    _initializeToggles() {
+        this.container.querySelectorAll('li').forEach(li => {
+            const submenu = li.querySelector('ul');
+            if (submenu) {
+                li.classList.add('toc-item--parent', 'is-open'); // Set to open by default
+    
+                const wrapper = document.createElement('div');
+                wrapper.className = 'toc-item-wrapper';
+    
+                const toggleButton = document.createElement('button');
+                toggleButton.className = 'toc-toggle';
+                toggleButton.setAttribute('aria-label', 'باز و بسته کردن زیرمنو');
+                toggleButton.setAttribute('aria-expanded', 'true'); // Set to open by default
+                toggleButton.innerHTML = `<span class="toc-toggle-icon" aria-hidden="true">›</span>`;
+    
+                const link = li.querySelector('a');
+                if (link) {
+                    // Move link into wrapper and add toggle
+                    li.insertBefore(wrapper, link);
+                    wrapper.appendChild(toggleButton);
+                    wrapper.appendChild(link);
+                }
+            }
+        });
+    }
+
+    /**
      * Sets up global event listeners for the plugin.
      * @private
      */
     _setupEventListeners() {
-        // Smooth scroll for TOC links
         this.container.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
+            // Handle Toggling
+            const toggle = e.target.closest('.toc-toggle');
+            if (toggle) {
                 e.preventDefault();
-                const targetId = e.target.getAttribute('href');
+                const parentLi = toggle.closest('.toc-item--parent');
+                if (parentLi) {
+                    const isOpen = parentLi.classList.toggle('is-open');
+                    toggle.setAttribute('aria-expanded', isOpen.toString());
+                }
+                return;
+            }
+            
+            // Handle Smooth scroll for TOC links
+            const link = e.target.closest('a');
+            if (link) {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
                     targetElement.scrollIntoView({ behavior: 'smooth' });
+                    // Manually update hash.
+                    window.history.replaceState(null, '', targetId);
                 }
             }
         });
@@ -161,13 +211,17 @@ export default class TocPlugin {
             }
         }
 
-        // Deactivate all links first
-        this.container.querySelectorAll('a.active').forEach(a => a.classList.remove('active'));
-
+        // If a heading is in the observation zone, update the active link
         if (topEntry) {
-            const link = this.container.querySelector(`a[href="#${topEntry.target.id}"]`);
-            if (link) {
-                link.classList.add('active');
+            const activeLink = this.container.querySelector(`a[href="#${topEntry.target.id}"]`);
+            
+            // Only update if the active link has changed to prevent unnecessary DOM manipulation
+            if (activeLink && activeLink !== this.lastActiveLink) {
+                if (this.lastActiveLink) {
+                    this.lastActiveLink.classList.remove('active');
+                }
+                activeLink.classList.add('active');
+                this.lastActiveLink = activeLink;
             }
         }
     }
