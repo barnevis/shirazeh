@@ -124,16 +124,58 @@ export class App {
     }
 
     /**
+     * Rewrites relative links and image paths within remotely fetched markdown content.
+     * @param {string} markdown - The raw markdown content.
+     * @param {string} baseUrl - The base URL of the remote file.
+     * @returns {string} The rewritten markdown.
+     * @private
+     */
+    _rewriteRemoteContent(markdown, baseUrl) {
+        // This regex finds markdown links and images with relative paths.
+        // It avoids absolute paths (http, https, data:, #) and protocol-relative paths (//).
+        const relativeLinkRegex = /(!?\[.*?\])\(\s*(?!#|data:|https?:|\/\/)(.*?)\s*\)/g;
+
+        return markdown.replace(relativeLinkRegex, (match, prefix, relativeUrl) => {
+            try {
+                // Resolve the relative URL against the base URL of the markdown file.
+                const absoluteUrl = new URL(relativeUrl, baseUrl).href;
+
+                // For images, use the absolute URL directly.
+                if (prefix.startsWith('!')) {
+                    return `${prefix}(${absoluteUrl})`;
+                }
+
+                // For links, convert the absolute URL into our internal remote routing format.
+                const remoteRoute = `#/remote/${btoa(absoluteUrl)}`;
+                return `${prefix}(${remoteRoute})`;
+
+            } catch (e) {
+                console.warn(`Could not resolve relative URL "${relativeUrl}" against base "${baseUrl}".`);
+                return match; // Return the original match if URL resolution fails
+            }
+        });
+    }
+
+    /**
      * Loads and renders a page based on a file path.
-     * @param {string} filePath - The path to the markdown file to load.
-     * @param {string} currentPath - The current navigation path (e.g., '/guide').
+     * @param {string} filePath - The path to the markdown file to load (can be local or a full URL).
+     * @param {string} currentPath - The current navigation path (e.g., '/guide' or '/remote/...').
      */
     async loadPage(filePath, currentPath) {
         try {
             renderLoading(this.contentElement);
 
-            const resolvedPath = this.resolvePath(filePath);
-            const markdown = await fetchContent(resolvedPath);
+            const isRemote = filePath.startsWith('http');
+            const resolvedPath = isRemote ? filePath : this.resolvePath(filePath);
+            
+            // Pass the config to fetchContent for proxy handling
+            let markdown = await fetchContent(resolvedPath, this.config);
+
+            // If the content is from a remote source, rewrite its internal links
+            if (isRemote) {
+                markdown = this._rewriteRemoteContent(markdown, resolvedPath);
+            }
+            
             const html = this.parserManager.parse(markdown);
             renderContent(this.contentElement, html);
 
@@ -163,7 +205,7 @@ export class App {
         console.warn(`Content not found, attempting to load custom 404 page. Original error: ${originalError.message}`);
         try {
             const notFoundPagePath = this.resolvePath(this.config.files.notFoundPage);
-            const markdown = await fetchContent(notFoundPagePath);
+            const markdown = await fetchContent(notFoundPagePath, this.config); // Pass config here too
             const html = this.parserManager.parse(markdown);
             renderContent(this.contentElement, html);
 

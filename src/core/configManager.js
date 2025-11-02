@@ -38,6 +38,10 @@ const DEFAULT_CONFIG = {
     },
     theme: {
         default: 'auto', // 'light', 'dark', or 'auto'
+    },
+    remote: {
+        enabled: false,
+        corsProxyUrl: '' // e.g., 'https://api.allorigins.win/raw?url='
     }
 };
 

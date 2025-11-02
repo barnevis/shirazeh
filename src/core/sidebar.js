@@ -43,13 +43,19 @@ export class Sidebar {
             const html = this.parser.parse(markdown);
             this.navElement.innerHTML = html;
             this._initializeNestedMenu();
-            // Convert relative links to hash-based links
+            // Process links to work with the router
             this.navElement.querySelectorAll('a').forEach(a => {
                 const href = a.getAttribute('href');
-                if (href && !href.startsWith('http')) {
-                    // Handle root path separately
-                    const hash = href === '/' ? '#/' : `#${href}`;
-                    a.setAttribute('href', hash);
+                if (href) {
+                    if (href.startsWith('http')) {
+                        // For external URLs, convert to the special remote route
+                        const encodedUrl = btoa(href);
+                        a.setAttribute('href', `#/remote/${encodedUrl}`);
+                    } else if (!href.startsWith('#')) {
+                        // For internal links, use the standard hash route
+                        const hash = href === '/' ? '#/' : `#${href}`;
+                        a.setAttribute('href', hash);
+                    }
                 }
             });
         } catch (error) {

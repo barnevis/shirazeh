@@ -50,13 +50,26 @@ export class Router {
     /**
      * Converts a navigation path to a markdown file path.
      * @param {string} path - The navigation path.
-     * @returns {string} The corresponding file path.
+     * @returns {string} The corresponding file path (can be local or a full URL).
      */
     getFilePath(path) {
         if (path === '/') {
             return this.defaultPage;
         }
-        // Remove leading slash and add .md extension
+
+        // Check for the remote file route
+        if (path.startsWith('/remote/')) {
+            try {
+                // Decode the base64 URL and return it
+                const encodedUrl = path.substring('/remote/'.length);
+                return atob(encodedUrl);
+            } catch (e) {
+                console.error('Failed to decode remote URL from hash:', e);
+                return this.defaultPage; // Fallback to default page on decode error
+            }
+        }
+
+        // Remove leading slash and add .md extension for local files
         return `${path.substring(1)}.md`;
     }
 }
