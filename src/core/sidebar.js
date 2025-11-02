@@ -11,12 +11,14 @@ export class Sidebar {
      * @param {string} config.toggleId - The ID of the toggle button.
      * @param {string} config.sidebarFile - The path to the sidebar markdown file.
      * @param {object} config.parser - The application's parser manager instance.
+     * @param {object} config.config - The main application configuration.
      */
-    constructor({ navElementId, toggleId, sidebarFile, parser }) {
+    constructor({ navElementId, toggleId, sidebarFile, parser, config }) {
         this.navElement = getElement(navElementId);
         this.toggle = getElement(toggleId);
         this.sidebarFile = sidebarFile;
         this.parser = parser;
+        this.config = config || {};
         if (!this.parser) {
             throw new Error('Sidebar requires a parser instance.');
         }
@@ -43,19 +45,28 @@ export class Sidebar {
             const html = this.parser.parse(markdown);
             this.navElement.innerHTML = html;
             this._initializeNestedMenu();
+            
             // Process links to work with the router
             this.navElement.querySelectorAll('a').forEach(a => {
                 const href = a.getAttribute('href');
-                if (href) {
-                    if (href.startsWith('http')) {
-                        // For external URLs, convert to the special remote route
+                if (!href) return;
+
+                const isRemoteEnabled = this.config.remote && this.config.remote.enabled;
+
+                if (href.startsWith('http')) {
+                    if (isRemoteEnabled) {
+                        // If enabled, convert external URLs to the special remote route
                         const encodedUrl = btoa(href);
                         a.setAttribute('href', `#/remote/${encodedUrl}`);
-                    } else if (!href.startsWith('#')) {
-                        // For internal links, use the standard hash route
-                        const hash = href === '/' ? '#/' : `#${href}`;
-                        a.setAttribute('href', hash);
+                    } else {
+                        // If disabled, treat as a standard external link opening in a new tab
+                        a.setAttribute('target', '_blank');
+                        a.setAttribute('rel', 'noopener noreferrer');
                     }
+                } else if (!href.startsWith('#')) {
+                    // For internal links, use the standard hash route
+                    const hash = href === '/' ? '#/' : `#${href}`;
+                    a.setAttribute('href', hash);
                 }
             });
         } catch (error) {

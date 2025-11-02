@@ -50,6 +50,7 @@ export class App {
                     toggleId: this.config.selectors.sidebarToggle,
                     sidebarFile: resolvedSidebarFile,
                     parser: this.parserManager, // Pass parser manager
+                    config: this.config, // Pass the full config
                 });
                 await this.sidebar.init();
             } else {
@@ -166,6 +167,13 @@ export class App {
             renderLoading(this.contentElement);
 
             const isRemote = filePath.startsWith('http');
+
+            // Security Gate: Check if remote loading is enabled before proceeding.
+            if (isRemote && (!this.config.remote || !this.config.remote.enabled)) {
+                // If remote loading is disabled, treat it as a "not found" error.
+                throw new Error('Remote file loading is disabled, content not found.');
+            }
+            
             const resolvedPath = isRemote ? filePath : this.resolvePath(filePath);
             
             // Pass the config to fetchContent for proxy handling
