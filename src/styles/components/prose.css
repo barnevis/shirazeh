@@ -95,3 +95,11 @@
   border-radius: 0;
   color: inherit;
 }
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem; /* گرد کردن گوشه‌های تصویر */
+  display: block; /* برای امکان وسط‌چین کردن با مارجین */
+  margin: 2rem auto; /* فاصله عمودی و وسط‌چین کردن افقی */
+}
