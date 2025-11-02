@@ -84,9 +84,11 @@
   background-color: rgba(31, 41, 55, 0.7); /* bg-gray-800/70 */
   padding: 1rem;
   border-radius: 0.5rem;
-  font-size: 0.9em;
+  font-size: 1.3em;
   overflow-x: auto;
   margin-bottom: 1.5rem;
+  direction: ltr; /* اطمینان از جهت صحیح برای کد */
+  text-align: left; /* تراز کردن متن کد به چپ */
 }
 
 .prose pre code {

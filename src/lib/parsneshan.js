@@ -276,14 +276,33 @@ function poetry_plugin(md) {
 
 // پلاگین هوشمند برای تشخیص خودکار جهت متن
 function auto_direction_plugin(md) {
+  /**
+   * Detects the appropriate direction for a line of text based on its content.
+   * - If any Farsi/Arabic character is present, it's 'rtl'.
+   * - If it's English-only and short (<= 3 words), it's treated as 'rtl' (e.g., a title).
+   * - If it's English-only and long (> 3 words), it's treated as 'ltr' (e.g., a paragraph).
+   * - Defaults to 'rtl' for neutral or empty strings.
+   * @param {string} text - The text content to analyze.
+   * @returns {'rtl' | 'ltr'}
+   */
   function detectDirection(text) {
     const rtlRegex = /[\u0600-\u06FF]/;
-    const ltrRegex = /[a-zA-Z]/;
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      if (rtlRegex.test(char)) return 'rtl';
-      if (ltrRegex.test(char)) return 'ltr';
+    // Priority 1: If any RTL character exists, the whole block is RTL.
+    if (rtlRegex.test(text)) {
+      return 'rtl';
     }
+
+    const ltrRegex = /[a-zA-Z]/;
+    // Priority 2: If no RTL chars, check for LTR chars.
+    if (ltrRegex.test(text)) {
+      // Heuristic for LTR-only content.
+      const words = text.trim().split(/\s+/).length;
+      if (words > 3) { // Long enough to be considered a full LTR paragraph.
+        return 'ltr';
+      }
+    }
+    
+    // Default to RTL for short LTR-only lines (titles/labels) or neutral content.
     return 'rtl';
   }
 
