@@ -1,6 +1,8 @@
 /**
  * @file Handles client-side routing based on URL hash.
  */
+import { base64ToUtf8 } from './utils.js';
+
 export class Router {
     /**
      * @param {object} config - The router configuration.
@@ -50,7 +52,7 @@ export class Router {
     /**
      * Converts a navigation path to a markdown file path.
      * @param {string} path - The navigation path.
-     * @returns {string} The corresponding file path (can be local or a full URL).
+     * @returns {string} The corresponding file path (can be a local or a full URL).
      */
     getFilePath(path) {
         if (path === '/') {
@@ -62,7 +64,7 @@ export class Router {
             try {
                 // Decode the base64 URL and return it
                 const encodedUrl = path.substring('/remote/'.length);
-                return atob(encodedUrl);
+                return base64ToUtf8(encodedUrl);
             } catch (e) {
                 console.error('Failed to decode remote URL from hash:', e);
                 return this.defaultPage; // Fallback to default page on decode error

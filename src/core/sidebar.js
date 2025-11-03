@@ -3,6 +3,7 @@
  */
 import { getElement } from './domRenderer.js';
 import { fetchContent } from './fileReader.js';
+import { utf8ToBase64 } from './utils.js';
 
 export class Sidebar {
     /**
@@ -62,7 +63,7 @@ export class Sidebar {
                     mapKey = href; // The original URL is the key
                     if (isRemoteEnabled) {
                         // If enabled, convert external URLs to the special remote route
-                        const encodedUrl = btoa(href);
+                        const encodedUrl = utf8ToBase64(href);
                         a.setAttribute('href', `#/remote/${encodedUrl}`);
                     } else {
                         // If disabled, treat as a standard external link opening in a new tab
