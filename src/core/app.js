@@ -96,9 +96,17 @@ export class App {
 
             const sidebarHeader = document.createElement('div');
             sidebarHeader.className = 'sidebar-header';
+            
+            const appTitleLink = document.createElement('a');
+            appTitleLink.href = '#/';
+            appTitleLink.className = 'app-title-link';
+
             const appTitle = document.createElement('h2');
             appTitle.textContent = this.config.appName;
-            sidebarHeader.appendChild(appTitle);
+
+            appTitleLink.appendChild(appTitle);
+            sidebarHeader.appendChild(appTitleLink);
+
 
             const sidebarNav = document.createElement('nav');
             sidebarNav.className = 'sidebar-nav';

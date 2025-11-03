@@ -17,6 +17,15 @@
   flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
 }
 
+.sidebar-header .app-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.sidebar-header .app-title-link:hover {
+  text-decoration: none;
+}
+
 .sidebar-header h2 {
   margin: 0;
   font-size: 1.5rem;
