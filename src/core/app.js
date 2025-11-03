@@ -32,7 +32,7 @@ export class App {
     async start() {
         try {
             this._createLayout(); // Create the DOM structure first
-            this.themeManager.init(); // Initialize the theme manager
+            await this.themeManager.init(this); // Initialize the theme & font manager
             
             // Initialize the parser before any content is loaded
             await this.parserManager.init();

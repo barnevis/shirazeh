@@ -77,7 +77,7 @@
   border-radius: 0.25rem;
   padding: 0.25rem 0.5rem;
   font-size: 0.9em;
-  font-family: monospace;
+  font-family: var(--font-family-code);
 }
 
 .prose pre {
@@ -96,6 +96,7 @@
   background-color: transparent;
   border-radius: 0;
   color: inherit;
+  font-family: var(--font-family-code);
 }
 
 .prose img {

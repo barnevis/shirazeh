@@ -94,6 +94,61 @@ window.shirazeh = {
   },
 
   /**
+   * @property {object} font
+   * تنظیمات مربوط به فونت‌ها و تایپوگرافی.
+   */
+  font: {
+    /**
+     * @property {string} baseSize
+     * اندازه پایه فونت برای کل وب‌سایت. مثال: '16px', '1rem'.
+     */
+    baseSize: '16px',
+    
+    /**
+     * @property {number} lineHeight
+     * ضریب ارتفاع خط برای متن اصلی.
+     */
+    lineHeight: 1.7,
+
+    /**
+     * @property {object} custom
+     * تنظیمات مربوط به استفاده از فونت سفارشی.
+     */
+    custom: {
+      /**
+       * @property {boolean} enabled
+       * برای فعال‌سازی فونت سفارشی، این گزینه را `true` کنید.
+       * در این حالت، باید پوشه `config/fonts` را ساخته و فایل‌های فونت و CSS را در آن قرار دهید.
+       */
+      enabled: false,
+
+      /**
+       * @property {string} path
+       * مسیر فایل CSS که فونت‌های سفارشی شما را با `@font-face` تعریف می‌کند.
+       * مسیر نسبت به `basePath` سنجیده می‌شود.
+       * مثال: 'config/fonts/my-fonts.css'
+       */
+      path: 'config/fonts/fonts.css',
+
+      /**
+       * @property {string} family
+       * نام `font-family` اصلی که باید برای متن‌ها استفاده شود.
+       * این نام باید با نام تعریف شده در فایل CSS شما مطابقت داشته باشد.
+       * مثال: 'IRANSansX'
+       */
+      family: '',
+
+      /**
+       * @property {string} codeFamily
+       * نام `font-family` که باید برای بلوک‌های کد استفاده شود.
+       * در صورت خالی بودن، از فونت پیش‌فرض مرورگر استفاده می‌شود.
+       * مثال: 'Fira Code VF'
+       */
+      codeFamily: '',
+    }
+  },
+
+  /**
    * @property {object} toc
    * تنظیمات مربوط به افزونه فهرست مطالب (Table of Contents).
    */

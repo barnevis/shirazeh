@@ -22,6 +22,16 @@ const DEFAULT_CONFIG = {
             plugins: []
         }
     },
+    font: {
+      baseSize: '16px',
+      lineHeight: 1.7,
+      custom: {
+          enabled: false,
+          path: 'config/fonts/fonts.css',
+          family: '',
+          codeFamily: ''
+      }
+    },
     toc: {
         enabled: false,
         maxDepth: 3,
@@ -58,7 +68,7 @@ function deepMerge(target, source) {
             const sourceValue = source[key];
             const targetValue = target[key];
 
-            // اگر هر دو مقدار شیء باشن (و آرایه نباشن)، به صورت بازگشتی ادغام کن
+            // اگر هر دو مقدار شیء باشن (و آرایه نباشن)، به صورت بازشتی ادغام کن
             if (isObject(sourceValue) && isObject(targetValue) && !Array.isArray(sourceValue)) {
                 output[key] = deepMerge(targetValue, sourceValue);
             } else {

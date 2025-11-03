@@ -1,7 +1,6 @@
 /**
- * @file Manages the theme of the application (light/dark mode).
+ * @file Manages the theme and fonts of the application.
  */
-import { getElement } from './domRenderer.js';
 
 const STORAGE_KEY = 'shirazeh-theme';
 
@@ -10,14 +9,19 @@ export class ThemeManager {
      * @param {object} config - The application configuration object.
      */
     constructor(config) {
-        this.config = config.theme || {};
+        this.themeConfig = config.theme || {};
+        this.fontConfig = config.font || {};
+        this.app = null; // Will be set in init()
         this.toggleButton = null;
     }
 
     /**
-     * Initializes the theme manager.
+     * Initializes the theme and font manager.
+     * @param {App} appInstance - The main application instance.
      */
-    init() {
+    async init(appInstance) {
+        this.app = appInstance;
+        await this._initFonts();
         this._setupToggleButton();
         const initialTheme = this._getInitialTheme();
         this.applyTheme(initialTheme);
@@ -32,6 +36,83 @@ export class ThemeManager {
                 this.applyTheme(newTheme, false); // Don't save, it's still auto
             }
         });
+    }
+    
+    /**
+     * Initializes font settings, loading custom fonts if configured.
+     * @private
+     */
+    async _initFonts() {
+        const useCustomFont = this.fontConfig.custom && this.fontConfig.custom.enabled;
+
+        if (useCustomFont) {
+            try {
+                await this._loadCustomFont();
+                this._applyTypographyVariables(true); // Apply custom fonts
+            } catch (error) {
+                console.error(error.message);
+                console.warn('Falling back to default font.');
+                this._applyTypographyVariables(false); // Apply default on error
+            }
+        } else {
+            this._applyTypographyVariables(false); // Apply default fonts
+        }
+    }
+    
+    /**
+     * Loads the custom font CSS file specified in the config.
+     * @returns {Promise<void>} A promise that resolves on success or rejects on failure.
+     * @private
+     */
+    _loadCustomFont() {
+        return new Promise((resolve, reject) => {
+            const customFont = this.fontConfig.custom;
+            if (!customFont.path) {
+                return reject(new Error('Custom font is enabled, but no path is provided in config.'));
+            }
+            if (!customFont.family) {
+                return reject(new Error('Custom font is enabled, but no `family` is specified in config.'));
+            }
+            
+            const cssPath = this.app.resolvePath(customFont.path);
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            link.onload = () => resolve();
+            link.onerror = () => reject(new Error(`Failed to load custom font CSS file from: ${cssPath}`));
+            document.head.appendChild(link);
+        });
+    }
+
+    /**
+     * Injects a style tag into the head to define all typography CSS variables.
+     * @param {boolean} useCustom - Whether to use custom font families or the defaults.
+     * @private
+     */
+    _applyTypographyVariables(useCustom) {
+        const fontConfig = this.fontConfig;
+        
+        const mainFamily = useCustom
+            ? `"${fontConfig.custom.family}", sans-serif`
+            : "'Vazirmatn', sans-serif";
+            
+        const codeFamily = useCustom && fontConfig.custom.codeFamily
+            ? `"${fontConfig.custom.codeFamily}", monospace`
+            : 'monospace';
+
+        const styleContent = `
+:root {
+    --font-family-main: ${mainFamily};
+    --font-family-code: ${codeFamily};
+    --font-size-base: ${fontConfig.baseSize || '16px'};
+    --line-height-base: ${fontConfig.lineHeight || 1.7};
+}
+        `.trim();
+        
+        const styleEl = document.createElement('style');
+        styleEl.id = 'shirazeh-typography';
+        styleEl.textContent = styleContent;
+        document.head.appendChild(styleEl);
     }
 
     /**
@@ -60,7 +141,7 @@ export class ThemeManager {
      * @private
      */
     _getConfigDefault() {
-        return this.config.default || 'auto';
+        return this.themeConfig.default || 'auto';
     }
 
     /**
@@ -91,9 +172,6 @@ export class ThemeManager {
             </span>
         `;
         
-        // ===================================
-        //     ↓↓↓ فقط این خط تغییر کرده ↓↓↓
-        // ===================================
         document.body.appendChild(this.toggleButton);
 
         this.toggleButton.addEventListener('click', () => this.toggleTheme());
@@ -140,7 +218,7 @@ export class ThemeManager {
     _applyCustomColors() {
         const root = document.documentElement;
         // Exclude the 'default' key from being processed as a color
-        const { default: _, ...colors } = this.config; 
+        const { default: _, ...colors } = this.themeConfig; 
 
         for (const [key, value] of Object.entries(colors)) {
             // Convert camelCase key (e.g., primaryColor) to kebab-case CSS variable (e.g., --primary-color)

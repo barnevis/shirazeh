@@ -1,0 +1,29 @@
+/*
+ * ==========================================
+ *  متغیرها و استایل‌های تایپوگرافی
+ * ==========================================
+ * این فایل متغیرهای اصلی مربوط به فونت را
+ * تعریف کرده و به عناصر پایه اعمال می‌کند.
+ * این متغیرها توسط FontManager به صورت پویا مقداردهی می‌شوند.
+ */
+
+:root {
+  /* مقادیر پیش‌فرض که در صورت عدم موفقیت جاوااسکریپت اعمال می‌شوند */
+  --font-family-main: 'Vazirmatn', sans-serif;
+  --font-family-code: monospace;
+  --font-size-base: 16px;
+  --line-height-base: 1.7;
+}
+
+body {
+  font-family: var(--font-family-main);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: var(--font-family-code);
+}

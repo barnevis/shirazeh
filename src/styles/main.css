@@ -7,20 +7,24 @@
  * از ویرایش مستقیم این فایل خودداری کنید.
  */
 
-/* 1. متغیرهای ساختاری و مشترک */
+/* 1. فونت پیش‌فرض و آفلاین */
+@import url('fonts/vazirmatn.css');
+
+/* 2. متغیرهای ساختاری و مشترک */
 @import url('variables.css');
 
-/* 2. تعریف متغیرهای رنگی تم‌ها */
+/* 3. تعریف متغیرهای رنگی تم‌ها */
 @import url('themes/light.css');
 @import url('themes/dark.css');
 
-/* 3. استایل‌های پایه و ریست */
+/* 4. استایل‌های پایه و تایپوگرافی */
+@import url('typography.css');
 @import url('base.css');
 
-/* 4. چیدمان اصلی صفحه */
+/* 5. چیدمان اصلی صفحه */
 @import url('layout.css');
 
-/* 5. استایل‌های کامپوننت‌ها */
+/* 6. استایل‌های کامپوننت‌ها */
 @import url('components/sidebar.css');
 @import url('components/content.css');
 @import url('components/prose.css');
@@ -28,5 +32,5 @@
 @import url('components/messages.css');
 @import url('components/themeToggle.css');
 
-/* 6. استایل‌های واکنش‌گرا */
+/* 7. استایل‌های واکنش‌گرا */
 @import url('utilities/responsive.css');
