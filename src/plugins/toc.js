@@ -189,8 +189,11 @@ export default class TocPlugin {
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
                     targetElement.scrollIntoView({ behavior: 'smooth' });
-                    // Manually update hash.
-                    window.history.replaceState(null, '', targetId);
+                    // Manually update hash, preserving the current path
+                    const currentPath = this.app.router.getCurrentPath().split('#')[0];
+                    const newHash = `${currentPath}${targetId}`;
+                    // Use replaceState to update the URL without adding to history or reloading
+                    window.history.replaceState(null, '', `#${newHash}`);
                 }
             }
         });

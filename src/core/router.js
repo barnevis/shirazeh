@@ -37,7 +37,8 @@ export class Router {
      */
     handleRouteChange() {
         const path = this.getCurrentPath();
-        const filePath = this.getFilePath(path);
+        const pathOnly = path.split('#')[0] || '/';
+        const filePath = this.getFilePath(pathOnly);
         this.onNavigate(filePath, path);
     }
 

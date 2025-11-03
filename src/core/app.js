@@ -208,8 +208,21 @@ export class App {
             this.pluginManager.notify('onPageLoad', this.contentElement);
 
             if (this.sidebar) {
-                this.sidebar.setActiveLink(currentPath);
+                this.sidebar.setActiveLink(currentPath.split('#')[0]);
                 this.sidebar.closeMobileSidebar();
+            }
+
+            // Handle scrolling to anchor on initial load
+            const pathParts = currentPath.split('#');
+            if (pathParts.length > 1) {
+                const anchorId = pathParts[1];
+                // Use a short delay to ensure the DOM is fully painted
+                setTimeout(() => {
+                    const element = document.getElementById(anchorId);
+                    if (element) {
+                        element.scrollIntoView(); // Instant scroll
+                    }
+                }, 100);
             }
         } catch (error) {
             if (error.message.includes('not found')) {
