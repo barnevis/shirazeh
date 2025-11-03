@@ -21,7 +21,7 @@ export function getElement(selector) {
  * @param {HTMLElement} element - The element where the loading content will be placed.
  */
 export function renderLoading(element) {
-    element.className = ''; // Reset classes
+    element.className = 'content is-loading'; // Add a class for centering
     element.innerHTML = `<div class="loading-message"><p>در حال بارگذاری محتوا...</p></div>`;
 }
 
@@ -31,7 +31,7 @@ export function renderLoading(element) {
  * @param {string} errorMessage - The error message to display.
  */
 export function renderError(element, errorMessage) {
-    element.className = ''; // Reset classes
+    element.className = 'content is-error'; // Add a class for centering
     element.innerHTML = `
         <div class="error-message" role="alert">
             <strong>خطا! </strong>
