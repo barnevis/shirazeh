@@ -1,7 +1,7 @@
 /**
  * @file Manages the dynamic browser tab title.
  */
-import { base64ToUtf8 } from './utils.js';
+import { base64ToUtf8, normalizePath } from './utils.js';
 
 /**
  * Manages the generation and updating of the document's title.
@@ -47,13 +47,17 @@ export class TitleManager {
         const priority = this.config.sourcePriority || ['sidebarTitle', 'sidebarLabel', 'h1', 'filename', 'fallback'];
 
         // Determine the key for looking up sidebar metadata
-        let sidebarMapKey = currentPath;
+        let sidebarMapKey;
         if (currentPath.startsWith('/remote/')) {
             try {
+                // For remote links, the key is the full, decoded URL
                 sidebarMapKey = base64ToUtf8(currentPath.substring('/remote/'.length));
             } catch (e) {
                 sidebarMapKey = ''; // Invalid encoding, can't look up
             }
+        } else {
+            // For local links, the key is the normalized path
+            sidebarMapKey = normalizePath(currentPath);
         }
 
         const linkMeta = sidebar?.linkMap.get(sidebarMapKey);
@@ -72,14 +76,15 @@ export class TitleManager {
                     if (h1?.textContent) foundTitle = h1.textContent;
                     break;
                 case 'filename':
+                    const mdExtRegex = /\.(md|markdown|mkd|mdown)$/i;
                     if (currentPath === '/') {
-                        foundTitle = this.defaultPage.replace(/\.md$/, '');
+                        foundTitle = this.defaultPage.replace(mdExtRegex, '');
                     } else if (!filePath.startsWith('http')) {
-                        foundTitle = filePath.split('/').pop().replace(/\.md$/, '');
+                        foundTitle = filePath.split('/').pop().replace(mdExtRegex, '');
                     } else {
                         try {
                             const url = new URL(filePath);
-                            foundTitle = url.pathname.split('/').pop().replace(/\.md$/, '');
+                            foundTitle = url.pathname.split('/').pop().replace(mdExtRegex, '');
                         } catch (e) { /* ignore invalid URL */ }
                     }
                     break;

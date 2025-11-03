@@ -3,7 +3,7 @@
  */
 import { getElement } from './domRenderer.js';
 import { fetchContent } from './fileReader.js';
-import { utf8ToBase64 } from './utils.js';
+import { utf8ToBase64, normalizePath } from './utils.js';
 
 export class Sidebar {
     /**
@@ -71,9 +71,10 @@ export class Sidebar {
                         a.setAttribute('rel', 'noopener noreferrer');
                     }
                 } else if (!href.startsWith('#')) {
-                    // For internal links, use the standard hash route
-                    mapKey = href;
-                    const hash = href === '/' ? '#/' : `#${href}`;
+                    // For internal links, normalize the path for consistent lookups
+                    const normalized = normalizePath(href);
+                    mapKey = normalized;
+                    const hash = normalized === '/' ? '#/' : `#${normalized}`;
                     a.setAttribute('href', hash);
                 }
 

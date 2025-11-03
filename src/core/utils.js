@@ -47,3 +47,30 @@ export function base64ToUtf8(b64) {
         return atob(b64); 
     }
 }
+
+/**
+ * Normalizes a local navigation path for consistent lookups.
+ * - Strips query strings and hashes.
+ * - Ensures a leading slash.
+ * - Removes a trailing slash (unless it's the root path '/').
+ * @param {string} path The path string to normalize.
+ * @returns {string} The normalized path.
+ */
+export function normalizePath(path) {
+    if (!path) return '/';
+
+    // 1. Strip query string and hash
+    let cleanPath = path.split(/[?#]/)[0];
+
+    // 2. Remove trailing slash unless it's the root path
+    if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
+        cleanPath = cleanPath.slice(0, -1);
+    }
+    
+    // 3. Ensure leading slash
+    if (!cleanPath.startsWith('/')) {
+        cleanPath = '/' + cleanPath;
+    }
+
+    return cleanPath;
+}

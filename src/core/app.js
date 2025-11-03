@@ -9,6 +9,7 @@ import { ThemeManager } from './themeManager.js';
 import { PluginManager } from './pluginManager.js';
 import { ParserManager } from './parserManager.js';
 import { TitleManager } from './titleManager.js';
+import { utf8ToBase64 } from './utils.js';
 
 /**
  * Represents the main Shirazeh application.
@@ -149,7 +150,7 @@ export class App {
                 }
 
                 // For links, convert the absolute URL into our internal remote routing format.
-                const remoteRoute = `#/remote/${btoa(absoluteUrl)}`;
+                const remoteRoute = `#/remote/${utf8ToBase64(absoluteUrl)}`;
                 return `${prefix}(${remoteRoute})`;
 
             } catch (e) {
