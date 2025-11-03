@@ -50,6 +50,7 @@ export class ThemeManager {
         
         const generateDefaultFont = () => {
             const fontPath = this.app.resolvePath('src/lib/vendor/fonts/vazirmatn');
+            this._preloadDefaultFonts(fontPath); // Preload fonts for smoother rendering
             fontFaces = `
 @font-face {
   font-family: 'Vazirmatn';
@@ -85,6 +86,36 @@ export class ThemeManager {
         this._injectTypographyStyles(fontFaces, fontVariables);
     }
     
+    /**
+     * Preloads the default Vazirmatn font files to improve rendering performance.
+     * @param {string} fontPath - The resolved path to the font directory.
+     * @private
+     */
+    _preloadDefaultFonts(fontPath) {
+        const fontFiles = [
+            'Vazirmatn-Regular.woff2',
+            'Vazirmatn-Medium.woff2',
+            'Vazirmatn-Bold.woff2'
+        ];
+
+        fontFiles.forEach(file => {
+            const fullPath = `${fontPath}/${file}`;
+            
+            // Prevent duplicate preloads
+            if (document.querySelector(`link[rel="preload"][href="${fullPath}"]`)) {
+                return;
+            }
+
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.href = fullPath;
+            link.as = 'font';
+            link.type = 'font/woff2';
+            link.crossOrigin = ''; // Use anonymous crossorigin for fonts
+            document.head.appendChild(link);
+        });
+    }
+
     /**
      * Loads the custom font CSS file specified in the config.
      * @returns {Promise<void>} A promise that resolves on success or rejects on failure.
