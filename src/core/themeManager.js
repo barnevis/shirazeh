@@ -3,6 +3,7 @@
  */
 
 const STORAGE_KEY = 'shirazeh-theme';
+const TYPOGRAPHY_STYLE_ID = 'shirazeh-typography';
 
 export class ThemeManager {
     /**
@@ -21,7 +22,7 @@ export class ThemeManager {
      */
     async init(appInstance) {
         this.app = appInstance;
-        await this._initFonts();
+        await this._initFonts(); // This now handles everything font-related
         this._setupToggleButton();
         const initialTheme = this._getInitialTheme();
         this.applyTheme(initialTheme);
@@ -39,24 +40,49 @@ export class ThemeManager {
     }
     
     /**
-     * Initializes font settings, loading custom fonts if configured.
+     * Initializes font settings, loading custom or default fonts and applying all typography variables.
      * @private
      */
     async _initFonts() {
         const useCustomFont = this.fontConfig.custom && this.fontConfig.custom.enabled;
+        let fontFaces = '';
+        let fontVariables = {};
+        
+        const generateDefaultFont = () => {
+            const fontPath = this.app.resolvePath('src/lib/vendor/fonts/vazirmatn');
+            fontFaces = `
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('${fontPath}/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('${fontPath}/Vazirmatn-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('${fontPath}/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}`;
+            fontVariables = this._getFontVariablesConfig(false);
+        };
 
         if (useCustomFont) {
             try {
                 await this._loadCustomFont();
-                this._applyTypographyVariables(true); // Apply custom fonts
+                fontVariables = this._getFontVariablesConfig(true); // Apply custom fonts
             } catch (error) {
                 console.error(error.message);
                 console.warn('Falling back to default font.');
-                this._applyTypographyVariables(false); // Apply default on error
+                generateDefaultFont(); // Fallback to default on error
             }
         } else {
-            this._applyTypographyVariables(false); // Apply default fonts
+            generateDefaultFont(); // Apply default fonts
         }
+        
+        this._injectTypographyStyles(fontFaces, fontVariables);
     }
     
     /**
@@ -83,13 +109,14 @@ export class ThemeManager {
             document.head.appendChild(link);
         });
     }
-
+    
     /**
-     * Injects a style tag into the head to define all typography CSS variables.
+     * Gets an object with all typography CSS variables based on config.
      * @param {boolean} useCustom - Whether to use custom font families or the defaults.
+     * @returns {object} An object of CSS variables and their values.
      * @private
      */
-    _applyTypographyVariables(useCustom) {
+    _getFontVariablesConfig(useCustom) {
         const fontConfig = this.fontConfig;
         
         const mainFamily = useCustom
@@ -100,20 +127,44 @@ export class ThemeManager {
             ? `"${fontConfig.custom.codeFamily}", monospace`
             : 'monospace';
 
+        return {
+            '--font-family-main': mainFamily,
+            '--font-family-code': codeFamily,
+            '--font-size-base': fontConfig.baseSize || '16px',
+            '--line-height-base': fontConfig.lineHeight || 1.7,
+        };
+    }
+
+    /**
+     * Injects a single style tag into the head to define all typography styles.
+     * Updates the tag if it already exists.
+     * @param {string} fontFaces - The string containing all @font-face rules.
+     * @param {object} fontVariables - The object of CSS variables for typography.
+     * @private
+     */
+    _injectTypographyStyles(fontFaces, fontVariables) {
+        const variablesString = Object.entries(fontVariables)
+            .map(([key, value]) => `    ${key}: ${value};`)
+            .join('\n');
+
         const styleContent = `
+${fontFaces.trim()}
+
 :root {
-    --font-family-main: ${mainFamily};
-    --font-family-code: ${codeFamily};
-    --font-size-base: ${fontConfig.baseSize || '16px'};
-    --line-height-base: ${fontConfig.lineHeight || 1.7};
+${variablesString}
 }
         `.trim();
         
-        const styleEl = document.createElement('style');
-        styleEl.id = 'shirazeh-typography';
+        let styleEl = document.getElementById(TYPOGRAPHY_STYLE_ID);
+        if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = TYPOGRAPHY_STYLE_ID;
+            document.head.appendChild(styleEl);
+        }
+        
         styleEl.textContent = styleContent;
-        document.head.appendChild(styleEl);
     }
+
 
     /**
      * Determines the initial theme based on storage, config, and system preference.

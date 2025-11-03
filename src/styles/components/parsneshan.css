@@ -8,7 +8,7 @@
  */
 
 /* --- استایل‌های جعبه‌های توضیحی (Admonitions) --- */
-.admonition {
+.prose .admonition {
   padding: 1.25rem;
   margin: 1.5rem 0;
   border-right: 5px solid; /* رنگ از طریق کلاس‌های زیر تعیین می‌شود */
@@ -16,63 +16,63 @@
   background-color: var(--sidebar-bg); /* یک پس‌زمینه ملایم */
 }
 
-.admonition-title {
+.prose .admonition-title {
   font-weight: bold;
   margin-top: 0;
   margin-bottom: 0.75rem;
 }
 
 /* رنگ‌بندی‌های مختلف با استفاده از متغیرهای تم */
-.admonition.note { border-color: var(--secondary-color); }
-.admonition.note .admonition-title { color: var(--secondary-color); }
+.prose .admonition.note { border-color: var(--secondary-color); }
+.prose .admonition.note .admonition-title { color: var(--secondary-color); }
 
-.admonition.tip { border-color: var(--primary-color); }
-.admonition.tip .admonition-title { color: var(--primary-color); }
+.prose .admonition.tip { border-color: var(--primary-color); }
+.prose .admonition.tip .admonition-title { color: var(--primary-color); }
 
-.admonition.warning { border-color: #f59e0b; } /* Amber 500 */
-.admonition.warning .admonition-title { color: #f59e0b; }
-[data-theme="dark"] .admonition.warning { border-color: #fcd34d; } /* Amber 300 */
-[data-theme="dark"] .admonition.warning .admonition-title { color: #fcd34d; }
+.prose .admonition.warning { border-color: #f59e0b; } /* Amber 500 */
+.prose .admonition.warning .admonition-title { color: #f59e0b; }
+[data-theme="dark"] .prose .admonition.warning { border-color: #fcd34d; } /* Amber 300 */
+[data-theme="dark"] .prose .admonition.warning .admonition-title { color: #fcd34d; }
 
-.admonition.important { border-color: #8b5cf6; } /* Violet 500 */
-.admonition.important .admonition-title { color: #8b5cf6; }
-[data-theme="dark"] .admonition.important { border-color: #a78bfa; } /* Violet 400 */
-[data-theme="dark"] .admonition.important .admonition-title { color: #a78bfa; }
+.prose .admonition.important { border-color: #8b5cf6; } /* Violet 500 */
+.prose .admonition.important .admonition-title { color: #8b5cf6; }
+[data-theme="dark"] .prose .admonition.important { border-color: #a78bfa; } /* Violet 400 */
+[data-theme="dark"] .prose .admonition.important .admonition-title { color: #a78bfa; }
 
-.admonition.caution { border-color: var(--error-border); }
-.admonition.caution .admonition-title { color: var(--error-text); }
+.prose .admonition.caution { border-color: var(--error-border); }
+.prose .admonition.caution .admonition-title { color: var(--error-text); }
 
 
 /* --- استایل‌های بازبینه‌ها (Task Lists) --- */
-.task-list-item {
+.prose .task-list-item {
   list-style-type: none; /* حذف دایره پیش‌فرض لیست */
 }
 
-.task-list-item-checkbox {
+.prose .task-list-item-checkbox {
   margin-left: 0.5em; /* فاصله چک‌باکس از متن */
   vertical-align: middle;
 }
 
-.task-list-item input:checked + span {
+.prose .task-list-item input:checked + span {
   text-decoration: line-through;
   opacity: 0.7;
 }
 
 
 /* --- استایل‌های نمایش شعر --- */
-.poetry-container {
+.prose .poetry-container {
   margin: 2em auto;
   padding: 1em 0;
 }
 
-.poetry-stanza {
+.prose .poetry-stanza {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2em; /* فاصله بین دو مصرع */
   margin-bottom: 1.2em;
 }
 
-.poetry-verse {
+.prose .poetry-verse {
   margin: 0;
   line-height: 1.8;
   padding: 0 1em;
@@ -81,14 +81,14 @@
 
 /* برای موبایل: مصرع‌ها زیر هم قرار بگیرند */
 @media (max-width: 600px) {
-  .poetry-stanza {
+  .prose .poetry-stanza {
     grid-template-columns: 1fr;
     gap: 0.5em;
   }
 }
 
 /* --- استایل متن هایلایت شده --- */
-mark {
+.prose mark {
   background-color: hsla(var(--primary-color-hsl, 158, 64%, 67%), 0.3);
   padding: 0.1em 0.3em;
   border-radius: 3px;

@@ -8,22 +8,12 @@
  */
 
 :root {
-  /* مقادیر پیش‌فرض که در صورت عدم موفقیت جاوااسکریپت اعمال می‌شوند */
-  --font-family-main: 'Vazirmatn', sans-serif;
+  /* 
+   * مقادیر پیش‌فرض که در صورت عدم موفقیت جاوااسکریپت اعمال می‌شوند.
+   * مقادیر واقعی توسط ThemeManager.js در زمان اجرا تزریق می‌شوند.
+   */
+  --font-family-main: sans-serif;
   --font-family-code: monospace;
   --font-size-base: 16px;
   --line-height-base: 1.7;
-}
-
-body {
-  font-family: var(--font-family-main);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-base);
-}
-
-pre,
-code,
-kbd,
-samp {
-  font-family: var(--font-family-code);
 }
