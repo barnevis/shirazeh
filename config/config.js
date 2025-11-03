@@ -168,6 +168,54 @@ window.shirazeh = {
      */
     title: 'در این صفحه',
   },
+  
+  /**
+   * @property {object} title
+   * تنظیمات مربوط به عنوان تب مرورگر (تگ <title>).
+   */
+  title: {
+    /**
+     * @property {boolean} enabled
+     * فعال یا غیرفعال کردن مدیریت هوشمند عنوان.
+     */
+    enabled: true,
+    
+    /**
+     * @property {boolean} includeWiki
+     * آیا نام ویکی (appName) در عنوان گنجانده شود؟
+     */
+    includeWiki: true,
+    
+    /**
+     * @property {string} order
+     * ترتیب نمایش نام ویکی و نام صفحه.
+     * مقادیر ممکن:
+     *  - 'page-first': 'نام صفحه | نام ویکی' (پیش‌فرض)
+     *  - 'wiki-first': 'نام ویکی | نام صفحه'
+     *  - 'page-only': 'نام صفحه'
+     */
+    order: 'page-first',
+    
+    /**
+     * @property {string} separator
+     * نویسه جداکننده بین نام صفحه و نام ویکی.
+     */
+    separator: ' | ',
+    
+    /**
+     * @property {string} fallback
+     * متنی که در صورت پیدا نشدن هیچ عنوانی نمایش داده می‌شود.
+     */
+    fallback: 'بدون عنوان',
+    
+    /**
+     * @property {Array<string>} sourcePriority
+     * اولویت منابع برای استخراج عنوان صفحه. اولین منبع معتبر استفاده می‌شود.
+     * مقادیر ممکن: 'sidebarTitle', 'sidebarLabel', 'h1', 'filename', 'fallback'.
+     * ویرایش این بخش توصیه نمی‌شود مگر اینکه بدانید چه می‌کنید.
+     */
+    // sourcePriority: ['sidebarTitle', 'sidebarLabel', 'h1', 'filename', 'fallback'],
+  },
 
   /**
    * @property {object} selectors

@@ -18,6 +18,7 @@ export class App {
      */
     constructor(config) {
         this.config = config;
+        this.titleConfig = config.title || {};
         this.contentElement = null;
         this.sidebar = null;
         this.router = null;
@@ -186,6 +187,8 @@ export class App {
             
             const html = this.parserManager.parse(markdown);
             renderContent(this.contentElement, html);
+            
+            this._updateTitle();
 
             // Notify plugins that a new page has been loaded
             this.pluginManager.notify('onPageLoad', this.contentElement);
@@ -216,6 +219,8 @@ export class App {
             const markdown = await fetchContent(notFoundPagePath, this.config); // Pass config here too
             const html = this.parserManager.parse(markdown);
             renderContent(this.contentElement, html);
+            
+            this._updateTitle();
 
             // Also notify plugins on 404 page load
             this.pluginManager.notify('onPageLoad', this.contentElement);
@@ -228,6 +233,91 @@ export class App {
             console.error(`Failed to load custom 404 page: ${notFoundError.message}. Falling back to default error display.`);
             this.handleError(originalError);
         }
+    }
+
+    /**
+     * Updates the document title based on the current page and configuration.
+     * @private
+     */
+    _updateTitle() {
+        if (!this.titleConfig.enabled) {
+            return;
+        }
+
+        const { contentElement, router, sidebar, config } = this;
+        const currentPath = router.getCurrentPath();
+        const filePath = router.getFilePath(currentPath);
+
+        let pageTitle = '';
+        const priority = this.titleConfig.sourcePriority || ['sidebarTitle', 'sidebarLabel', 'h1', 'filename', 'fallback'];
+
+        // 1. Determine the source key for the sidebar map
+        let sidebarMapKey = currentPath;
+        if (currentPath.startsWith('/remote/')) {
+            try {
+                sidebarMapKey = atob(currentPath.substring('/remote/'.length));
+            } catch (e) {
+                sidebarMapKey = ''; // Invalid encoding, can't look up
+            }
+        }
+
+        const linkMeta = sidebar?.linkMap.get(sidebarMapKey);
+
+        for (const source of priority) {
+            let foundTitle = '';
+            switch (source) {
+                case 'sidebarTitle':
+                    if (linkMeta?.title) foundTitle = linkMeta.title;
+                    break;
+                case 'sidebarLabel':
+                    if (linkMeta?.label) foundTitle = linkMeta.label;
+                    break;
+                case 'h1':
+                    const h1 = contentElement?.querySelector('h1');
+                    if (h1?.textContent) foundTitle = h1.textContent;
+                    break;
+                case 'filename':
+                    if (currentPath === '/') {
+                        foundTitle = config.files.defaultPage.replace(/\.md$/, '');
+                    } else if (!filePath.startsWith('http')) {
+                        foundTitle = filePath.split('/').pop().replace(/\.md$/, '');
+                    } else {
+                        try {
+                            const url = new URL(filePath);
+                            foundTitle = url.pathname.split('/').pop().replace(/\.md$/, '');
+                        } catch (e) { /* ignore invalid URL */ }
+                    }
+                    break;
+                case 'fallback':
+                    foundTitle = this.titleConfig.fallback || 'بدون عنوان';
+                    break;
+            }
+
+            if (foundTitle) {
+                pageTitle = foundTitle.trim();
+                break; // Stop at the first successful source
+            }
+        }
+
+        // 2. Format the final title
+        let finalTitle = pageTitle;
+        const { includeWiki, order, separator } = this.titleConfig;
+        const appName = config.appName;
+
+        if (includeWiki && order !== 'page-only') {
+            if (order === 'wiki-first') {
+                finalTitle = `${appName}${separator}${pageTitle}`;
+            } else { // 'page-first' is the default
+                finalTitle = `${pageTitle}${separator}${appName}`;
+            }
+        }
+
+        // 3. Trim and set the title
+        if (finalTitle.length > 80) {
+            finalTitle = finalTitle.substring(0, 77) + '...';
+        }
+
+        document.title = finalTitle;
     }
 
     /**

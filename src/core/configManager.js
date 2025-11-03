@@ -37,6 +37,14 @@ const DEFAULT_CONFIG = {
         maxDepth: 3,
         title: 'فهرست مطالب',
     },
+    title: {
+        enabled: true,
+        includeWiki: true,
+        order: 'page-first', // 'wiki-first', 'page-first', 'page-only'
+        separator: ' | ',
+        sourcePriority: ['sidebarTitle', 'sidebarLabel', 'h1', 'filename', 'fallback'],
+        fallback: 'بدون عنوان'
+    },
     selectors: {
         root: '#app',
         content: '.content',

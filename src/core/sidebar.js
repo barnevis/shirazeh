@@ -19,6 +19,7 @@ export class Sidebar {
         this.sidebarFile = sidebarFile;
         this.parser = parser;
         this.config = config || {};
+        this.linkMap = new Map();
         if (!this.parser) {
             throw new Error('Sidebar requires a parser instance.');
         }
@@ -46,14 +47,19 @@ export class Sidebar {
             this.navElement.innerHTML = html;
             this._initializeNestedMenu();
             
-            // Process links to work with the router
+            // Process links to work with the router and build the metadata map
+            this.linkMap.clear();
             this.navElement.querySelectorAll('a').forEach(a => {
                 const href = a.getAttribute('href');
                 if (!href) return;
 
+                const label = a.textContent.trim();
+                const titleAttr = a.getAttribute('title')?.trim() || '';
+                let mapKey = '';
                 const isRemoteEnabled = this.config.remote && this.config.remote.enabled;
 
                 if (href.startsWith('http')) {
+                    mapKey = href; // The original URL is the key
                     if (isRemoteEnabled) {
                         // If enabled, convert external URLs to the special remote route
                         const encodedUrl = btoa(href);
@@ -65,8 +71,13 @@ export class Sidebar {
                     }
                 } else if (!href.startsWith('#')) {
                     // For internal links, use the standard hash route
+                    mapKey = href;
                     const hash = href === '/' ? '#/' : `#${href}`;
                     a.setAttribute('href', hash);
+                }
+
+                if (mapKey && (label || titleAttr)) {
+                    this.linkMap.set(mapKey, { label, title: titleAttr });
                 }
             });
         } catch (error) {
