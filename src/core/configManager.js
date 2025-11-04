@@ -9,6 +9,12 @@
  */
 const DEFAULT_CONFIG = {
     appName: 'شیرازه',
+    logo: {
+        enabled: false,
+        src: '',
+        size: '32px',
+        appNameFontSize: '1.5rem',
+    },
     basePath: '.',
     files: {
         sidebar: 'config/sidebar.md',

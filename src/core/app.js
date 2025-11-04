@@ -35,6 +35,7 @@ export class App {
     async start() {
         try {
             this._createLayout(); // Create the DOM structure first
+            this._setupFavicon(); // Set the favicon based on config
             await this.themeManager.init(this); // Initialize the theme & font manager
             
             // Initialize the parser before any content is loaded
@@ -101,8 +102,22 @@ export class App {
             appTitleLink.href = '#/';
             appTitleLink.className = 'app-title-link';
 
+            const hasLogo = this.config.logo && this.config.logo.enabled && this.config.logo.src;
+            if (hasLogo) {
+                const logoImg = document.createElement('img');
+                logoImg.src = this.resolvePath(this.config.logo.src);
+                logoImg.alt = `${this.config.appName} Logo`;
+                logoImg.className = 'app-logo';
+                logoImg.style.width = this.config.logo.size || '32px';
+                logoImg.style.height = this.config.logo.size || '32px';
+                appTitleLink.appendChild(logoImg);
+            }
+
             const appTitle = document.createElement('h2');
             appTitle.textContent = this.config.appName;
+            if (hasLogo) {
+                appTitle.style.fontSize = this.config.logo.appNameFontSize || '1.5rem';
+            }
 
             appTitleLink.appendChild(appTitle);
             sidebarHeader.appendChild(appTitleLink);
@@ -125,6 +140,27 @@ export class App {
         
         appContainer.appendChild(content);
         rootElement.appendChild(appContainer);
+    }
+    
+    /**
+     * Updates the favicon if a logo is configured.
+     * @private
+     */
+    _setupFavicon() {
+        if (!this.config.logo || !this.config.logo.enabled || !this.config.logo.src) {
+            return;
+        }
+        const logoPath = this.resolvePath(this.config.logo.src);
+
+        const iconLink = document.getElementById('favicon-icon');
+        if (iconLink) {
+            iconLink.href = logoPath;
+        }
+
+        const shortcutIconLink = document.getElementById('favicon-shortcut-icon');
+        if (shortcutIconLink) {
+            shortcutIconLink.href = logoPath;
+        }
     }
     
     /**

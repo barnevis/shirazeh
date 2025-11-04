@@ -14,6 +14,34 @@ window.shirazeh = {
    * نام ویکی شما که در هدر سایدبار نمایش داده می‌شود.
    */
   appName: 'شیرازه',
+
+  /**
+   * @property {object} logo
+   * تنظیمات مربوط به لوگوی ویکی.
+   */
+  logo: {
+    /**
+     * @property {boolean} enabled - آیا نمایش لوگو فعال باشد؟
+     */
+    enabled: true,
+    
+    /**
+     * @property {string} src - مسیر فایل لوگو.
+     * این لوگو هم در هدر و هم به عنوان favicon استفاده می‌شود.
+     * مثال: 'assets/icon/shirazehLogo.png'
+     */
+    src: '/assets/icon/shirazehLogo.png',
+    
+    /**
+     * @property {string} size - اندازه لوگو در هدر (عرض و ارتفاع).
+     */
+    size: '32px',
+    
+    /**
+     * @property {string} appNameFontSize - اندازه فونت نام ویکی در کنار لوگو.
+     */
+    appNameFontSize: '1.5rem',
+  },
   
   /**
    * @property {string} basePath
