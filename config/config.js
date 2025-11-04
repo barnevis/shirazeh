@@ -27,7 +27,7 @@ window.shirazeh = {
     
     /**
      * @property {string} src - مسیر فایل لوگو.
-     * این لوگو هم در هدر و هم به عنوان favicon استفاده می‌شود.
+     * این لوگو در هدر سایدبار نمایش داده می‌شود.
      * مثال: 'assets/icon/shirazehLogo.png'
      */
     src: '/assets/icon/shirazehLogo.png',
@@ -41,6 +41,31 @@ window.shirazeh = {
      * @property {string} appNameFontSize - اندازه فونت نام ویکی در کنار لوگو.
      */
     appNameFontSize: '1.5rem',
+  },
+
+  /**
+   * @property {object} favicon
+   * تنظیمات مربوط به آیکون تب مرورگر (Favicon).
+   */
+  favicon: {
+    /**
+     * @property {boolean} enabled - آیا مدیریت Favicon فعال باشد؟
+     */
+    enabled: true,
+    
+    /**
+     * @property {string} src - مسیر فایل Favicon.
+     * اگر این فیلد خالی باشد، از مقدار `logo.src` استفاده می‌شود.
+     * مثال: 'assets/icon/favicon.ico'
+     */
+    src: '',
+    
+    /**
+     * @property {string} type - نوع MIME فایل Favicon.
+     * مقدار 'auto' به صورت خودکار نوع فایل را از روی پسوند آن تشخیص می‌دهد.
+     * مثال: 'image/png', 'image/svg+xml', 'image/x-icon', 'auto'
+     */
+    type: 'auto',
   },
   
   /**

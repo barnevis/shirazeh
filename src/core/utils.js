@@ -74,3 +74,29 @@ export function normalizePath(path) {
 
     return cleanPath;
 }
+
+/**
+ * Determines the MIME type of a file based on its extension.
+ * @param {string} path The file path or URL.
+ * @returns {string} The corresponding MIME type, or a default if not found.
+ */
+export function getMimeTypeFromPath(path) {
+    const extension = path.split('.').pop().toLowerCase();
+    switch (extension) {
+        case 'png':
+            return 'image/png';
+        case 'ico':
+            return 'image/x-icon';
+        case 'svg':
+            return 'image/svg+xml';
+        case 'jpg':
+        case 'jpeg':
+            return 'image/jpeg';
+        case 'gif':
+            return 'image/gif';
+        default:
+            // A reasonable fallback for unknown image types.
+            // Browsers are often smart enough to handle it.
+            return 'image/png';
+    }
+}

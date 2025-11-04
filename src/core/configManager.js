@@ -15,6 +15,11 @@ const DEFAULT_CONFIG = {
         size: '32px',
         appNameFontSize: '1.5rem',
     },
+    favicon: {
+        enabled: true,
+        src: '', // If empty, it will try to use the logo.src
+        type: 'auto'
+    },
     basePath: '.',
     files: {
         sidebar: 'config/sidebar.md',

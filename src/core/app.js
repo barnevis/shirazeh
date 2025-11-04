@@ -9,7 +9,7 @@ import { ThemeManager } from './themeManager.js';
 import { PluginManager } from './pluginManager.js';
 import { ParserManager } from './parserManager.js';
 import { TitleManager } from './titleManager.js';
-import { utf8ToBase64 } from './utils.js';
+import { utf8ToBase64, getMimeTypeFromPath } from './utils.js';
 
 /**
  * Represents the main Shirazeh application.
@@ -143,24 +143,54 @@ export class App {
     }
     
     /**
-     * Updates the favicon if a logo is configured.
+     * Dynamically creates and sets the favicon based on the configuration.
      * @private
      */
     _setupFavicon() {
-        if (!this.config.logo || !this.config.logo.enabled || !this.config.logo.src) {
+        const faviconConfig = this.config.favicon;
+        if (!faviconConfig || !faviconConfig.enabled) {
             return;
         }
-        const logoPath = this.resolvePath(this.config.logo.src);
 
-        const iconLink = document.getElementById('favicon-icon');
-        if (iconLink) {
-            iconLink.href = logoPath;
+        // Determine the source path: favicon.src has priority, fallback to logo.src
+        let faviconSrc = faviconConfig.src;
+        if (!faviconSrc) {
+            const logoConfig = this.config.logo;
+            if (logoConfig && logoConfig.enabled && logoConfig.src) {
+                faviconSrc = logoConfig.src;
+            }
         }
 
-        const shortcutIconLink = document.getElementById('favicon-shortcut-icon');
-        if (shortcutIconLink) {
-            shortcutIconLink.href = logoPath;
+        // If no source is found, do nothing.
+        if (!faviconSrc) {
+            return;
         }
+        
+        const faviconPath = this.resolvePath(faviconSrc);
+        
+        let faviconType;
+        if (faviconConfig.type === 'auto') {
+            faviconType = getMimeTypeFromPath(faviconPath);
+        } else {
+            faviconType = faviconConfig.type || 'image/png';
+        }
+
+        // Remove any existing favicon links to avoid duplicates
+        document.querySelectorAll("link[rel*='icon']").forEach(el => el.remove());
+
+        // Create and append the new favicon link
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.type = faviconType;
+        link.href = faviconPath;
+        document.head.appendChild(link);
+
+        // Add a shortcut icon link for older browsers
+        const shortcutLink = document.createElement('link');
+        shortcutLink.rel = 'shortcut icon';
+        shortcutLink.type = faviconType;
+        shortcutLink.href = faviconPath;
+        document.head.appendChild(shortcutLink);
     }
     
     /**
