@@ -11,8 +11,9 @@
 window.shirazeh = {
   // ... سایر تنظیمات
   plugins: [
-    'src/plugins/toc.js', // افزونه فهرست مطالب
-    'src/plugins/githubCorner/githubCorner.js', // افزونه لینک گیت‌هاب
+    'src/plugins/toc.js',
+    'src/plugins/githubCorner/githubCorner.js',
+    'src/plugins/codeCopy/codeCopy.js',
     'src/plugins/my-custom-plugin.js' // افزونه جدید شما
   ],
   // ...
@@ -29,7 +30,10 @@ window.shirazeh = {
 این افزونه به صورت خودکار یک پنل ناوبری شناور در سمت چپ صفحه برای مقالات طولانی ایجاد می‌کند. برای اطلاعات بیشتر به **[مستندات افزونه TOC](./plugins/toc.md)** مراجعه کنید.
 
 ### افزونه لینک گیت‌هاب (GitHub Corner)
-این افزونه یک لینک زیبا به شکل "روبان" در گوشه صفحه برای ارجاع به مخزن گیت‌هاب پروژه شما اضافه می‌کند. برای اطلاعات کامل و گزینه‌های پیکربندی، به **[مستندات افزونه GitHub Corner](./plugins/githubCorner.md)** مراجعه کنید.
+این افزونه یک لینک زیبا به شکل "روبان" در گوشه صفحه برای ارجاع به مخزن گیت‌هاب پروژه شما اضافه می‌کند. برای اطلاعات کامل به **[مستندات افزونه GitHub Corner](./plugins/githubCorner.md)** مراجعه کنید.
+
+### افزونه رونوشت کد (Code Copy)
+این افزونه یک دکمه «رونوشت» به تمام بلوک‌های کد اضافه می‌کند تا کاربران بتوانند به راحتی قطعه کدها را در کلیپ‌بورد خود رونوشت کنند. برای اطلاعات بیشتر به **[مستندات افزونه رونوشت کد](./plugins/codeCopy.md)** مراجعه کنید.
 
 ---
 
@@ -56,100 +60,32 @@ window.shirazeh = {
 
 ## ساخت یک افزونه نمونه
 
-بیایید یک افزونه ساده بسازیم که یک دکمه "کپی" به تمام بلوک‌های کد (`<pre>`) در هر صفحه اضافه می‌کند.
+بیایید یک افزونه بسیار ساده بسازیم که هنگام بارگذاری هر صفحه، یک پیام در کنسول مرورگر چاپ می‌کند.
 
-### ۱. ساختار فایل‌ها
+### ۱. نوشتن کد جاوااسکریپت (`src/plugins/hello.js`)
 
-ابتدا فایل‌های مورد نیاز را در پوشه `src/plugins/` ایجاد می‌کنیم:
-
-```
-src/
-└── plugins/
-    ├── code-copy/
-    │   ├── code-copy.css
-    │   └── code-copy.js
-    └── ...
-```
-> **نکته:** قراردادن هر افزونه در پوشه خودش به سازماندهی بهتر کمک می‌کند.
-
-### ۲. نوشتن کد جاوااسکریپت (`code-copy.js`)
+یک فایل جدید به نام `hello.js` در پوشه `src/plugins/` ایجاد کنید و کد زیر را در آن قرار دهید:
 
 ```javascript
 /**
- * @file افزونه‌ای برای افزودن دکمه کپی به بلوک‌های کد
+ * @file یک افزونه نمونه برای نمایش پیام در کنسول
  */
-import { injectCSS } from '../../core/pluginManager.js';
-
-export default class CodeCopyPlugin {
+export default class HelloPlugin {
     onInit(app) {
-        console.log('CodeCopyPlugin: Initialized!');
-        // استایل‌های دکمه کپی را به صفحه اضافه می‌کنیم
-        const cssPath = app.resolvePath('src/plugins/code-copy/code-copy.css');
-        injectCSS(cssPath);
+        // این پیام فقط یک بار هنگام شروع برنامه نمایش داده می‌شود
+        console.log(`HelloPlugin: Initialized! App name is "${app.config.appName}".`);
     }
 
     onPageLoad(contentElement) {
-        // تمام بلوک‌های <pre> را در محتوای صفحه پیدا می‌کنیم
-        const codeBlocks = contentElement.querySelectorAll('pre');
-
-        codeBlocks.forEach(block => {
-            const button = document.createElement('button');
-            button.className = 'copy-code-button';
-            button.innerText = 'کپی';
-
-            button.addEventListener('click', () => {
-                const code = block.querySelector('code');
-                if (code) {
-                    navigator.clipboard.writeText(code.innerText).then(() => {
-                        button.innerText = 'کپی شد!';
-                        setTimeout(() => {
-                            button.innerText = 'کپی';
-                        }, 2000);
-                    }).catch(err => {
-                        console.error('Failed to copy text: ', err);
-                        button.innerText = 'خطا';
-                    });
-                }
-            });
-
-            // دکمه را به بلوک کد اضافه می‌کنیم
-            // ابتدا position آن را relative می‌کنیم تا دکمه به درستی قرار گیرد
-            block.style.position = 'relative';
-            block.appendChild(button);
-        });
+        // این پیام با هر بار بارگذاری صفحه جدید نمایش داده می‌شود
+        const h1 = contentElement.querySelector('h1');
+        const pageTitle = h1 ? h1.textContent : 'Unknown Page';
+        console.log(`HelloPlugin: Page loaded - "${pageTitle}"`);
     }
 }
 ```
 
-### ۳. افزودن استایل (`code-copy.css`)
-
-```css
-/* استایل دکمه کپی */
-.copy-code-button {
-    position: absolute;
-    top: 0.5rem;
-    left: 0.5rem; /* در حالت راست‌چین در سمت چپ قرار می‌گیرد */
-    background-color: var(--sidebar-bg);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    opacity: 0; /* در حالت عادی مخفی است */
-    transition: opacity 0.2s;
-}
-
-/* نمایش دکمه هنگام هاور روی بلوک کد */
-pre:hover .copy-code-button {
-    opacity: 1;
-}
-
-.copy-code-button:hover {
-    background-color: var(--border-color);
-}
-```
-
-### ۴. فعال‌سازی افزونه
+### ۲. فعال‌سازی افزونه
 
 در نهایت، افزونه جدید را در `config/config.js` فعال می‌کنیم:
 
@@ -158,14 +94,13 @@ pre:hover .copy-code-button {
 window.shirazeh = {
   // ...
   plugins: [
-    'src/plugins/hello.js',
-    'src/plugins/code-copy/code-copy.js' // <-- این خط را اضافه کنید
+    'src/plugins/hello.js' // <-- این خط را اضافه کنید
   ],
   // ...
 };
 ```
 
-حالا با رفرش کردن صفحه، باید دکمه "کپی" را هنگام هاور کردن روی بلوک‌های کد مشاهده کنید.
+حالا با رفرش کردن صفحه و باز کردن کنسول مرورگر، باید پیام‌های این افزونه را مشاهده کنید. این مثال ساده، نحوه کارکرد هوک‌های چرخه حیات را به خوبی نشان می‌دهد.
 
 ## ابزارهای کمکی برای افزونه‌ها
 

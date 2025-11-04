@@ -11,4 +11,5 @@
 - افزونه‌های داخلی
   - [افزونه فهرست مطالب](/docs/plugins/toc)
   - [افزونه لینک گیت‌هاب](/docs/plugins/githubCorner)
+  - [افزونه کپی کد](/docs/plugins/codeCopy)
 - [تاریخچه تغییرات](changelog)
