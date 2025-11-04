@@ -1,11 +1,13 @@
 - [صفحه اصلی](/)
-- [شروع سریع](/docs/gettingStarted)
-- [پیکربندی](/docs/configuration)
-- فنی
-    - [معماری](/docs/architecture)
-    - [افزونه‌نویسی](/docs/plugins)
-    - [مفسر مارک‌داون](/docs/parsers)
-    - [تم](/docs/theming)
-- [آموزش](/docs/writingContent)
-- افزونه‌ها
-    - [افزونه فهرست مطالب](/docs/plugins/toc)
+- [معرفی و ویژگی‌ها](/docs/features)
+- راهنمای کاربر
+  - [شروع سریع](/docs/gettingStarted)
+  - [نوشتن محتوا](/docs/writingContent)
+  - [پیکربندی](/docs/configuration)
+- توسعه و مفاهیم پیشرفته
+  - [معماری پروژه](/docs/architecture)
+  - [سیستم افزونه‌نویسی](/docs/plugins)
+  - [مفسرهای مارک‌داون](/docs/parsers)
+- افزونه‌های داخلی
+  - [افزونه فهرست مطالب](/docs/plugins/toc)
+- [تاریخچه تغییرات](changelog)
