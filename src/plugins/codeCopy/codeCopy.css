@@ -1,8 +1,14 @@
 /*
- * Styles for the Code Copy plugin button.
+ * ==========================================
+ *  Styles for the Code Copy plugin.
+ * ==========================================
  */
+
+/* --- Base Styles --- */
 .prose pre {
   position: relative;
+  /* Add some padding to prevent button overlap */
+  padding-top: 2.5rem;
 }
 
 .copy-code-button {
@@ -12,19 +18,111 @@
   background-color: var(--sidebar-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8em;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out, background-color 0.2s;
+  
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
   font-family: var(--font-family-main);
+  font-weight: 500;
+  
+  border-radius: 0.375rem;
+  cursor: pointer;
+  
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out, 
+              background-color 0.2s ease,
+              transform 0.1s ease;
+  
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
+/* --- Hover States --- */
 .prose pre:hover .copy-code-button {
   opacity: 1;
 }
 
-.copy-code-button:hover {
+.copy-code-button:hover:not(:disabled) {
   background-color: var(--border-color);
+  transform: scale(1.05);
+}
+
+.copy-code-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* --- Focus State (Accessibility) --- */
+.copy-code-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+.copy-code-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* --- Disabled State --- */
+.copy-code-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* --- Success State --- */
+.copy-code-button.success {
+  background-color: #10b981; /* Green */
+  color: white;
+  border-color: #059669;
+}
+
+/* --- Error State --- */
+.copy-code-button.error {
+  background-color: #ef4444; /* Red */
+  color: white;
+  border-color: #dc2626;
+}
+
+/* --- Icon Support (Optional Enhancement) --- */
+.copy-code-button::before {
+  content: '';
+  font-size: 0.9em;
+}
+
+.copy-code-button.success::before {
+  content: '';
+}
+
+.copy-code-button.error::before {
+  content: '';
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .copy-code-button {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .prose pre {
+    padding-top: 2rem;
+  }
+}
+
+/* --- Print Styles --- */
+@media print {
+  .copy-code-button {
+    display: none;
+  }
+}
+
+/* --- Dark Theme Enhancements --- */
+@media (prefers-color-scheme: dark) {
+  .copy-code-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .copy-code-button:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
 }

@@ -376,4 +376,29 @@ window.shirazeh = {
      */
     corsProxyUrl: '',
   },
+
+   /**
+   * تنظیمات افزونه رونوشت کد (اختیاری)
+   */
+  codeCopy: {
+    /**
+     * @property {string} buttonText - متن دکمه
+     */
+    buttonText: 'رونوشت',
+
+    /**
+     * @property {string} successText - متن موفقیت
+     */
+    successText: 'رونوشت شد',
+
+    /**
+     * @property {string} errorText - متن خطا
+     */
+    errorText: 'خطا',
+
+    /**
+     * @property {number} successDuration - مدت نمایش پیام موفقیت (میلی‌ثانیه)
+     */
+    successDuration: 2000,
+  },
 };
