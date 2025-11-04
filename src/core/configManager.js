@@ -48,6 +48,14 @@ const DEFAULT_CONFIG = {
         maxDepth: 3,
         title: 'فهرست مطالب',
     },
+    githubCorner: {
+        enabled: false,
+        url: '',
+        position: 'top-right',
+        size: '80px',
+        backgroundColor: '',
+        iconColor: ''
+    },
     title: {
         enabled: true,
         includeWiki: true,

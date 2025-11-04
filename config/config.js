@@ -103,7 +103,8 @@ window.shirazeh = {
    * مسیرها نسبت به `basePath` سنجیده می‌شوند.
    */
   plugins: [
-    'src/plugins/toc.js' // فعال‌سازی افزونه فهرست مطالب
+    'src/plugins/toc.js', // فعال‌سازی افزونه فهرست مطالب
+    'src/plugins/githubCorner/githubCorner.js', // فعال‌سازی افزونه لینک گیت‌هاب
   ],
 
   /**
@@ -222,6 +223,47 @@ window.shirazeh = {
     title: 'در این صفحه',
   },
   
+  /**
+   * @property {object} githubCorner
+   * تنظیمات مربوط به افزونه نمایش لینک گیت‌هاب در گوشه صفحه.
+   */
+  githubCorner: {
+    /**
+     * @property {boolean} enabled - آیا افزونه فعال باشد؟
+     */
+    enabled: true,
+
+    /**
+     * @property {string} url - آدرس کامل مخزن گیت‌هاب شما.
+     */
+    url: 'https://github.com/barnevis/shirazeh',
+
+    /**
+     * @property {string} position - موقعیت قرارگیری آیکون.
+     * مقادیر ممکن: 'top-left', 'top-right'
+     */
+    position: 'top-left',
+
+    /**
+     * @property {string} size - اندازه آیکون (عرض و ارتفاع).
+     */
+    size: '80px',
+
+    /**
+     * @property {string} backgroundColor - رنگ پس‌زمینه آیکون.
+     * اگر خالی باشد، از رنگ پیش‌فرض تم (`--primary-color`) استفاده می‌شود.
+     * مثال: '#151513'
+     */
+    backgroundColor: '',
+
+    /**
+     * @property {string} iconColor - رنگ آیکون اختاپوس.
+     * اگر خالی باشد، از رنگ پیش‌فرض تم (`--sidebar-bg`) استفاده می‌شود.
+     * مثال: '#fff'
+     */
+    iconColor: '',
+  },
+
   /**
    * @property {object} title
    * تنظیمات مربوط به عنوان تب مرورگر (تگ <title>).

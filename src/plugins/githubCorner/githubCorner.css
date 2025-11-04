@@ -1,0 +1,58 @@
+/*
+ * ==========================================
+ *  Styles for the GitHub Corner plugin.
+ * ==========================================
+ */
+
+@keyframes octocat-wave {
+  0%, 100% { transform: rotate(0); }
+  20%, 60% { transform: rotate(-25deg); }
+  40%, 80% { transform: rotate(10deg); }
+}
+
+.github-corner {
+  --github-corner-size: 80px; /* Default size, can be overridden by config */
+  
+  position: fixed;
+  z-index: 101; /* Lowered z-index to avoid overlapping theme-toggle */
+  border: 0;
+  width: var(--github-corner-size);
+  height: var(--github-corner-size);
+  overflow: hidden; /* Ensures the SVG corners are clipped */
+
+  /* Set the color for the icon paths which use `fill="currentColor"` */
+  color: var(--github-corner-icon, var(--sidebar-bg));
+  transition: color 0.3s;
+}
+
+/* --- Positioning --- */
+.github-corner.top-left {
+  top: 0;
+  left: 0;
+  transform: scaleX(-1); /* Flips horizontally for left side */
+}
+
+.github-corner.top-right {
+  top: 0;
+  right: 0;
+}
+
+/* --- SVG Styling & Theme Integration --- */
+.github-corner .bg-path {
+  /* Set the fill color for the background triangle path */
+  fill: var(--github-corner-bg, var(--primary-color));
+  transition: fill 0.3s;
+}
+
+/* --- Hover Animation --- */
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out;
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 767px) {
+  /* Hide the corner on small screens to save space */
+  .github-corner {
+    display: none;
+  }
+}

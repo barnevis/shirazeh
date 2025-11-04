@@ -7,8 +7,8 @@
 .theme-toggle {
   /* موقعیت ثابت در گوشه بالا-چپ صفحه */
   position: fixed;
-  top: 10px;
-  left: 15px;
+  top: 30px;
+  left: 65px;
   right: auto; /* برای لغو هر استایل قبلی */
   z-index: 102; /* بالاتر از دکمه سایدبار (که 101 بود) */
 
