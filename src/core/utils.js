@@ -100,3 +100,20 @@ export function getMimeTypeFromPath(path) {
             return 'image/png';
     }
 }
+
+/**
+ * Resolves a relative path against a configured base path.
+ * @param {string} relativePath - The path relative to the base path.
+ * @param {string} basePath - The base path from the configuration.
+ * @returns {string} The fully resolved path.
+ */
+export function resolvePath(relativePath, basePath) {
+    // Simple path join, removes leading slash from relativePath if basePath is not empty.
+    if (basePath && relativePath.startsWith('/')) {
+        relativePath = relativePath.substring(1);
+    }
+    return [basePath, relativePath]
+        .filter(Boolean) // Remove empty parts
+        .join('/')
+        .replace(/\/\//g, '/'); // Avoid double slashes
+}

@@ -956,3 +956,8 @@ downloadable font: font load failed (font-family: "Vazirmatn" style:normal weigh
 gemini, cluade, chatGPT و خودت
 
 با توجه به سندهایی هم که در پروژه وجود داره نوار کناری را پیکربندی کن.
+
+## پرامپت ۶۴
+ازت می‌‌خوام فایل `app.js` بررسی کنی و براساس معماری ماژولار و هر فایل یک وظیفه (Single Responsibility) اون رو بازبینی و بازسازی کنی.
+
+فایل‌ها و پوشه‌های مورد نیاز را هم ایجاد کن.
