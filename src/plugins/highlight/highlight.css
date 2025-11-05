@@ -33,10 +33,17 @@
   font-size: 0.75rem;
   font-family: var(--font-family-main);
   border-radius: 0.375rem;
-  text-transform: uppercase;
   font-weight: 600;
   user-select: none;
   z-index: 10;
+}
+
+.hljs-language-label .hljs-lang-name {
+  text-transform: uppercase;
+}
+
+.hljs-language-label .hljs-file-name {
+  text-transform: none; /* Be explicit */
 }
 
 
