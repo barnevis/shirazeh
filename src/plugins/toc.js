@@ -11,7 +11,8 @@ export default class TocPlugin {
     onInit(app) {
         this.app = app;
         this.config = app.config.toc || {};
-        
+        this.usedIds = new Set(); // To track IDs on a per-page basis
+
         if (!this.config.enabled) {
             return;
         }
@@ -49,19 +50,18 @@ export default class TocPlugin {
         this.container.innerHTML = '';
         this.observer.disconnect();
         this.lastActiveLink = null;
-        document.body.classList.remove('toc-active'); // Always reset on page load
+        document.body.classList.remove('toc-active');
+        this.usedIds.clear(); // Reset for each new page
 
         const headings = this._getHeadings(contentElement);
 
-        // Hide TOC and remove body class if there are not enough headings
         if (headings.length < 2) {
             return;
         }
         
-        // Add class to body to enable layout adjustments via CSS
         document.body.classList.add('toc-active');
         this._buildToc(headings);
-        this._initializeToggles(); // Add toggles after building
+        this._initializeToggles();
     }
     
     /**
@@ -75,9 +75,52 @@ export default class TocPlugin {
         const selector = Array.from({ length: maxDepth }, (_, i) => `h${i + 1}`).join(', ');
         return Array.from(contentElement.querySelectorAll(selector));
     }
+    
+    /**
+     * Extracts the clean text content of a heading, ignoring the anchor link.
+     * @param {HTMLElement} heading - The heading element.
+     * @returns {string} The clean text content.
+     * @private
+     */
+    _getCleanHeadingText(heading) {
+        let cleanText = '';
+        for (const node of heading.childNodes) {
+            if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('heading-anchor-link')) {
+                continue;
+            }
+            cleanText += node.textContent;
+        }
+        return cleanText.trim();
+    }
+    
+    /**
+     * This function is an exact copy of the one in the headingAnchor plugin
+     * to ensure that the generated IDs are identical.
+     * @param {string} text - The heading text.
+     * @returns {string} A unique, URL-friendly ID.
+     * @private
+     */
+    _generateUniqueId(text) {
+        const baseId = text
+            .trim()
+            .toLowerCase()
+            .replace(/[^\u0600-\u06FF\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+
+        let finalId = baseId || 'section';
+        let counter = 2;
+        while (this.usedIds.has(finalId)) {
+            finalId = `${baseId}-${counter}`;
+            counter++;
+        }
+
+        this.usedIds.add(finalId);
+        return finalId;
+    }
 
     /**
-     * Builds the TOC HTML structure and appends it to the container using a robust stack-based algorithm.
+     * Builds the TOC HTML structure.
      * @param {HTMLElement[]} headings - The heading elements to process.
      * @private
      */
@@ -88,26 +131,24 @@ export default class TocPlugin {
         this.container.appendChild(titleEl);
 
         const tocFragment = document.createDocumentFragment();
-        // The stack holds parent elements for nesting. Starts with the fragment at level 0.
         const stack = [{ level: 0, el: tocFragment }];
 
-        headings.forEach((heading, index) => {
+        headings.forEach(heading => {
             const level = parseInt(heading.tagName.substring(1), 10);
-            
-            // Ensure headings have an ID for linking
-            if (!heading.id) {
-                heading.id = `toc-heading-${index}`;
-            }
+            const cleanText = this._getCleanHeadingText(heading);
 
-            // Find the correct parent in the stack by popping elements with higher or equal level
+            // Generate the ID using the exact same logic as the headingAnchor plugin.
+            const id = this._generateUniqueId(cleanText);
+            
+            // CRITICAL: Set the generated ID on the heading element itself.
+            // This makes it the single source of truth for links and anchors.
+            heading.id = id;
+
             while (stack[stack.length - 1].level >= level) {
                 stack.pop();
             }
 
-            // The correct parent is now at the top of the stack
             let parent = stack[stack.length - 1].el;
-
-            // Find or create the list (ul) to append the new item to
             let list = parent.querySelector('ul');
             if (!list) {
                 list = document.createElement('ul');
@@ -116,17 +157,20 @@ export default class TocPlugin {
 
             const listItem = document.createElement('li');
             const link = document.createElement('a');
-            link.href = `#${heading.id}`;
-            link.textContent = heading.textContent;
+            
+            // ✅ FIX: Build complete URL like HeadingAnchor plugin
+            const currentUrl = window.location.href;
+            const baseUrl = currentUrl.split('#')[0];
+            const hashPath = (window.location.hash || '#/').substring(1).split('#')[0];
+            link.href = `${baseUrl}#${hashPath}#${id}`;
+            
+            link.textContent = cleanText;
             link.setAttribute('data-level', level);
             
             listItem.appendChild(link);
             list.appendChild(listItem);
 
-            // Push the current list item to the stack, making it a potential parent for the next, deeper heading
             stack.push({ level: level, el: listItem });
-
-            // Add heading to the observer for scrollspy
             this.observer.observe(heading);
         });
 
@@ -141,7 +185,7 @@ export default class TocPlugin {
         this.container.querySelectorAll('li').forEach(li => {
             const submenu = li.querySelector('ul');
             if (submenu) {
-                li.classList.add('toc-item--parent', 'is-open'); // Set to open by default
+                li.classList.add('toc-item--parent', 'is-open');
     
                 const wrapper = document.createElement('div');
                 wrapper.className = 'toc-item-wrapper';
@@ -149,12 +193,11 @@ export default class TocPlugin {
                 const toggleButton = document.createElement('button');
                 toggleButton.className = 'toc-toggle';
                 toggleButton.setAttribute('aria-label', 'باز و بسته کردن زیرمنو');
-                toggleButton.setAttribute('aria-expanded', 'true'); // Set to open by default
+                toggleButton.setAttribute('aria-expanded', 'true');
                 toggleButton.innerHTML = `<span class="toc-toggle-icon" aria-hidden="true">›</span>`;
     
                 const link = li.querySelector('a');
                 if (link) {
-                    // Move link into wrapper and add toggle
                     li.insertBefore(wrapper, link);
                     wrapper.appendChild(toggleButton);
                     wrapper.appendChild(link);
@@ -169,7 +212,6 @@ export default class TocPlugin {
      */
     _setupEventListeners() {
         this.container.addEventListener('click', (e) => {
-            // Handle Toggling
             const toggle = e.target.closest('.toc-toggle');
             if (toggle) {
                 e.preventDefault();
@@ -181,23 +223,20 @@ export default class TocPlugin {
                 return;
             }
             
-            // Handle Smooth scroll for TOC links
             const link = e.target.closest('a');
             if (link) {
                 e.preventDefault();
-                const targetId = link.getAttribute('href');
-                if (!targetId || targetId === '#') return;
+                const href = link.getAttribute('href');
+                if (!href || href === '#') return;
 
-                // Use getElementById for efficiency and clarity
-                const targetElement = document.getElementById(targetId.substring(1));
+                // Extract the anchor ID from the full URL
+                const parts = href.split('#');
+                const targetId = parts[parts.length - 1];
+                const targetElement = document.getElementById(targetId);
                 
                 if (targetElement) {
                     targetElement.scrollIntoView({ behavior: 'smooth' });
-                    // Manually update hash, preserving the current path
-                    const currentPath = this.app.router.getCurrentPath().split('#')[0];
-                    const newHash = `${currentPath}${targetId}`;
-                    // Use replaceState to update the URL without adding to history or reloading
-                    window.history.replaceState(null, '', `#${newHash}`);
+                    window.history.replaceState(null, '', href);
                 }
             }
         });
@@ -209,7 +248,6 @@ export default class TocPlugin {
      * @private
      */
     _onObserve(entries) {
-        // Find the topmost visible heading among all intersecting entries
         let topEntry = null;
         for (const entry of entries) {
             if (entry.isIntersecting) {
@@ -219,11 +257,9 @@ export default class TocPlugin {
             }
         }
 
-        // If a heading is in the observation zone, update the active link
         if (topEntry) {
-            const activeLink = this.container.querySelector(`a[href="#${topEntry.target.id}"]`);
+            const activeLink = this.container.querySelector(`a[href*="#${topEntry.target.id}"]`);
             
-            // Only update if the active link has changed to prevent unnecessary DOM manipulation
             if (activeLink && activeLink !== this.lastActiveLink) {
                 if (this.lastActiveLink) {
                     this.lastActiveLink.classList.remove('active');
