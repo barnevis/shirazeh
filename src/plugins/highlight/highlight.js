@@ -102,8 +102,9 @@ export default class HighlightPlugin {
         if (this.config.showLanguage) {
             const detectedLang = block.result?.language || '';
             const language = metadata.language || detectedLang;
+            const shouldShowFilename = this.config.showFileName && metadata.filename;
 
-            if (language || metadata.filename) {
+            if (language || shouldShowFilename) {
                 const label = document.createElement('div');
                 label.className = 'hljs-language-label';
 
@@ -114,7 +115,7 @@ export default class HighlightPlugin {
                     label.appendChild(langSpan);
                 }
 
-                if (metadata.filename) {
+                if (shouldShowFilename) {
                     if (language) {
                         label.appendChild(document.createTextNode(': '));
                     }

@@ -59,6 +59,7 @@ const DEFAULT_CONFIG = {
         languages: [],
         lineNumbers: true,
         showLanguage: true,
+        showFileName: true,
     },
     toc: {
         enabled: false,

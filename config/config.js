@@ -221,6 +221,7 @@ window.shirazeh = {
     ],
     lineNumbers: false,
     showLanguage: true,
+    showFileName: true,
   },
 
   /**
