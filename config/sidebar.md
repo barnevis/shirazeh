@@ -10,6 +10,8 @@
   - [مفسرهای مارک‌داون](/docs/parsers)
 - افزونه‌های داخلی
   - [افزونه فهرست مطالب](/docs/plugins/toc)
-  - [افزونه لینک گیت‌هاب](/docs/plugins/githubCorner)
-  - [افزونه کپی کد](/docs/plugins/codeCopy)
+  - [افزونه پیوند گیت‌هاب](/docs/plugins/githubCorner)
+  - [افزونه رونوشت کد](/docs/plugins/codeCopy)
+  - [افزونه پیوند عنوان‌ها](/docs/plugins/headingAnchor)
+  - [افزونه رنگی کردن کد](/docs/plugins/highlight)
 - [تاریخچه تغییرات](changelog)
