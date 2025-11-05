@@ -360,24 +360,31 @@ function link_rewriter_plugin(md) {
   };
 
   md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    const hrefIndex = tokens[idx].attrIndex('href');
-    if (hrefIndex >= 0) {
-      const href = tokens[idx].attrs[hrefIndex][1];
-      
-      const isInternal = href.startsWith('/') && !href.startsWith('//');
-      const isExternal = /^(https?:|mailto:|tel:)/.test(href);
+    const token = tokens[idx];
+    const hrefIndex = token.attrIndex('href');
+    if (hrefIndex < 0) return defaultRender(tokens, idx, options, env, self);
 
-      if (isInternal) {
-        // Rewrite to hash-based route for the SPA router
-        tokens[idx].attrs[hrefIndex][1] = `#${href}`;
-      } else if (isExternal) {
-        // Ensure external links open in a new tab for security and good UX
-        tokens[idx].attrSet('target', '_blank');
-        tokens[idx].attrSet('rel', 'noopener noreferrer');
-      }
+    let href = token.attrs[hrefIndex][1];
+
+    const isExternal = /^(https?:|mailto:|tel:|data:)/.test(href);
+    const isAnchorOnly = href.startsWith('#');
+    const isInternalPage = href.startsWith('/') && !href.startsWith('//');
+
+    if (isExternal) {
+      token.attrSet('target', '_blank');
+      token.attrSet('rel', 'noopener noreferrer');
+    } else if (isAnchorOnly) {
+      // For same-page anchors, construct a full hash path that the router can handle.
+      // The router expects #/path/to/page#anchor.
+      const currentPagePath = window.location.hash.substring(1).split('#')[0] || '/';
+      const newHref = `#${currentPagePath}${href}`;
+      // Sanitize for root path, e.g., #//#anchor -> #/#anchor
+      token.attrs[hrefIndex][1] = newHref.replace('//', '/'); 
+    } else if (isInternalPage) {
+      // For cross-page links, just prepend the main hash for the router.
+      token.attrs[hrefIndex][1] = `#${href}`;
     }
     
-    // Call the original renderer to apply the attributes
     return defaultRender(tokens, idx, options, env, self);
   };
 }
@@ -397,7 +404,7 @@ export function createParsNeshan(options = {}) {
   md.use(persian_ordered_list_plugin);
   md.use(poetry_plugin);
   md.use(auto_direction_plugin);
-  md.use(link_rewriter_plugin); // <-- پلاگین جدید اضافه شد
+  md.use(link_rewriter_plugin);
 
   plugins.forEach(pluginConfig => {
     if (Array.isArray(pluginConfig)) {

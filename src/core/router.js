@@ -37,8 +37,14 @@ export class Router {
      */
     handleRouteChange() {
         const path = this.getCurrentPath();
-        const pathOnly = path.split('#')[0] || '/';
-        const filePath = this.getFilePath(pathOnly);
+        
+        // Robustly separate the page path from the anchor.
+        // The page path is everything before the first '#' that is NOT at the start.
+        // This correctly handles `/#anchor` and `/page#anchor`.
+        const anchorIndex = path.indexOf('#', 1);
+        const pathOnly = anchorIndex > -1 ? path.substring(0, anchorIndex) : path;
+
+        const filePath = this.getFilePath(pathOnly || '/'); // Ensure fallback for root path
         this.onNavigate(filePath, path);
     }
 

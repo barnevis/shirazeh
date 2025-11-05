@@ -132,14 +132,15 @@ export class PageManager {
      * @private
      */
     _scrollToAnchor(path) {
-        const pathParts = path.split('#');
-        if (pathParts.length > 1) {
-            // The anchor part of the URL might be URL-encoded (e.g., for non-ASCII characters).
-            // We need to decode it to match the actual ID on the element.
-            const anchorId = decodeURIComponent(pathParts[1]);
-            
+        // Find the anchor, which is everything after the first hash that is NOT at the start of the string.
+        // This correctly handles paths like `/#anchor` and `/page/path#anchor`.
+        const anchorIndex = path.indexOf('#', 1);
+
+        if (anchorIndex > -1) {
+            const anchorId = decodeURIComponent(path.substring(anchorIndex + 1));
+
             // We use a short timeout to ensure the browser has rendered the new content
-            // and the plugins have had a chance to add IDs to the headings.
+            // and plugins have had a chance to add IDs to the headings.
             setTimeout(() => {
                 const element = document.getElementById(anchorId);
                 if (element) {
