@@ -186,7 +186,11 @@ export default class TocPlugin {
             if (link) {
                 e.preventDefault();
                 const targetId = link.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
+                if (!targetId || targetId === '#') return;
+
+                // Use getElementById for efficiency and clarity
+                const targetElement = document.getElementById(targetId.substring(1));
+                
                 if (targetElement) {
                     targetElement.scrollIntoView({ behavior: 'smooth' });
                     // Manually update hash, preserving the current path

@@ -60,18 +60,19 @@ export default class HeadingAnchorPlugin {
     }
 
     _generateUniqueId(text) {
-        // Slugify the text
+        // A robust slugification function
         const baseId = text
             .trim()
             .toLowerCase()
-            .replace(/[\u0600-\u06FF\s\w-]+/g, ' ') // Keep Persian, English, numbers, spaces, hyphens
-            .replace(/[^\u0600-\u06FF\s\w-]/g, '') // Remove remaining special characters
-            .trim()
-            .replace(/\s+/g, '-') // Replace spaces with hyphens
-            .replace(/-+/g, '-'); // Replace multiple hyphens with a single one
+            // Remove characters that are not Persian, English letters, numbers, spaces, or hyphens.
+            .replace(/[^\u0600-\u06FF\w\s-]/g, '')
+            // Replace one or more whitespace characters with a single hyphen.
+            .replace(/\s+/g, '-')
+            // Replace multiple hyphens with a single one.
+            .replace(/-+/g, '-');
 
         // Handle duplicates
-        let finalId = baseId;
+        let finalId = baseId || 'section'; // Fallback for empty titles
         let counter = 2;
         while (this.usedIds.has(finalId)) {
             finalId = `${baseId}-${counter}`;
