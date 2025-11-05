@@ -81,6 +81,7 @@
 }
 
 .prose pre {
+  position: relative; /* This is the key fix for positioning context */
   background-color: rgba(31, 41, 55, 0.7); /* bg-gray-800/70 */
   padding: 1rem;
   border-radius: 0.5rem;

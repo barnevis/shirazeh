@@ -4,13 +4,6 @@
  * ==========================================
  */
 
-/* --- Base Styles --- */
-.prose pre {
-  position: relative;
-  /* Add some padding to prevent button overlap */
-  padding-top: 2.5rem;
-}
-
 .copy-code-button {
   position: absolute;
   top: 0.5rem;
@@ -18,6 +11,7 @@
   background-color: var(--sidebar-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
+  z-index: 10; /* Ensure it's above the code */
   
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;

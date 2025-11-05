@@ -7,20 +7,26 @@
  * The actual syntax colors are controlled by the Highlight.js theme files.
  */
 
-/* Ensure <pre> is a positioning context for its children */
+/*
+ * The <pre> element's positioning context is now set in `prose.css`.
+ * Here, we add padding-top to make space for our UI elements and apply the background color.
+ */
 .prose pre {
-  position: relative;
-  /* Add padding to prevent code from overlapping with the language label */
   padding-top: 2.5rem;
-  /* Remove default markdown-it background, as hljs theme provides it */
-  background-color: transparent !important;
+  background-color: var(--hljs-background, #f3f4f6); /* Default light bg */
 }
+
+[data-theme="dark"] .prose pre {
+    background-color: var(--hljs-background, #1f2937); /* Default dark bg */
+}
+
 
 /* --- Language / Filename Label --- */
 .hljs-language-label {
   position: absolute;
   top: 0.5rem;
-  left: 0.5rem; /* Positioned on the left for RTL, appears top-right */
+  /* This correctly places the label in the top-left corner, opposite the copy button. */
+  left: 0.5rem;
   background-color: var(--sidebar-bg);
   color: var(--text-color);
   padding: 0.2rem 0.6rem;
@@ -30,22 +36,7 @@
   text-transform: uppercase;
   font-weight: 600;
   user-select: none;
-}
-
-/* Adjust position to not conflict with copy button */
-.prose pre .copy-code-button ~ .hljs-language-label {
-  left: auto;
-  right: 3.5rem; /* Position it next to the copy button */
-}
-
-[dir="ltr"] .hljs-language-label {
-  left: auto;
-  right: 0.5rem;
-}
-
-[dir="ltr"] .prose pre .copy-code-button ~ .hljs-language-label {
-  right: auto;
-  left: 3.5rem;
+  z-index: 10;
 }
 
 
@@ -84,25 +75,8 @@
 }
 
 /* --- General HLJS adjustments to fit Shirazeh's theme --- */
-.prose pre .hljs {
-  padding: 1rem;
-  border-radius: 0.5rem;
-  direction: ltr;
-  text-align: left;
-}
-
-/* Override padding if line numbers are enabled */
-.prose pre code.hljs-line-numbers.hljs {
-    padding-left: 3.5em;
-}
-
-/* Ensure the background color from the hljs theme is used */
-.prose pre,
+/* The inner `<code>` element must be transparent and have no extra padding. */
 .prose pre code.hljs {
-    background-color: var(--hljs-background, #f3f4f6);
-}
-
-[data-theme="dark"] .prose pre,
-[data-theme="dark"] .prose pre code.hljs {
-    background-color: var(--hljs-background, #1f2937);
+    background: transparent;
+    padding: 0;
 }
