@@ -353,6 +353,35 @@ function auto_direction_plugin(md) {
   });
 }
 
+// پلاگین برای بازنویسی لینک‌های داخلی و خارجی
+function link_rewriter_plugin(md) {
+  const defaultRender = md.renderer.rules.link_open || function(tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options);
+  };
+
+  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    const hrefIndex = tokens[idx].attrIndex('href');
+    if (hrefIndex >= 0) {
+      const href = tokens[idx].attrs[hrefIndex][1];
+      
+      const isInternal = href.startsWith('/') && !href.startsWith('//');
+      const isExternal = /^(https?:|mailto:|tel:)/.test(href);
+
+      if (isInternal) {
+        // Rewrite to hash-based route for the SPA router
+        tokens[idx].attrs[hrefIndex][1] = `#${href}`;
+      } else if (isExternal) {
+        // Ensure external links open in a new tab for security and good UX
+        tokens[idx].attrSet('target', '_blank');
+        tokens[idx].attrSet('rel', 'noopener noreferrer');
+      }
+    }
+    
+    // Call the original renderer to apply the attributes
+    return defaultRender(tokens, idx, options, env, self);
+  };
+}
+
 
 export function createParsNeshan(options = {}) {
   const { plugins = [], ...mdOptions } = options;
@@ -368,6 +397,7 @@ export function createParsNeshan(options = {}) {
   md.use(persian_ordered_list_plugin);
   md.use(poetry_plugin);
   md.use(auto_direction_plugin);
+  md.use(link_rewriter_plugin); // <-- پلاگین جدید اضافه شد
 
   plugins.forEach(pluginConfig => {
     if (Array.isArray(pluginConfig)) {
