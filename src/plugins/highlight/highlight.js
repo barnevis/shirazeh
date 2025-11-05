@@ -81,28 +81,40 @@ export default class HighlightPlugin {
         });
     }
     
+    /**
+     * Processes a single code block to apply highlighting and features.
+     * @param {HTMLElement} block - The <code> element.
+     * @private
+     */
     _processCodeBlock(block) {
         const pre = block.parentElement;
+        // 1. Parse all metadata from the complex class name.
         const metadata = this._parseMetadata(block.className);
 
-        // Add language class for auto-detection fallback
+        // 2. CRITICAL FIX: Before highlighting, clean the block's class name.
+        // Highlight.js needs a simple class like "language-js" to work correctly.
         if (metadata.language) {
-            block.classList.add(metadata.language);
+            block.className = `language-${metadata.language}`;
+        } else {
+            // Clear the complex class to allow hljs to auto-detect the language.
+            block.className = '';
         }
-        
-        // Apply syntax highlighting
+
+        // 3. Now, with a clean class name, apply syntax highlighting.
         window.hljs.highlightElement(block);
 
-        // Add language/filename label
+        // 4. Add the language or filename label, using the parsed metadata.
         if (this.config.showLanguage) {
-            const labelText = metadata.filename || metadata.language || 'Code';
+            // Use filename if present, then explicit lang, then detected lang.
+            const detectedLang = block.result ? block.result.language : '';
+            const labelText = metadata.filename || metadata.language || detectedLang || 'CODE';
             const label = document.createElement('div');
             label.className = 'hljs-language-label';
-            label.textContent = labelText;
+            label.textContent = labelText.toUpperCase(); // For style consistency
             pre.appendChild(label);
         }
         
-        // Handle line numbers and highlighting
+        // 5. Apply line numbers and line highlighting features.
         if (this.config.lineNumbers || metadata.highlights.size > 0) {
             this._applyLineFeatures(block, metadata.highlights);
         }
