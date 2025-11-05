@@ -1161,3 +1161,22 @@ headingAnchor: {
 
 ## پرامپت ۸۶
 مشکل بر طرف نشد.
+
+## پرامپت ۸۷
+زمانی که هایلایت کد در بلوک کد قرار می‌دم:
+
+```bash:deploy.sh{3-4}
+#!/bin/bash
+echo "Starting deployment..."
+npm run build
+npx serve .
+echo "Deployment finished."
+```
+
+کامنت‌ها در خط جداگانه نمایش داده نمی‌شه.
+```
+#!/bin/bashecho "Starting deployment..."npm run buildnpx serve .echo "Deployment finished."​
+```
+
+## پرامپت ۸۸
+تغییری که ایجاد کردی اوضاع را بدتر کرد. با اگر یک بولک کد هایلایت داشته باشه فاصله اضافی بین خط‌ها ایجاد می‌شه و اگر گزینه نمایش شماره خط هم فعال بشه برای بلوک‌های کد دیگه هم فاصله اضافی نمایش داده می‌شه.

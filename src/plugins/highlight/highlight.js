@@ -135,18 +135,21 @@ export default class HighlightPlugin {
     }
     
     _applyLineFeatures(block, highlights) {
-        block.innerHTML = block.innerHTML
-            .split('\n')
+        let lines = block.innerHTML.split('\n');
+    
+        if (lines.length > 1 && lines[lines.length - 1].trim() === '') {
+            lines.pop();
+        }
+    
+        block.innerHTML = lines
             .map((line, index) => {
                 const lineNumber = index + 1;
                 const isHighlighted = highlights.has(lineNumber);
                 const highlightClass = isHighlighted ? ' hljs-line-highlight' : '';
                 
-                // Wrap each line for styling and highlighting
-                // Add an empty line content placeholder for blank lines to preserve height
                 return `<span class="hljs-line${highlightClass}">${line || '&#8203;'}</span>`;
             })
-            .join(''); // FIX: Remove the newline joiner to prevent extra spacing with display:block spans
+            .join(''); // FIX: Do not join with '\n'. The CSS `display:block` will handle line breaks.
             
         if (this.config.lineNumbers) {
             block.classList.add('hljs-line-numbers');
@@ -154,21 +157,24 @@ export default class HighlightPlugin {
     }
 
     _parseMetadata(className) {
-        const result = { language: '', filename: '', highlights: new Set() };
-        const match = className.match(/language-([^:{}\s]+)(?::([^:{}\s]+))?(?:{([0-9,-]+)})?/);
+        // Updated regex to handle spaces within the curly braces for line highlighting.
+        const match = className.match(/language-([^:{}\s]+)(?::([^:{}\s]+))?(?:{([\d,\s-]+)})?/);
 
+        const result = { language: '', filename: '', highlights: new Set() };
         if (match) {
             result.language = match[1];
             result.filename = match[2] || '';
             
             if (match[3]) {
-                match[3].split(',').forEach(part => {
+                // Remove all whitespace from the highlight string before parsing
+                const highlightString = match[3].replace(/\s/g, '');
+                highlightString.split(',').forEach(part => {
                     if (part.includes('-')) {
                         const [start, end] = part.split('-').map(Number);
                         for (let i = start; i <= end; i++) {
                             result.highlights.add(i);
                         }
-                    } else {
+                    } else if (part) {
                         result.highlights.add(Number(part));
                     }
                 });

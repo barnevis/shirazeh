@@ -47,15 +47,29 @@
 }
 
 
-/* --- Line Numbers --- */
+/* --- Line Numbers & Line Highlighting --- */
+
+/*
+ * This is the KEY FIX: It ensures that any line wrapped by the plugin
+ * (for either line numbers OR highlighting) is displayed as a block,
+ * preventing code from collapsing onto a single line and ensuring consistent spacing.
+ */
+.prose code .hljs-line {
+  display: block;
+}
+
+/* Styles specific to when line numbers are enabled */
 .prose code.hljs-line-numbers {
   counter-reset: line;
   padding-left: 3.5em !important; /* Make space for line numbers */
 }
 
+/*
+ * A numbered line needs to be a positioning context for its number
+ * pseudo-element, but this should only apply when line numbers are active.
+ */
 .prose code.hljs-line-numbers .hljs-line {
   position: relative;
-  display: block;
 }
 
 .prose code.hljs-line-numbers .hljs-line::before {
