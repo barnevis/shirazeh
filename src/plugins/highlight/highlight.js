@@ -146,7 +146,7 @@ export default class HighlightPlugin {
                 // Add an empty line content placeholder for blank lines to preserve height
                 return `<span class="hljs-line${highlightClass}">${line || '&#8203;'}</span>`;
             })
-            .join('\n');
+            .join(''); // FIX: Remove the newline joiner to prevent extra spacing with display:block spans
             
         if (this.config.lineNumbers) {
             block.classList.add('hljs-line-numbers');
