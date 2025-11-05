@@ -7,8 +7,7 @@ export default class HighlightPlugin {
     onInit(app) {
         this.app = app;
         this.config = app.config.highlight || {};
-        this.isLoaded = false;
-        this.initPromise = null;
+        this.initPromise = null; // Will be used to track the loading promise
 
         if (!this.config.enabled) {
             return;
@@ -17,21 +16,31 @@ export default class HighlightPlugin {
         // Inject the plugin's own CSS for UI elements like labels and line numbers
         injectCSS(app.resolvePath('src/plugins/highlight/highlight.css'));
 
-        // Start loading Highlight.js and its dependencies
-        this.initPromise = this._loadHighlightJs();
-
-        // Set up theme switching
+        // Set up theme switching, but don't load the actual themes yet
         this._setupThemeObserver();
     }
 
     async onPageLoad(contentElement) {
-        if (!this.config.enabled || !this.initPromise) {
+        if (!this.config.enabled) {
+            return;
+        }
+
+        const codeBlocks = contentElement.querySelectorAll('pre code');
+        // Optimization: Don't load hljs if there's no code on the page.
+        if (codeBlocks.length === 0) {
             return;
         }
 
         try {
+            // Start loading Highlight.js only when it's first needed.
+            // This promise will be created only once.
+            if (!this.initPromise) {
+                this.initPromise = this._loadHighlightJs();
+            }
+            
             await this.initPromise; // Ensure hljs is loaded before processing
-            contentElement.querySelectorAll('pre code').forEach(block => {
+            
+            codeBlocks.forEach(block => {
                 this._processCodeBlock(block);
             });
         } catch (error) {
@@ -46,7 +55,6 @@ export default class HighlightPlugin {
     _loadHighlightJs() {
         return new Promise(async (resolve, reject) => {
             if (window.hljs) {
-                this.isLoaded = true;
                 return resolve();
             }
 
@@ -71,8 +79,11 @@ export default class HighlightPlugin {
                     await Promise.all(langPromises);
                 }
 
-                this.isLoaded = true;
                 console.info('Highlight.js and languages loaded successfully.');
+                
+                // Now that themes are in the DOM, we can ensure the correct one is active.
+                this._updateTheme();
+                
                 resolve();
             } catch (error) {
                 console.error(`Failed to load Highlight.js from ${source}.`, error);
@@ -100,6 +111,9 @@ export default class HighlightPlugin {
         window.hljs.highlightElement(block);
 
         if (this.config.showLanguage) {
+            // Avoid adding a duplicate label
+            if (pre.querySelector('.hljs-language-label')) return;
+
             const detectedLang = block.result?.language || '';
             const language = metadata.language || detectedLang;
             const shouldShowFilename = this.config.showFileName && metadata.filename;
@@ -137,6 +151,9 @@ export default class HighlightPlugin {
     _applyLineFeatures(block, highlights) {
         let lines = block.innerHTML.split('\n');
     
+        // Don't process if it's already been processed (e.g., by another plugin or error)
+        if (block.querySelector('.hljs-line')) return;
+
         if (lines.length > 1 && lines[lines.length - 1].trim() === '') {
             lines.pop();
         }
@@ -188,6 +205,9 @@ export default class HighlightPlugin {
         const themeFile = themeType === 'light' ? themeConfig.themeLight : themeConfig.themeDark;
         if (!themeFile) return;
 
+        // Prevent duplicate injection
+        if (document.getElementById(`hljs-theme-${themeType}`)) return;
+
         const themeUrl = `${baseUrl}/styles/${themeFile}`;
         const link = document.createElement('link');
         link.id = `hljs-theme-${themeType}`;
@@ -208,7 +228,7 @@ export default class HighlightPlugin {
         
         observer.observe(document.documentElement, { attributes: true });
         
-        // Set initial theme
+        // Set initial theme state for when themes are loaded
         this._updateTheme();
     }
 
@@ -217,6 +237,7 @@ export default class HighlightPlugin {
         const lightTheme = document.getElementById('hljs-theme-light');
         const darkTheme = document.getElementById('hljs-theme-dark');
         
+        // Themes might not be in the DOM yet, so check for their existence.
         if (lightTheme) lightTheme.disabled = currentTheme !== 'light';
         if (darkTheme) darkTheme.disabled = currentTheme !== 'dark';
     }
