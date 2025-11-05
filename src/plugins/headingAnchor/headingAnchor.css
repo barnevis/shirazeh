@@ -1,0 +1,57 @@
+/*
+ * ==========================================
+ *  Styles for the Heading Anchor Links plugin.
+ * ==========================================
+ */
+
+/* The heading retains its default block display, so no special style is needed */
+.prose .heading-with-anchor {
+}
+
+.heading-anchor-link {
+  /* Positioned inline, after the heading text */
+  margin-right: 0.5em; /* Space between text and icon in RTL */
+  padding: 0.2em;
+  
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.8em; /* Make it slightly smaller than the heading text */
+  
+  /* Hide by default, show on hover of parent heading */
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+
+  /* Minor adjustment for better vertical alignment with text */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.prose .heading-with-anchor:hover .heading-anchor-link,
+.prose .heading-with-anchor .heading-anchor-link:focus {
+  opacity: 1;
+}
+
+.heading-anchor-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Tooltip for copy success message --- */
+.heading-anchor-tooltip {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  background-color: var(--text-color-strong);
+  color: var(--bg-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px; /* Pill shape */
+  font-size: 0.875rem;
+  font-family: var(--font-family-main);
+  
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none; /* Prevent interaction */
+}

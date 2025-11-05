@@ -13,8 +13,8 @@ window.shirazeh = {
   plugins: [
     'src/plugins/toc.js',
     'src/plugins/githubCorner/githubCorner.js',
-    'src/plugins/codeCopy/codeCopy.js',
-    'src/plugins/my-custom-plugin.js' // افزونه جدید شما
+    'src/plugins/code-copy/code-copy.js',
+    'src/plugins/headingAnchor/headingAnchor.js', // افزونه جدید شما
   ],
   // ...
 };
@@ -32,8 +32,11 @@ window.shirazeh = {
 ### افزونه لینک گیت‌هاب (GitHub Corner)
 این افزونه یک لینک زیبا به شکل "روبان" در گوشه صفحه برای ارجاع به مخزن گیت‌هاب پروژه شما اضافه می‌کند. برای اطلاعات کامل به **[مستندات افزونه GitHub Corner](./plugins/githubCorner.md)** مراجعه کنید.
 
-### افزونه رونوشت کد (Code Copy)
+### افزونه کپی کد (Code Copy)
 این افزونه یک دکمه «رونوشت» به تمام بلوک‌های کد اضافه می‌کند تا کاربران بتوانند به راحتی قطعه کدها را در کلیپ‌بورد خود رونوشت کنند. برای اطلاعات بیشتر به **[مستندات افزونه رونوشت کد](./plugins/codeCopy.md)** مراجعه کنید.
+
+### افزونه لینک عناوین (Heading Anchor)
+این افزونه یک آیکون قابل کلیک در کنار عناوین صفحه (h2, h3, ...) اضافه می‌کند که به کاربران اجازه می‌دهد لینک مستقیم به آن بخش را کپی کنند. برای اطلاعات بیشتر به **[مستندات افزونه لینک عناوین](./plugins/headingAnchor.md)** مراجعه کنید.
 
 ---
 

@@ -79,6 +79,19 @@ const DEFAULT_CONFIG = {
     remote: {
         enabled: false,
         corsProxyUrl: '' // e.g., 'https://api.allorigins.win/raw?url='
+    },
+    codeCopy: {
+        buttonText: 'رونوشت',
+        successText: 'رونوشت شد',
+        errorText: 'خطا',
+        successDuration: 2000,
+    },
+    headingAnchor: {
+        enabled: true,
+        levels: [2, 3, 4, 5, 6],
+        icon: '#',
+        successMessage: 'پیوند رونوشت شد',
+        messageDuration: 2000,
     }
 };
 

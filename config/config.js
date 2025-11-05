@@ -93,6 +93,7 @@ window.shirazeh = {
    * مسیرها نسبت به `basePath` سنجیده می‌شوند.
    */
   plugins: [
+    'src/plugins/headingAnchor/headingAnchor.js', // فعال‌سازی افزونه لینک عناوین
     'src/plugins/toc.js', // فعال‌سازی افزونه فهرست مطالب
     'src/plugins/githubCorner/githubCorner.js', // فعال‌سازی افزونه لینک گیت‌هاب
     'src/plugins/codeCopy/codeCopy.js', // فعال‌سازی افزونه رونوشت کد
@@ -401,4 +402,36 @@ window.shirazeh = {
      */
     successDuration: 2000,
   },
+ 
+ /**
+   * @property {object} headingAnchor
+   * Configuration for the Heading Anchor Links plugin.
+   */
+  headingAnchor: {
+    /**
+     * @property {boolean} enabled - Whether the plugin is enabled.
+     */
+    enabled: true,
+    
+    /**
+     * @property {Array<number>} levels - The heading levels to which anchors should be added.
+     * Example: [2, 3, 4] for h2, h3, and h4.
+     */
+    levels: [2, 3, 4, 5, 6],
+    
+    /**
+     * @property {string} icon - The icon to display. Can be an emoji or SVG markup.
+     */
+    icon: '#',
+    
+    /**
+     * @property {string} successMessage - The message to show after a successful copy.
+     */
+    successMessage: 'پیوند رونوشت شد',
+    
+    /**
+     * @property {number} messageDuration - How long the success message is displayed (in milliseconds).
+     */
+    messageDuration: 2000,
+  }
 };
