@@ -43,6 +43,23 @@ const DEFAULT_CONFIG = {
           codeFamily: ''
       }
     },
+    highlight: {
+        enabled: true,
+        source: 'cdn',
+        cdn: {
+          version: '11.9.0',
+          themeLight: 'github.min.css',
+          themeDark: 'github-dark.min.css',
+        },
+        local: {
+          path: 'src/lib/vendor/highlight',
+          themeLight: 'github.min.css',
+          themeDark: 'github-dark.min.css',
+        },
+        languages: [],
+        lineNumbers: true,
+        showLanguage: true,
+    },
     toc: {
         enabled: false,
         maxDepth: 3,

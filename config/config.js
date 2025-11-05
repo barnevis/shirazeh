@@ -97,6 +97,7 @@ window.shirazeh = {
     'src/plugins/toc.js', // فعال‌سازی افزونه فهرست مطالب
     'src/plugins/githubCorner/githubCorner.js', // فعال‌سازی افزونه لینک گیت‌هاب
     'src/plugins/codeCopy/codeCopy.js', // فعال‌سازی افزونه رونوشت کد
+    'src/plugins/highlight/highlight.js', // افزونه هایلایت کد
   ],
 
   /**
@@ -192,6 +193,34 @@ window.shirazeh = {
        */
       codeFamily: '',
     }
+  },
+
+  /**
+   * @property {object} highlight
+   * Configuration for the syntax highlighting plugin (Highlight.js).
+   */
+  highlight: {
+    enabled: true,
+    source: 'cdn', // 'cdn' or 'local'
+    cdn: {
+      version: '11.9.0',
+      themeLight: 'github.min.css',
+      themeDark: 'github-dark.min.css',
+    },
+    local: {
+      path: 'src/lib/vendor/highlight', // Path to the highlight.js library folder
+      themeLight: 'github.min.css',
+      themeDark: 'github-dark.min.css',
+    },
+    languages: [ // A list of language files to load from the source
+      'javascript',
+      'xml', // For HTML
+      'css',
+      'bash',
+      'json'
+    ],
+    lineNumbers: false,
+    showLanguage: true,
   },
 
   /**

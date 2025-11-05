@@ -1,0 +1,108 @@
+/*
+ * ==========================================
+ *  Styles for the Highlight.js Plugin UI
+ * ==========================================
+ * This file styles the UI elements added by the plugin,
+ * such as the language label, line numbers, and highlighted lines.
+ * The actual syntax colors are controlled by the Highlight.js theme files.
+ */
+
+/* Ensure <pre> is a positioning context for its children */
+.prose pre {
+  position: relative;
+  /* Add padding to prevent code from overlapping with the language label */
+  padding-top: 2.5rem;
+  /* Remove default markdown-it background, as hljs theme provides it */
+  background-color: transparent !important;
+}
+
+/* --- Language / Filename Label --- */
+.hljs-language-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem; /* Positioned on the left for RTL, appears top-right */
+  background-color: var(--sidebar-bg);
+  color: var(--text-color);
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: var(--font-family-main);
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  user-select: none;
+}
+
+/* Adjust position to not conflict with copy button */
+.prose pre .copy-code-button ~ .hljs-language-label {
+  left: auto;
+  right: 3.5rem; /* Position it next to the copy button */
+}
+
+[dir="ltr"] .hljs-language-label {
+  left: auto;
+  right: 0.5rem;
+}
+
+[dir="ltr"] .prose pre .copy-code-button ~ .hljs-language-label {
+  right: auto;
+  left: 3.5rem;
+}
+
+
+/* --- Line Numbers --- */
+.prose code.hljs-line-numbers {
+  counter-reset: line;
+  padding-left: 3.5em !important; /* Make space for line numbers */
+}
+
+.prose code.hljs-line-numbers .hljs-line {
+  position: relative;
+  display: block;
+}
+
+.prose code.hljs-line-numbers .hljs-line::before {
+  content: counter(line);
+  counter-increment: line;
+  position: absolute;
+  left: -3.5em; /* Position numbers in the padding area */
+  width: 2.5em; /* Fixed width for alignment */
+  text-align: right;
+  color: var(--quote-text); /* Use a less prominent color */
+  opacity: 0.7;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+
+/* --- Highlighted Lines --- */
+.hljs-line-highlight {
+  /* Use a subtle background color that works in both light and dark themes */
+  background-color: hsla(var(--primary-color-hsl, 158, 64%, 67%), 0.1);
+  display: block; /* Ensures the background covers the full width */
+  margin: 0 -1rem; /* Extend background to fill pre padding */
+  padding: 0 1rem;
+}
+
+/* --- General HLJS adjustments to fit Shirazeh's theme --- */
+.prose pre .hljs {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  direction: ltr;
+  text-align: left;
+}
+
+/* Override padding if line numbers are enabled */
+.prose pre code.hljs-line-numbers.hljs {
+    padding-left: 3.5em;
+}
+
+/* Ensure the background color from the hljs theme is used */
+.prose pre,
+.prose pre code.hljs {
+    background-color: var(--hljs-background, #f3f4f6);
+}
+
+[data-theme="dark"] .prose pre,
+[data-theme="dark"] .prose pre code.hljs {
+    background-color: var(--hljs-background, #1f2937);
+}
