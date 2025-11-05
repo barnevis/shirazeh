@@ -134,11 +134,16 @@ export class PageManager {
     _scrollToAnchor(path) {
         const pathParts = path.split('#');
         if (pathParts.length > 1) {
-            const anchorId = pathParts[1];
+            // The anchor part of the URL might be URL-encoded (e.g., for non-ASCII characters).
+            // We need to decode it to match the actual ID on the element.
+            const anchorId = decodeURIComponent(pathParts[1]);
+            
+            // We use a short timeout to ensure the browser has rendered the new content
+            // and the plugins have had a chance to add IDs to the headings.
             setTimeout(() => {
                 const element = document.getElementById(anchorId);
                 if (element) {
-                    element.scrollIntoView();
+                    element.scrollIntoView({ behavior: 'smooth' });
                 }
             }, 100);
         }
