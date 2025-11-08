@@ -288,27 +288,64 @@ export default class NavbarPlugin {
      * @private
      */
     _setupEventListeners() {
-        // بستن منوی بازشونده با کلیک در خارج از آن
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.has-dropdown')) {
-                this.navbarEl.querySelectorAll('.has-dropdown.is-active').forEach(item => {
-                    item.classList.remove('is-active');
+        const dropdowns = this.navbarEl.querySelectorAll('.has-dropdown');
+        const isMobile = () => window.innerWidth <= parseInt(this.config.mobile.breakpoint, 10);
+
+        dropdowns.forEach(dropdown => {
+            // --- رفتار هاور برای دسکتاپ ---
+            dropdown.addEventListener('mouseenter', () => {
+                if (isMobile()) return;
+
+                // بستن زیرمنوهای هم‌سطح
+                const parentList = dropdown.parentElement;
+                parentList.querySelectorAll(':scope > .has-dropdown').forEach(sibling => {
+                    if (sibling !== dropdown) {
+                        sibling.classList.remove('is-active');
+                    }
+                });
+                dropdown.classList.add('is-active');
+            });
+
+            dropdown.addEventListener('mouseleave', () => {
+                if (isMobile()) return;
+                dropdown.classList.remove('is-active');
+            });
+            
+            // --- رفتار کلیک برای موبایل ---
+            const toggleLink = dropdown.querySelector(':scope > a');
+            if(toggleLink) {
+                toggleLink.addEventListener('click', (e) => {
+                    if (!isMobile()) return;
+                    
+                    e.preventDefault();
+                    
+                    const wasActive = dropdown.classList.contains('is-active');
+
+                    // بستن زیرمنوهای هم‌سطح
+                    const parentList = dropdown.parentElement;
+                    parentList.querySelectorAll(':scope > .has-dropdown').forEach(sibling => {
+                         if (sibling !== dropdown) {
+                            sibling.classList.remove('is-active');
+                         }
+                    });
+                     
+                    if (!wasActive) {
+                        dropdown.classList.add('is-active');
+                    } else {
+                        dropdown.classList.remove('is-active');
+                    }
                 });
             }
         });
 
-        // مدیریت باز و بسته شدن زیرمنوها
-        this.navbarEl.addEventListener('click', (e) => {
-            const dropdownParent = e.target.closest('.has-dropdown');
-            if (dropdownParent) {
-                // برای جلوگیری از دنبال کردن لینک والد در موبایل
-                if (window.innerWidth <= parseInt(this.config.mobile.breakpoint)) {
-                     e.preventDefault();
-                }
-                dropdownParent.classList.toggle('is-active');
-            }
+        // بستن تمام منوها با ترک کردن کل نوار ناوبری
+        this.navbarEl.addEventListener('mouseleave', () => {
+             if (isMobile()) return;
+             this.navbarEl.querySelectorAll('.has-dropdown.is-active').forEach(item => {
+                item.classList.remove('is-active');
+            });
         });
-
+    
         // مدیریت دکمه همبرگری
         this.hamburgerBtn.addEventListener('click', () => {
             const isOpen = document.body.classList.toggle('mobile-menu-open');
@@ -317,10 +354,10 @@ export default class NavbarPlugin {
         
         let scrollTimeout;
         window.addEventListener('scroll', () => {
-             if (scrollTimeout) window.cancelAnimationFrame(scrollTimeout);
-             scrollTimeout = window.requestAnimationFrame(this._handleScroll.bind(this));
+            if (scrollTimeout) window.cancelAnimationFrame(scrollTimeout);
+            scrollTimeout = window.requestAnimationFrame(this._handleScroll.bind(this));
         }, { passive: true });
-
+    
         window.addEventListener('resize', this._updateBodyPadding.bind(this));
     }
     
@@ -377,9 +414,13 @@ export default class NavbarPlugin {
         if (bestMatch) {
             bestMatch.classList.add('is-active');
             // فعال کردن والد در منوی باز شونده
-            const parent = bestMatch.closest('.has-dropdown');
-            if(parent) {
-                parent.querySelector('a').classList.add('is-active');
+            let parent = bestMatch.closest('.has-dropdown');
+            while(parent) {
+                const parentLink = parent.querySelector(':scope > a');
+                if (parentLink) {
+                    parentLink.classList.add('is-active');
+                }
+                parent = parent.parentElement.closest('.has-dropdown');
             }
         }
     }
