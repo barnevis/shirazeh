@@ -15,4 +15,5 @@
   - [افزونه رونوشت کد](/docs/plugins/codeCopy)
   - [افزونه پیوند عنوان‌ها](/docs/plugins/headingAnchor)
   - [افزونه رنگی کردن کد](/docs/plugins/highlight)
+  - [افزونه تنظیم اندازه تصویر](/docs/plugins/imageSizer)
 - [تاریخچه تغییرات](changelog)
