@@ -14,6 +14,11 @@ window.shirazeh = {
      * @property {boolean} enabled - آیا نمایش لوگو فعال باشد؟
      */
     enabled: true,
+
+    /**
+     * @property {boolean} showAppName - Whether to display the app name text.
+     */
+    showAppName: true,
     
     /**
      * @property {string} src - مسیر فایل لوگو.

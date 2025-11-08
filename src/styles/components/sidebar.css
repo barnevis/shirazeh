@@ -17,6 +17,11 @@
   flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
 }
 
+/* اگر هدر خالی باشد (نه لوگو و نه نام)، آن را کاملا مخفی کن */
+.sidebar-header.is-empty {
+  display: none;
+}
+
 .sidebar-header .app-title-link {
   text-decoration: none;
   color: inherit;

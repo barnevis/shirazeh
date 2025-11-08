@@ -10,7 +10,8 @@
 const DEFAULT_CONFIG = {
     appName: 'شیرازه',
     logo: {
-        enabled: false,
+        enabled: true,
+        showAppName: true,
         src: '',
         size: '32px',
         appNameFontSize: '1.5rem',

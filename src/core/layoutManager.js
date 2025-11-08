@@ -51,26 +51,39 @@ export class LayoutManager {
             appTitleLink.href = '#/';
             appTitleLink.className = 'app-title-link';
 
-            const hasLogo = this.config.logo && this.config.logo.enabled && this.config.logo.src;
-            if (hasLogo) {
-                const logoImg = document.createElement('img');
-                logoImg.src = this.app.resolvePath(this.config.logo.src);
-                logoImg.alt = `${this.config.appName} Logo`;
-                logoImg.className = 'app-logo';
-                logoImg.style.width = this.config.logo.size || '32px';
-                logoImg.style.height = this.config.logo.size || '32px';
-                appTitleLink.appendChild(logoImg);
+            // خواندن تنظیمات لوگو و نام برنامه
+            const logoConfig = this.config.logo || {};
+            const showLogo = logoConfig.enabled && logoConfig.src;
+            // اگر showAppName تعریف نشده باشد (undefined)، به طور پیش‌فرض آن را true در نظر می‌گیریم
+            const showAppName = logoConfig.showAppName !== false;
+
+            // اگر نه لوگو و نه نام برنامه فعال باشند، یک کلاس برای مخفی‌سازی هدر اضافه می‌کنیم
+            if (!showLogo && !showAppName) {
+                sidebarHeader.classList.add('is-empty');
+            } else {
+                // اگر لوگو فعال است، آن را بساز
+                if (showLogo) {
+                    const logoImg = document.createElement('img');
+                    logoImg.src = this.app.resolvePath(logoConfig.src);
+                    logoImg.alt = `${this.config.appName} Logo`;
+                    logoImg.className = 'app-logo';
+                    logoImg.style.width = logoConfig.size || '32px';
+                    logoImg.style.height = logoConfig.size || '32px';
+                    appTitleLink.appendChild(logoImg);
+                }
+
+                // اگر نام برنامه فعال است، آن را بساز
+                if (showAppName) {
+                    const appTitle = document.createElement('h2');
+                    appTitle.textContent = this.config.appName;
+                    // تنظیم اندازه فونت فقط در صورتی که لوگو هم وجود داشته باشد منطقی است
+                    if (showLogo) {
+                        appTitle.style.fontSize = this.config.logo.appNameFontSize || '1.5rem';
+                    }
+                    appTitleLink.appendChild(appTitle);
+                }
+                sidebarHeader.appendChild(appTitleLink);
             }
-
-            const appTitle = document.createElement('h2');
-            appTitle.textContent = this.config.appName;
-            if (hasLogo) {
-                appTitle.style.fontSize = this.config.logo.appNameFontSize || '1.5rem';
-            }
-
-            appTitleLink.appendChild(appTitle);
-            sidebarHeader.appendChild(appTitleLink);
-
 
             const sidebarNav = document.createElement('nav');
             sidebarNav.className = 'sidebar-nav';
