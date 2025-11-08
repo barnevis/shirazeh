@@ -131,6 +131,9 @@ const DEFAULT_CONFIG = {
       mobile: {
         breakpoint: '768px',
       }
+    },
+    imageSizer: {
+        enabled: true,
     }
 };
 

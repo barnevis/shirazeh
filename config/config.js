@@ -104,6 +104,7 @@ window.shirazeh = {
     'src/plugins/githubCorner/githubCorner.js', // فعال‌سازی افزونه لینک گیت‌هاب
     'src/plugins/codeCopy/codeCopy.js', // فعال‌سازی افزونه رونوشت کد
     'src/plugins/highlight/highlight.js', // افزونه هایلایت کد
+    'src/plugins/imageSizer/imageSizer.js', // افزونه تنظیم اندازه تصویر
   ],
 
   /**
@@ -494,5 +495,16 @@ window.shirazeh = {
     mobile: {
       breakpoint: '768px',
     }
-  }
+  },
+
+  /**
+   * @property {object} imageSizer
+   * Configuration for the Image Sizing plugin.
+   */
+  imageSizer: {
+    /**
+     * @property {boolean} enabled - Whether the plugin is enabled.
+     */
+    enabled: true,
+  },
 };
