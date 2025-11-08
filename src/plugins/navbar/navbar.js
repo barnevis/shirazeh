@@ -145,6 +145,9 @@ export default class NavbarPlugin {
                 const level = Math.floor(indentation / 2);
                 let content = itemMatch[2].trim();
                 
+                // FIX: Strip HTML comments before parsing the content
+                content = content.replace(/<!--.*-->/, '').trim();
+
                 const item = { text: content, children: [] };
                 
                 // پردازش سینتکس‌های ویژه ({.cta}, {.badge:..})
