@@ -50,9 +50,8 @@ body.navbar-scrolled .navbar-container.is-sticky {
 
 /* -- چیدمان داخلی -- */
 .navbar-wrapper {
-  max-width: 1280px;
+  /* حذف max-width برای تمام-عرض شدن */
   height: 100%;
-  margin: 0 auto;
   padding: 0 1.5rem;
   display: flex;
   align-items: center;
@@ -195,6 +194,9 @@ body.navbar-scrolled .navbar-container.is-sticky {
 
 .dropdown-menu .navbar-item a {
   width: 100%;
+  /* راست‌چین کردن محتوای لینک‌های زیرمنو */
+  justify-content: flex-start; /* آیتم‌ها را در شروع محور (راست در RTL) قرار بده */
+  text-align: right;
 }
 
 /* -- حالت موبایل و همبرگر -- */

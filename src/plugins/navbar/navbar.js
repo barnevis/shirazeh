@@ -67,6 +67,9 @@ export default class NavbarPlugin {
      * @private
      */
     _createNavbarContainer() {
+        // افزودن یک کلاس به body برای اینکه سایر کامپوننت‌ها از وجود نوار ناوبری مطلع شوند
+        document.body.classList.add('shirazeh-navbar-active');
+        
         this.navbarEl = document.createElement('nav');
         this.navbarEl.className = 'navbar-container';
         
@@ -74,9 +77,9 @@ export default class NavbarPlugin {
             this.navbarEl.classList.add('is-sticky');
         }
 
-        // تنظیم متغیرهای CSS از کانفیگ
-        this.navbarEl.style.setProperty('--navbar-height', this.config.height || '64px');
-        this.navbarEl.style.setProperty('--navbar-height-scrolled', this.config.heightScrolled || '56px');
+        // تنظیم متغیرهای CSS به صورت سراسری تا سایر فایل‌های CSS بتوانند از آن‌ها استفاده کنند
+        document.documentElement.style.setProperty('--navbar-height', this.config.height || '64px');
+        document.documentElement.style.setProperty('--navbar-height-scrolled', this.config.heightScrolled || '56px');
         
         const wrapper = document.createElement('div');
         wrapper.className = 'navbar-wrapper';
