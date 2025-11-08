@@ -1,5 +1,5 @@
 # شیرازه
-![پارسی‌نگار](https://img.shields.io/badge/shirazeh-v0.5.0-blue)
+![پارسی‌نگار](https://img.shields.io/badge/shirazeh-v0.6.0-blue)
 ![زبان](https://img.shields.io/badge/Language-Persian-green)
 ![مجوز](https://img.shields.io/badge/License-MIT-yellow)
 
