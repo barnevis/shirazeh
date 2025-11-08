@@ -111,6 +111,26 @@ const DEFAULT_CONFIG = {
         icon: '#',
         successMessage: 'پیوند رونوشت شد',
         messageDuration: 2000,
+    },
+    navbar: {
+      enabled: true,
+      source: 'config/navbar.md',
+      sticky: true,
+      scrollBehavior: 'shrink', // 'shrink' | 'hide' | 'normal'
+      height: '64px',
+      heightScrolled: '56px',
+      logo: {
+        show: true,
+        src: null, // null = use from global config.logo.src
+        size: '32px',
+      },
+      appName: {
+        show: true,
+        text: null, // null = use from global config.appName
+      },
+      mobile: {
+        breakpoint: '768px',
+      }
     }
 };
 

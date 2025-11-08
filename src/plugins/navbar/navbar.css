@@ -1,0 +1,292 @@
+/*
+ * ==========================================
+ *  Styles for the Navbar Plugin
+ * ==========================================
+ */
+
+/* -- متغیرهای اصلی نوار ناوبری -- */
+:root {
+  --navbar-height: 64px;
+  --navbar-height-scrolled: 56px;
+  --navbar-bg: var(--sidebar-bg);
+  --navbar-border-color: var(--border-color);
+  --navbar-text-color: var(--text-color);
+  --navbar-text-hover-bg: var(--border-color);
+  --navbar-text-active-color: var(--primary-color);
+  --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --navbar-z-index: 1000;
+}
+
+[data-theme="dark"] {
+  --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* -- کانتینر اصلی -- */
+.navbar-container {
+  background-color: var(--navbar-bg);
+  height: var(--navbar-height);
+  width: 100%;
+  border-bottom: 1px solid var(--navbar-border-color);
+  transition: height 0.3s ease, transform 0.3s ease;
+  z-index: var(--navbar-z-index);
+}
+
+.navbar-container.is-sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: var(--navbar-shadow);
+}
+
+/* -- رفتارهای اسکرول -- */
+body.navbar-scrolled .navbar-container.is-sticky {
+  height: var(--navbar-height-scrolled);
+}
+
+.navbar-container.is-sticky.is-hidden {
+  transform: translateY(-100%);
+}
+
+/* -- چیدمان داخلی -- */
+.navbar-wrapper {
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-center {
+  flex-grow: 1;
+  justify-content: center;
+}
+
+/* -- برندینگ (لوگو و نام) -- */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-color-strong);
+  font-weight: 700;
+}
+.navbar-logo {
+  flex-shrink: 0;
+}
+.navbar-app-name {
+  font-size: 1.25rem;
+  white-space: nowrap;
+}
+
+/* -- آیتم‌های منو -- */
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+}
+
+.navbar-item {
+  position: relative;
+}
+
+.navbar-item a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  color: var(--navbar-text-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.navbar-item a:hover {
+  background-color: var(--navbar-text-hover-bg);
+  color: var(--text-color-strong);
+}
+
+.navbar-item a.is-active {
+  color: var(--navbar-text-active-color);
+  font-weight: 700;
+}
+
+/* -- دکمه فراخوان (CTA) -- */
+.navbar-item a.is-cta {
+  background-color: var(--primary-color);
+  color: var(--sidebar-bg);
+  font-weight: 700;
+}
+
+.navbar-item a.is-cta:hover {
+  opacity: 0.9;
+  color: var(--sidebar-bg);
+}
+
+/* -- نشان (Badge) -- */
+.badge {
+  background-color: var(--secondary-color);
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 99px;
+  margin-right: -4px;
+}
+
+/* -- جداکننده -- */
+.navbar-item.is-divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--navbar-border-color);
+  margin: 0 0.5rem;
+}
+
+/* -- منوی بازشونده (Dropdown) -- */
+.has-dropdown > a::after {
+  content: '▾';
+  font-size: 0.75em;
+  margin-right: 0.25rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0; /* برای RTL */
+  left: auto; /* برای RTL */
+  background-color: var(--navbar-bg);
+  border: 1px solid var(--navbar-border-color);
+  border-radius: 8px;
+  box-shadow: var(--navbar-shadow);
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  min-width: 180px;
+  z-index: calc(var(--navbar-z-index) + 1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  /* انیمیشن */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.has-dropdown:hover .dropdown-menu,
+.has-dropdown.is-active .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu .navbar-item a {
+  width: 100%;
+}
+
+/* -- حالت موبایل و همبرگر -- */
+.hamburger-button {
+  display: none; /* در دسکتاپ مخفی است */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: calc(var(--navbar-z-index) + 2);
+}
+
+.hamburger-button span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--text-color-strong);
+  margin: 5px 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+@media (max-width: 768px) {
+  /* بر اساس breakpoint کانفیگ، این مقدار باید تغییر کند */
+  /* اما برای سادگی، از مقدار پیش‌فرض استفاده می‌کنیم */
+  
+  .navbar-wrapper {
+    padding: 0 1rem;
+  }
+  .navbar-section.navbar-center,
+  .navbar-section.navbar-right .navbar-menu {
+    display: none;
+  }
+
+  .hamburger-button {
+    display: block;
+  }
+
+  /* منوی موبایل */
+  .mobile-menu-open .navbar-section.navbar-center {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--navbar-bg);
+    padding: 2rem;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+  
+  body.navbar-scrolled.mobile-menu-open .navbar-section.navbar-center {
+    top: var(--navbar-height-scrolled);
+  }
+
+  .mobile-menu-open .navbar-center .navbar-menu {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .mobile-menu-open .navbar-item a {
+    font-size: 1.1rem;
+    padding: 0.75rem;
+  }
+
+  .mobile-menu-open .dropdown-menu {
+    position: static;
+    border: none;
+    box-shadow: none;
+    padding-right: 1.5rem;
+    background: transparent;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: none; /* در حالت بسته */
+    margin-top: 0.5rem;
+  }
+
+  .mobile-menu-open .has-dropdown.is-active .dropdown-menu {
+    display: flex;
+  }
+
+  /* انیمیشن دکمه همبرگر */
+  .mobile-menu-open .hamburger-button span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .mobile-menu-open .hamburger-button span:nth-child(2) {
+    opacity: 0;
+  }
+  .mobile-menu-open .hamburger-button span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}

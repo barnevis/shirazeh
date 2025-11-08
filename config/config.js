@@ -98,6 +98,7 @@ window.shirazeh = {
    * مسیرها نسبت به `basePath` سنجیده می‌شوند.
    */
   plugins: [
+    'src/plugins/navbar/navbar.js', // فعال‌سازی افزونه نوار ناوبری
     'src/plugins/headingAnchor/headingAnchor.js', // فعال‌سازی افزونه لینک عناوین
     'src/plugins/toc.js', // فعال‌سازی افزونه فهرست مطالب
     'src/plugins/githubCorner/githubCorner.js', // فعال‌سازی افزونه لینک گیت‌هاب
@@ -468,5 +469,30 @@ window.shirazeh = {
      * @property {number} messageDuration - How long the success message is displayed (in milliseconds).
      */
     messageDuration: 2000,
+  },
+
+  /**
+   * @property {object} navbar
+   * Configuration for the Navbar plugin.
+   */
+  navbar: {
+    enabled: true,
+    source: 'config/navbar.md',
+    sticky: true,
+    scrollBehavior: 'shrink', // 'shrink' | 'hide' | 'normal'
+    height: '64px',
+    heightScrolled: '56px',
+    logo: {
+      show: true,
+      src: null, // null = use from global config.logo.src
+      size: '32px',
+    },
+    appName: {
+      show: true,
+      text: null, // null = use from global config.appName
+    },
+    mobile: {
+      breakpoint: '768px',
+    }
   }
 };
