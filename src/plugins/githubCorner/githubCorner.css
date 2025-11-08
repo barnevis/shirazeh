@@ -57,7 +57,7 @@
   }
 }
 
-/* --- Navbar Integration --- */
+/* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
 body.shirazeh-navbar-active .github-corner {
   /* Push the corner down below the navbar */
   top: var(--navbar-height, 64px);

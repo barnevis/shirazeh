@@ -136,7 +136,7 @@ body:not(.toc-active) .toc-container {
     }
 }
 
-/* --- Navbar Integration --- */
+/* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
 body.shirazeh-navbar-active .toc-container {
   top: calc(var(--navbar-height, 64px) + 20px);
   max-height: calc(100vh - var(--navbar-height, 64px) - 40px);

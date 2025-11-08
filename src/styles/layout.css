@@ -45,14 +45,15 @@ body.sidebar-disabled .sidebar-toggle {
 
 /* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
 body.shirazeh-navbar-active .sidebar {
-  /* تنظیم موقعیت برای قرارگیری زیر نوار ناوبری چسبنده */
-  top: var(--navbar-height, 64px);
+  /* 
+   * موقعیت عمودی توسط padding-top که افزونه به body اضافه می‌کند کنترل می‌شود.
+   * ما فقط ارتفاع را تنظیم می‌کنیم تا سایدبار از پایین صفحه بیرون نزند.
+   */
   height: calc(100vh - var(--navbar-height, 64px));
-  /* افزودن top و height به انیمیشن برای تغییرات نرم */
-  transition: top 0.3s ease, height 0.3s ease, margin-right 0.3s ease;
+  /* افزودن height به انیمیشن برای تغییرات نرم */
+  transition: height 0.3s ease, margin-right 0.3s ease;
 }
 
 body.shirazeh-navbar-active.navbar-scrolled .sidebar {
-  top: var(--navbar-height-scrolled, 56px);
   height: calc(100vh - var(--navbar-height-scrolled, 56px));
 }

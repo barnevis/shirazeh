@@ -138,12 +138,38 @@
   background: none;
   border: none;
   color: var(--text-color);
-  font-size: 1.75rem;
   cursor: pointer;
-  /* padding: 0.5rem; */
   position: fixed;
   top: 10px;
   right: 15px; /* موقعیت پیش‌فرض در موبایل و حالت جمع‌شده */
-  z-index: 101;
-  transition: right 0.3s ease;
+  z-index: 101; /* باید بالاتر از محتوا و لایه زیرین موبایل باشد */
+  transition: right 0.3s ease, top 0.3s ease, background-color 0.2s;
+
+  /* Styling for SVG icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.sidebar-toggle:hover {
+  background-color: var(--border-color);
+}
+
+.sidebar-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
+/* وقتی نوار ناوبری فعال است، دکمه را به زیر آن منتقل کن تا همپوشانی ایجاد نشود */
+body.shirazeh-navbar-active .sidebar-toggle {
+  top: calc(var(--navbar-height, 64px) + 10px);
+}
+
+body.shirazeh-navbar-active.navbar-scrolled .sidebar-toggle {
+  top: calc(var(--navbar-height-scrolled, 56px) + 10px);
 }
