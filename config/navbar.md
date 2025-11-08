@@ -6,23 +6,24 @@
 <!-- این بخش معمولاً برای لوگو و نام برند استفاده می‌شود. -->
 <!-- افزونه به صورت خودکار لوگو و نام را بر اساس config.js اضافه می‌کند. -->
 {.position: left}
-
-<!-- بخش مرکزی: لینک‌های اصلی ناوبری -->
-{.position: center}
-- [خانه](/)
 - [معرفی](/docs/features)
 - [راهنمای کاربر](/docs/gettingStarted)
   - [شروع سریع](/docs/gettingStarted)
   - [پیکربندی](/docs/configuration)
   - [نوشتن محتوا](/docs/writingContent)
 - [افزونه‌ها](/docs/plugins) {.badge: جدید}
-  - [نوار ناوبری](/docs/plugins/navbar)
-  - [فهرست مطالب](/docs/plugins/toc)
-  - [کپی کد](/docs/plugins/codeCopy)
+  - [افزونه نوار ناوبری](/docs/plugins/navbar)
+  - [افزونه فهرست مطالب](/docs/plugins/toc)
+  - [افزونه پیوند گیت‌هاب](/docs/plugins/githubCorner)
+  - [افزونه رونوشت کد](/docs/plugins/codeCopy)
+  - [افزونه پیوند عنوان‌ها](/docs/plugins/headingAnchor)
+  - [افزونه رنگی کردن کد](/docs/plugins/highlight)
+
+<!-- بخش مرکزی: لینک‌های اصلی ناوبری -->
+{.position: center}
+
 
 <!-- بخش راست (در حالت راست‌چین، این بخش در سمت چپ قرار می‌گیرد) -->
 <!-- این بخش معمولاً برای لینک‌های خارجی یا دکمه‌های فراخوان به کار می‌رود. -->
 {.position: right}
-- [گیت‌هاب](https://github.com/barnevis/shirazeh)
-- --- <!-- یک جداکننده عمودی -->
-- [دانلود](/download) {.cta}
+- [گیت‌هاب](https://github.com/barnevis/shirazeh) {.cta}

@@ -13,12 +13,12 @@ window.shirazeh = {
     /**
      * @property {boolean} enabled - آیا نمایش لوگو فعال باشد؟
      */
-    enabled: true,
+    enabled: false,
 
     /**
      * @property {boolean} showAppName - Whether to display the app name text.
      */
-    showAppName: true,
+    showAppName: false,
     
     /**
      * @property {string} src - مسیر فایل لوگو.
@@ -259,7 +259,7 @@ window.shirazeh = {
     /**
      * @property {boolean} enabled - آیا افزونه فعال باشد؟
      */
-    enabled: true,
+    enabled: false,
 
     /**
      * @property {string} url - آدرس کامل مخزن گیت‌هاب شما.

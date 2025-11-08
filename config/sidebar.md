@@ -9,6 +9,7 @@
   - [سیستم افزونه‌نویسی](/docs/plugins)
   - [مفسرهای مارک‌داون](/docs/parsers)
 - افزونه‌های داخلی
+  - [افزونه نوار ناوبری](/docs/plugins/navbar)
   - [افزونه فهرست مطالب](/docs/plugins/toc)
   - [افزونه پیوند گیت‌هاب](/docs/plugins/githubCorner)
   - [افزونه رونوشت کد](/docs/plugins/codeCopy)
