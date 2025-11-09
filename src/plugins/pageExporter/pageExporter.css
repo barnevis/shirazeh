@@ -64,9 +64,6 @@
 /* -- Dropdown Menu -- */
 .exporter-dropdown {
   position: absolute;
-  bottom: 100%;
-  right: 0;
-  margin-bottom: 0.5rem;
   min-width: 200px;
   background-color: var(--bg-color);
   border: 1px solid var(--border-color);
@@ -78,8 +75,14 @@
   /* Animation */
   opacity: 0;
   visibility: hidden;
+  /* Default transform for opening down */
   transform: translateY(10px);
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+/* Transform for opening up */
+.exporter-dropdown[data-position="up"] {
+  transform: translateY(-10px);
 }
 
 .exporter-dropdown.is-active {

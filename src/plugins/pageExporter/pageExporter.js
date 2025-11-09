@@ -144,6 +144,58 @@ export default class PageExporterPlugin {
     _toggleDropdown(forceState) {
         const isActive = this.dropdown.classList.toggle('is-active', forceState);
         this.mainButton.setAttribute('aria-expanded', isActive);
+        if (isActive) {
+            this._positionDropdown(this.mainButton, this.dropdown);
+        }
+    }
+
+    /**
+     * Calculates and applies the optimal position for the dropdown menu.
+     * @param {HTMLElement} button - The button that toggles the dropdown.
+     * @param {HTMLElement} dropdown - The dropdown element to position.
+     * @private
+     */
+    _positionDropdown(button, dropdown) {
+        const buttonRect = button.getBoundingClientRect();
+        const dropdownRect = dropdown.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+
+        // --- Vertical Placement ---
+        const spaceBelow = viewportHeight - buttonRect.bottom;
+        const spaceAbove = buttonRect.top;
+
+        // Decide whether to open up or down.
+        // Open up ONLY if there's not enough space below AND there's more space above.
+        if (spaceBelow < dropdownRect.height && spaceAbove > spaceBelow) {
+            // Open upwards
+            dropdown.style.bottom = '100%';
+            dropdown.style.top = 'auto';
+            dropdown.style.marginBottom = '0.5rem';
+            dropdown.style.marginTop = 'auto';
+            dropdown.dataset.position = 'up';
+        } else {
+            // Open downwards (default)
+            dropdown.style.top = '100%';
+            dropdown.style.bottom = 'auto';
+            dropdown.style.marginTop = '0.5rem';
+            dropdown.style.marginBottom = 'auto';
+            dropdown.dataset.position = 'down';
+        }
+
+        // --- Horizontal Placement ---
+        // Align "inwards" based on which half of the screen the button is on.
+        const isRightAligned = (buttonRect.left + buttonRect.width / 2) > (viewportWidth / 2);
+        
+        if (isRightAligned) {
+            // Button is on the right, so align dropdown's right edge to button's right edge
+            dropdown.style.right = '0';
+            dropdown.style.left = 'auto';
+        } else {
+            // Button is on the left, so align dropdown's left edge to button's left edge
+            dropdown.style.left = '0';
+            dropdown.style.right = 'auto';
+        }
     }
     
     _getFilename() {
@@ -218,6 +270,9 @@ export default class PageExporterPlugin {
                 } else {
                     const isActive = dropdown.classList.toggle('is-active');
                     button.setAttribute('aria-expanded', isActive);
+                    if (isActive) {
+                        this._positionDropdown(button, dropdown);
+                    }
                 }
             });
 
