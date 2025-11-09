@@ -138,10 +138,10 @@ const DEFAULT_CONFIG = {
     widgets: {
       enabled: true,
       slots: {
-        // Widget ID: { desktop: 'slot-name', mobile: 'policy' }
+        // Widget ID: { desktop: 'slot-name', mobile: 'policy', priority: number }
         // Policies: 'show', 'hide', 'menu', 'dock'
-        'theme-toggle': { desktop: 'dock-top-left', mobile: 'menu' },
-        'github-corner': { desktop: 'dock-top-left', mobile: 'hide' },
+        'theme-toggle': { desktop: 'navbar-right', mobile: 'menu', priority: 90 },
+        'github-corner': { desktop: 'dock-top-left', mobile: 'hide', priority: 80 },
       }
     }
 };

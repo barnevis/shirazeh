@@ -1475,3 +1475,12 @@ navbar: {
 - حتماً RTL-friendly باشد (از CSS logical properties مثل inset-inline-start/end استفاده کن).
 
 فقط ازت می‌خوام سیستم مدیریت ویجت‌ها را پیاده‌سازی کنی و هیچ بخش دیگه را تغییر ندی.
+
+## پرامپت ۱۱۲
+کد widget system خیلی خوب نوشته شده! فقط ۶ تا اصلاح کوچک لازمه:
+1. **configManager.js**: به هر widget یک `priority` اضافه کن (مثلاً theme-toggle: priority 90، github-corner: priority 80). همچنین theme-toggle رو از dock-top-left به navbar-right تغییر بده.
+2. **widgets.css**: z-index رو از 101 به 999 تغییر بده.
+3. **layout.css**: به .sidebar اضافه کن: `display: flex; flex-direction: column;` و به .sidebar-nav اضافه کن: `flex: 1; overflow-y: auto;`
+4. **widgetManager.js**: در متد _placeWidgets قبل از appendChild، widgets رو بر اساس priority مرتب کن (بزرگ‌تر = اول).
+5. **layoutManager.js**: در _createWidgetSlots، container اضافی رو حذف کن و slot ها رو مستقیم به rootElement اضافه کن.
+6. **githubCorner.css**: یک استایل جدید اضافه کن که وقتی .github-corner داخل .widget-slot هست، به یک دکمه گرد ۴۰px تبدیل بشه.

@@ -16,7 +16,7 @@
 .slot-dock-bottom-left, .slot-dock-bottom-right,
 .slot-fallback-right-stack {
   position: fixed;
-  z-index: 101; /* Above content, below navbar/modals */
+  z-index: 999; /* Above content, below modals */
   display: flex;
   gap: 0.75rem;
   transition: top 0.3s ease, bottom 0.3s ease;

@@ -32,6 +32,7 @@ export class WidgetManager {
             ...widget,
             desktopSlot: placement.desktop || 'fallback-right-stack',
             mobilePolicy: placement.mobile || 'hide', // show, hide, menu, dock
+            priority: placement.priority || 0,
         };
         this.widgets.set(widget.id, finalWidget);
     }
@@ -45,24 +46,24 @@ export class WidgetManager {
     }
 
     /**
-     * Places each widget into its correct slot based on device type (desktop/mobile).
+     * Places each widget into its correct slot based on device type and priority.
      * @private
      */
     _placeWidgets() {
+        // 1. Group widgets by their target slot
+        const slotsToWidgets = new Map();
+
         this.widgets.forEach(widget => {
             let targetSlotId;
 
             if (this.isMobile) {
                 switch (widget.mobilePolicy) {
                     case 'show':
+                    case 'dock':
                         targetSlotId = widget.desktopSlot;
                         break;
                     case 'menu':
                         targetSlotId = 'navbar-mobile-actions';
-                        break;
-                    case 'dock':
-                        // If mobile policy is 'dock', it stays in its desktop slot.
-                        targetSlotId = widget.desktopSlot;
                         break;
                     case 'hide':
                     default:
@@ -73,16 +74,30 @@ export class WidgetManager {
                 targetSlotId = widget.desktopSlot;
             }
 
-            const targetSlot = targetSlotId ? document.getElementById(`widget-slot-${targetSlotId}`) : null;
-
-            if (targetSlot) {
-                // This handles re-placement on resize.
-                targetSlot.appendChild(widget.element);
-            } else {
-                // If target slot doesn't exist or is null, detach the element.
-                if (widget.element.parentElement) {
-                    widget.element.parentElement.removeChild(widget.element);
+            if (targetSlotId) {
+                if (!slotsToWidgets.has(targetSlotId)) {
+                    slotsToWidgets.set(targetSlotId, []);
                 }
+                slotsToWidgets.get(targetSlotId).push(widget);
+            }
+        });
+        
+        // 2. Clear all slots before re-placing to handle resizes correctly
+        document.querySelectorAll('.widget-slot').forEach(slot => {
+            slot.innerHTML = '';
+        });
+
+        // 3. Place sorted widgets into their respective slots
+        slotsToWidgets.forEach((widgetsInSlot, slotId) => {
+            const targetSlot = document.getElementById(`widget-slot-${slotId}`);
+            if (targetSlot) {
+                // Sort widgets by priority (higher number comes first)
+                widgetsInSlot.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+                
+                // Append sorted widgets to the DOM
+                widgetsInSlot.forEach(widget => {
+                    targetSlot.appendChild(widget.element);
+                });
             }
         });
     }

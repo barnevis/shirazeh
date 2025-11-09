@@ -52,7 +52,7 @@
 .sidebar-nav {
   padding: 1rem 0;
   overflow-y: auto;
-  flex-grow: 1; /* فضای باقی‌مانده را پر می‌کند */
+  flex: 1; /* فضای باقی‌مانده را پر می‌کند و امکان اسکرول را فراهم می‌کند */
 }
 
 .sidebar-nav ul {

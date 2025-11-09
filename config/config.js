@@ -1,3 +1,4 @@
+
 window.shirazeh = {
   /**
    * @property {string} appName
@@ -260,7 +261,7 @@ window.shirazeh = {
     /**
      * @property {boolean} enabled - آیا افزونه فعال باشد؟
      */
-    enabled: false,
+    enabled: true,
 
     /**
      * @property {string} url - آدرس کامل مخزن گیت‌هاب شما.
@@ -524,7 +525,8 @@ window.shirazeh = {
      * The key is the widget's unique ID.
      */
     slots: {
-      // Widget ID: { desktop: 'slot-name', mobile: 'policy' }
+      // Widget ID: { desktop: 'slot-name', mobile: 'policy', priority: number }
+      // The higher the priority, the earlier the widget appears in the slot.
       //
       // Available desktop slots:
       // - 'sidebar-header-actions'
@@ -539,8 +541,8 @@ window.shirazeh = {
       // - 'hide': Hide on mobile.
       // - 'menu': Move to the mobile navbar menu (if navbar plugin is active).
       // - 'dock': Force it to stay in its docked position.
-      'theme-toggle': { desktop: 'sidebar-footer-actions', mobile: 'menu' },
-      'github-corner': { desktop: 'dock-top-left', mobile: 'hide' },
+      'theme-toggle': { desktop: 'navbar-right', mobile: 'menu', priority: 90 },
+      'github-corner': { desktop: 'dock-top-right', mobile: 'hide', priority: 80 },
     },
   },
 };

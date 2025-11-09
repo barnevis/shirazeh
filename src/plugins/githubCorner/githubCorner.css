@@ -60,3 +60,47 @@ body.shirazeh-navbar-active.navbar-scrolled .github-corner.top-right {
 .github-corner:hover .octo-arm {
   animation: octocat-wave 560ms ease-in-out;
 }
+
+/*
+ * ==========================================
+ *  Button Style for Widget Slots
+ * ==========================================
+ * When the corner is placed in a standard slot (like the navbar),
+ * transform it from a corner banner into a circular button.
+ */
+
+.widget-slot .github-corner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  transform: none !important; /* Override flipping */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.widget-slot .github-corner:hover {
+  background-color: var(--border-color);
+}
+
+.widget-slot .github-corner svg {
+  /* Scale and reposition the SVG to center the octocat */
+  width: 75px;
+  height: 75px;
+  transform: translate(14px, -14px);
+  color: var(--text-color); /* Override default icon color for better contrast */
+}
+
+.widget-slot .github-corner .bg-path {
+  /* Hide the corner banner background */
+  fill: transparent;
+}
+
+.widget-slot .github-corner:hover .octo-arm {
+  /* Disable the wave animation which looks odd in a small circle */
+  animation: none;
+}

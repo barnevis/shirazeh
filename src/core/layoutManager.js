@@ -109,7 +109,7 @@ export class LayoutManager {
             const toggleButton = document.createElement('button');
             toggleButton.className = 'sidebar-toggle';
             toggleButton.setAttribute('aria-label', 'باز و بسته کردن منو');
-            toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+            toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
             rootElement.appendChild(toggleButton);
         }
         
@@ -131,17 +131,12 @@ export class LayoutManager {
             'fallback-right-stack'
         ];
 
-        const container = document.createElement('div');
-        container.className = 'widget-slots-container';
-
         slotIds.forEach(id => {
             const slot = document.createElement('div');
             slot.id = `widget-slot-${id}`;
             slot.className = `widget-slot slot-${id}`;
-            container.appendChild(slot);
+            rootElement.appendChild(slot);
         });
-
-        rootElement.appendChild(container);
     }
 
     /**
