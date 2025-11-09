@@ -138,11 +138,11 @@ body:not(.toc-active) .toc-container {
 
 /* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
 body.shirazeh-navbar-active .toc-container {
-  top: calc(var(--navbar-height, 64px) + 20px);
+  top: calc(var(--navbar-height, 64px) + 60px);
   max-height: calc(100vh - var(--navbar-height, 64px) - 40px);
 }
 
 body.shirazeh-navbar-active.navbar-scrolled .toc-container {
-  top: calc(var(--navbar-height-scrolled, 56px) + 20px);
+  top: calc(var(--navbar-height-scrolled, 56px) + 60px);
   max-height: calc(100vh - var(--navbar-height-scrolled, 56px) - 40px);
 }
