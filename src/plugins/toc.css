@@ -63,7 +63,7 @@ body:not(.toc-active) .toc-container {
 }
 
 .toc-item--parent.is-open .toc-toggle-icon {
-    transform: rotate(90deg); /* Points down */
+    transform: rotate(-90deg); /* Points down */
 }
 
 .toc-container a {
