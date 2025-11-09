@@ -142,6 +142,22 @@ const DEFAULT_CONFIG = {
         // Policies: 'show', 'hide', 'menu', 'dock'
         'theme-toggle': { desktop: 'navbar-right', mobile: 'menu', priority: 90 },
         'github-corner': { desktop: 'dock-top-left', mobile: 'hide', priority: 80 },
+        'page-exporter': { desktop: 'dock-bottom-right', mobile: 'hide', priority: 100 },
+      }
+    },
+    pageExporter: {
+      enabled: true,
+      widgetId: 'page-exporter',
+      formats: ['pdf', 'html', 'md'],
+      filename: '{{page-title}}',
+      displayMode: 'icon', // 'icon' or 'button'
+      labels: {
+        button: 'دانلود',
+        downloadAs: 'دانلود به عنوان:',
+        pdf: 'فایل PDF',
+        html: 'فایل HTML',
+        md: 'فایل Markdown',
+        preparing: 'در حال آماده‌سازی...'
       }
     }
 };

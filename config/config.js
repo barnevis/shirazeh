@@ -1,3 +1,10 @@
+/**
+ * @file User configuration file for Shirazeh.
+ * This is where you can customize your wiki's behavior and appearance.
+ * 
+ * For a complete list of options, please refer to the documentation:
+ * /docs/configuration
+ */
 
 window.shirazeh = {
   /**
@@ -106,6 +113,7 @@ window.shirazeh = {
     'src/plugins/codeCopy/codeCopy.js', // فعال‌سازی افزونه رونوشت کد
     'src/plugins/highlight/highlight.js', // افزونه هایلایت کد
     'src/plugins/imageSizer/imageSizer.js', // افزونه تنظیم اندازه تصویر
+    'src/plugins/pageExporter/pageExporter.js', // افزونه خروجی صفحه
   ],
 
   /**
@@ -543,6 +551,39 @@ window.shirazeh = {
       // - 'dock': Force it to stay in its docked position.
       'theme-toggle': { desktop: 'navbar-left', mobile: 'hide', priority: 90 },
       'github-corner': { desktop: 'navbar-left', mobile: 'hide', priority: 80 },
+      'page-exporter': { desktop: 'dock-bottom-right', mobile: 'hide', priority: 100 },
     },
+  },
+  
+  /**
+   * @property {object} pageExporter
+   * Configuration for the Page Exporter plugin.
+   */
+  pageExporter: {
+    enabled: true,
+    widgetId: 'page-exporter', // Should match the ID in widgets.slots
+    
+    // An array of formats to enable. Order determines display order.
+    // Possible values: 'pdf', 'html', 'md'
+    formats: ['pdf', 'html', 'md'],
+    
+    // Filename template for downloads.
+    // Available placeholders: {{page-title}}, {{wiki-name}}, {{date}}
+    filename: '{{page-title}} - {{wiki-name}}',
+
+    // How the widget/button should be displayed.
+    // 'icon': A small, round icon button (like the theme toggle).
+    // 'button': A full button with text and icon.
+    displayMode: 'icon',
+
+    // Text labels used in the UI.
+    labels: {
+      button: 'دانلود',
+      downloadAs: 'دانلود به عنوان:',
+      pdf: 'فایل PDF',
+      html: 'فایل HTML',
+      md: 'فایل Markdown',
+      preparing: 'در حال آماده‌سازی...'
+    }
   },
 };

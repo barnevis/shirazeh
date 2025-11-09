@@ -17,4 +17,5 @@
   - [افزونه پیوند عنوان‌ها](/docs/plugins/headingAnchor)
   - [افزونه رنگی کردن کد](/docs/plugins/highlight)
   - [افزونه تنظیم اندازه تصویر](/docs/plugins/imageSizer)
+  - [افزونه خروجی صفحه](/docs/plugins/pageExporter)
 - [تاریخچه تغییرات](changelog)

@@ -32,5 +32,10 @@
 @import url('components/themeToggle.css');
 @import url('components/widgets.css');
 
-/* 7. استایل‌های واکنش‌گرا */
+/* 7. استایل‌های افزونه‌ها (اگر CSS داشته باشند) */
+/* (مثال: @import url('../plugins/myPlugin/myPlugin.css');) */
+@import url('../plugins/pageExporter/pageExporter.css');
+
+
+/* 8. استایل‌های واکنش‌گرا */
 @import url('utilities/responsive.css');
