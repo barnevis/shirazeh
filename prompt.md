@@ -1628,3 +1628,17 @@ pageExporter.js:190:21
 ```html
 <img src="/assets/image.png">
 ```
+
+## پرامپت ۱۳۰
+در زمان دانلود PDF خطای زیر نمایش داده می‌شه:
+
+```js
+Failed to export as pdf: Error: html2pdf.js library failed to initialize within the timeout period.
+    intervalId http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:39
+    setInterval handler*ensureLibraryLoaded/loadPromise< http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:30
+    ensureLibraryLoaded http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:19
+    export_ http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:73
+    _triggerExport http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:238
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:137
+pageExporter.js:246:21
+```

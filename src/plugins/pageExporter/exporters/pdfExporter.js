@@ -7,6 +7,7 @@ let loadPromise = null;
 
 /**
  * Dynamically loads the html2pdf.js library script and waits for it to be ready.
+ * This version uses an event-driven approach (onload/onerror) instead of polling.
  * @param {App} app - The main application instance.
  * @returns {Promise<void>} A promise that resolves when the library is ready.
  */
@@ -22,38 +23,28 @@ function ensureLibraryLoaded(app) {
             return resolve();
         }
         
-        // --- Start Polling for the library ---
-        const checkInterval = 100; // ms
-        const timeout = 7000; // 7 seconds
-        let elapsedTime = 0;
-        
-        const intervalId = setInterval(() => {
+        const scriptId = 'shirazeh-html2pdf-script';
+        const script = document.createElement('script');
+        script.id = scriptId;
+        script.src = app.resolvePath('src/lib/vendor/html2pdf.bundle.min.js');
+        script.async = true;
+
+        script.onload = () => {
+            // The script has loaded, but we must verify the global object exists.
             if (typeof window.html2pdf === 'function') {
-                clearInterval(intervalId);
                 resolve();
             } else {
-                elapsedTime += checkInterval;
-                if (elapsedTime >= timeout) {
-                    clearInterval(intervalId);
-                    loadPromise = null; // Allow retry on failure
-                    reject(new Error('html2pdf.js library failed to initialize within the timeout period.'));
-                }
-            }
-        }, checkInterval);
-
-        // --- Inject the script if it doesn't exist ---
-        const scriptId = 'shirazeh-html2pdf-script';
-        if (!document.getElementById(scriptId)) {
-            const script = document.createElement('script');
-            script.id = scriptId;
-            script.src = app.resolvePath('src/lib/vendor/html2pdf.bundle.min.js');
-            script.onerror = () => {
-                clearInterval(intervalId);
                 loadPromise = null; // Allow retry on failure
-                reject(new Error('Failed to load the html2pdf.js script file.'));
-            };
-            document.head.appendChild(script);
-        }
+                reject(new Error('html2pdf.js script loaded but failed to initialize.'));
+            }
+        };
+
+        script.onerror = () => {
+            loadPromise = null; // Allow retry on failure
+            reject(new Error('Failed to load the html2pdf.js script file. Check the path and network connection.'));
+        };
+
+        document.head.appendChild(script);
     });
     
     return loadPromise;
