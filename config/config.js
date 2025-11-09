@@ -21,12 +21,12 @@ window.shirazeh = {
     /**
      * @property {boolean} enabled - آیا نمایش لوگو فعال باشد؟
      */
-    enabled: false,
+    enabled: true,
 
     /**
      * @property {boolean} showAppName - Whether to display the app name text.
      */
-    showAppName: false,
+    showAppName: true,
     
     /**
      * @property {string} src - مسیر فایل لوگو.
@@ -486,7 +486,7 @@ window.shirazeh = {
    * Configuration for the Navbar plugin.
    */
   navbar: {
-    enabled: true,
+    enabled: false,
     source: 'config/navbar.md',
     sticky: true,
     scrollBehavior: 'shrink', // 'shrink' | 'hide' | 'normal'
@@ -549,9 +549,9 @@ window.shirazeh = {
       // - 'hide': Hide on mobile.
       // - 'menu': Move to the mobile navbar menu (if navbar plugin is active).
       // - 'dock': Force it to stay in its docked position.
-      'theme-toggle': { desktop: 'navbar-left', mobile: 'hide', priority: 90 },
-      'github-corner': { desktop: 'navbar-left', mobile: 'hide', priority: 80 },
-      'page-exporter': { desktop: 'dock-bottom-right', mobile: 'hide', priority: 100 },
+      'theme-toggle': { desktop: 'dock-top-left', mobile: 'hide', priority: 90 },
+      'github-corner': { desktop: 'dock-top-left', mobile: 'hide', priority: 80 },
+      'page-exporter': { desktop: 'dock-bottom-left', mobile: 'hide', priority: 100 },
     },
   },
   
@@ -579,7 +579,7 @@ window.shirazeh = {
     // Text labels used in the UI.
     labels: {
       button: 'دانلود',
-      downloadAs: 'دانلود به عنوان:',
+      downloadAs: '',
       pdf: 'فایل PDF',
       html: 'فایل HTML',
       md: 'فایل Markdown',
