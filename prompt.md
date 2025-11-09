@@ -1484,3 +1484,10 @@ navbar: {
 4. **widgetManager.js**: در متد _placeWidgets قبل از appendChild، widgets رو بر اساس priority مرتب کن (بزرگ‌تر = اول).
 5. **layoutManager.js**: در _createWidgetSlots، container اضافی رو حذف کن و slot ها رو مستقیم به rootElement اضافه کن.
 6. **githubCorner.css**: یک استایل جدید اضافه کن که وقتی .github-corner داخل .widget-slot هست، به یک دکمه گرد ۴۰px تبدیل بشه.
+
+## پرامپت ۱۱۳
+مشکل‌های زیر را بر طرف کن:
+1. لوگوی GitHub در حالت widget slot نمایش داده نمیشه. وقتی GitHub corner داخل یک widget slot قرار می‌گیره، لوگو نمایش داده نمیشه.
+2. sidebar-header-actions با لوگو و نام تداخل داره. این slot باید **زیر** لوگو/نام و **بالای** اولین آیتم منو قرار بگیره، نه داخل sidebar-header.
+3. dock slots همیشه top-right نشون میدن با انتخاب dock-top-left، dock-bottom-left، dock-bottom-right همه آیکون‌ها فقط در top-right نمایش داده میشن.
+4. وقتی sidebar فعاله، dock slots بالای sidebar ظاهر میشن و فضای خالی ایجاد میشه.

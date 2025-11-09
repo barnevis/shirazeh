@@ -48,6 +48,16 @@
   text-overflow: ellipsis;
 }
 
+/* --- اسلات ویجت‌های هدر (زیر هدر) --- */
+#widget-slot-sidebar-header-actions {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+#widget-slot-sidebar-header-actions:empty {
+  display: none; /* در صورت خالی بودن، فضا اشغال نکند */
+}
+
 /* --- نویگیشن و آیتم‌های منو --- */
 .sidebar-nav {
   padding: 1rem 0;

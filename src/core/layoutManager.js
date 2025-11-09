@@ -87,21 +87,22 @@ export class LayoutManager {
                 sidebarHeader.appendChild(appTitleLink);
             }
 
-            const sidebarHeaderActions = document.createElement('div');
-            sidebarHeaderActions.id = 'widget-slot-sidebar-header-actions';
-            sidebarHeaderActions.className = 'widget-slot';
-            sidebarHeader.appendChild(sidebarHeaderActions);
-
             const sidebarNav = document.createElement('nav');
             sidebarNav.className = 'sidebar-nav';
 
-            sidebar.appendChild(sidebarHeader);
-            sidebar.appendChild(sidebarNav);
+            // *** FIX: sidebar-header-actions is now a direct child of sidebar ***
+            const sidebarHeaderActions = document.createElement('div');
+            sidebarHeaderActions.id = 'widget-slot-sidebar-header-actions';
+            sidebarHeaderActions.className = 'widget-slot';
 
             const sidebarFooterActions = document.createElement('div');
             sidebarFooterActions.id = 'widget-slot-sidebar-footer-actions';
             sidebarFooterActions.className = 'widget-slot sidebar-footer';
-            sidebar.appendChild(sidebarFooterActions);
+
+            sidebar.appendChild(sidebarHeader);
+            sidebar.appendChild(sidebarHeaderActions); // Placed after header
+            sidebar.appendChild(sidebarNav);
+            sidebar.appendChild(sidebarFooterActions); // Placed after nav
 
             appContainer.appendChild(sidebar);
 

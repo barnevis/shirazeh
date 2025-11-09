@@ -88,10 +88,10 @@ body.shirazeh-navbar-active.navbar-scrolled .github-corner.top-right {
 }
 
 .widget-slot .github-corner svg {
-  /* Scale and reposition the SVG to center the octocat */
-  width: 75px;
-  height: 75px;
-  transform: translate(14px, -14px);
+  /* FIX: Scale and reposition the SVG to center the octocat */
+  width: 60px;
+  height: 60px;
+  transform: translate(-10px, -10px); /* Adjust to pull the icon into view */
   color: var(--text-color); /* Override default icon color for better contrast */
 }
 
