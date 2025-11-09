@@ -62,7 +62,7 @@ window.shirazeh = {
 | `dock-top-right`           | به صورت شناور در گوشه بالا-راست صفحه.                                 |
 | `dock-bottom-left`         | به صورت شناور در گوشه پایین-چپ صفحه.                                 |
 | `dock-bottom-right`        | به صورت شناور در گوشه پایین-راست صفحه.                                |
-| `fallback-right-stack`     | (پیش‌فرض) یک ستون عمودی در سمت راست-بالای صفحه.                  |
+| `fallback-right-stack` | (پیش‌فرض) ستون عمودی شناور در گوشه راست-بالای صفحه. این اسلات زمانی استفاده می‌شود که slot دیگری مشخص نشده باشد. |
 
 ## سیاست‌های موبایل (`mobile`)
 
@@ -111,3 +111,38 @@ window.shirazeh = {
     }
     ```
 -   **نکته مهم:** حتماً یک ورودی پیش‌فرض برای ویجت خود در `src/core/configManager.js` اضافه کنید تا کاربران به راحتی بتوانند آن را کشف و استفاده کنند.
+
+
+## نمونه‌های کاربردی
+
+### نمونه ۱: قرار دادن تغییر تم در نوار ناوبری
+```javascript
+widgets: {
+  enabled: true,
+  slots: {
+    'theme-toggle': { desktop: 'navbar-right', mobile: 'menu', priority: 90 },
+  }
+}
+```
+
+### نمونه ۲: قرار دادن GitHub Corner در گوشه
+```javascript
+widgets: {
+  enabled: true,
+  slots: {
+    'github-corner': { desktop: 'dock-top-left', mobile: 'hide', priority: 80 },
+  }
+}
+```
+
+### نمونه ۳: قرار دادن چند ویجت در نوار کناری
+```javascript
+widgets: {
+  enabled: true,
+  slots: {
+    'theme-toggle': { desktop: 'sidebar-header-actions', mobile: 'show', priority: 100 },
+    'search-button': { desktop: 'sidebar-header-actions', mobile: 'show', priority: 90 },
+    'download-link': { desktop: 'sidebar-footer-actions', mobile: 'show', priority: 80 },
+  }
+}
+```
