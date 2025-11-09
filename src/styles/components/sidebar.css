@@ -50,12 +50,26 @@
 
 /* --- اسلات ویجت‌های هدر (زیر هدر) --- */
 #widget-slot-sidebar-header-actions {
+  display: flex;
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
+  justify-content: space-around; /* ویجت‌ها را با فاصله یکسان توزیع می‌کند */
 }
 #widget-slot-sidebar-header-actions:empty {
   display: none; /* در صورت خالی بودن، فضا اشغال نکند */
+}
+
+/* --- اسلات ویجت‌های فوتر (پایین سایدبار) --- */
+#widget-slot-sidebar-footer-actions {
+  display: flex;
+  padding: 1rem 1.5rem;
+  margin-top: auto; /* Push to the bottom */
+  border-top: 1px solid var(--border-color);
+  justify-content: space-around;
+}
+#widget-slot-sidebar-footer-actions:empty {
+  display: none;
 }
 
 /* --- نویگیشن و آیتم‌های منو --- */

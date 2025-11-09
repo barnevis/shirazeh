@@ -1491,3 +1491,9 @@ navbar: {
 2. sidebar-header-actions با لوگو و نام تداخل داره. این slot باید **زیر** لوگو/نام و **بالای** اولین آیتم منو قرار بگیره، نه داخل sidebar-header.
 3. dock slots همیشه top-right نشون میدن با انتخاب dock-top-left، dock-bottom-left، dock-bottom-right همه آیکون‌ها فقط در top-right نمایش داده میشن.
 4. وقتی sidebar فعاله، dock slots بالای sidebar ظاهر میشن و فضای خالی ایجاد میشه.
+
+## پرامپت ۱۱۴
+در sidebar-header-actions و sidebar-footer-actions ویجت‌ها در این بخش باید به صورت افقی کنار هم قرار بگیرن.
+
+## پرامپت ۱۱۵
+تغییری که دادی مشکل را حل نکرد.

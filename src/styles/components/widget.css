@@ -66,14 +66,6 @@ body.shirazeh-navbar-active.navbar-scrolled .slot-fallback-right-stack {
 }
 
 
-/* -- Sidebar Slots -- */
-#widget-slot-sidebar-footer-actions {
-  padding: 1rem 1.5rem;
-  margin-top: auto; /* Push to the bottom */
-  border-top: 1px solid var(--border-color);
-  justify-content: space-around;
-}
-
 /* -- Navbar Slots -- */
 #widget-slot-navbar-mobile-actions {
   display: flex;
