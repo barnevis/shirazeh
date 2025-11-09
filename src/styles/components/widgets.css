@@ -93,6 +93,13 @@ body.shirazeh-navbar-active.navbar-scrolled .slot-fallback-right-stack {
   width: 100%;
 }
 
+#widget-slot-navbar-mobile-actions:empty {
+  display: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
 /* -- Widget Base Styles -- */
 .widget-slot > * {
   /* Default styles for items placed in a slot */
