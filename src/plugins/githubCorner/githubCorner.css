@@ -26,6 +26,15 @@
   transition: color 0.3s;
 }
 
+/* --- SVG Visibility Control --- */
+.github-corner .github-icon-svg {
+    display: none;
+}
+.github-corner .github-corner-svg {
+    display: block;
+}
+
+
 /* --- Positioning --- */
 /* Fallback positioning for when widget system is disabled */
 .github-corner.top-left {
@@ -74,7 +83,7 @@ body.shirazeh-navbar-active.navbar-scrolled .github-corner.top-right {
   height: 40px;
   border-radius: 50%;
   background-color: var(--sidebar-bg);
-  border: 1px solid var(--border-color);
+  /* border: 1px solid var(--border-color); */
   transform: none !important; /* Override flipping */
   overflow: hidden;
   display: flex;
@@ -87,20 +96,21 @@ body.shirazeh-navbar-active.navbar-scrolled .github-corner.top-right {
   background-color: var(--border-color);
 }
 
-.widget-slot .github-corner svg {
-  /* FIX: Scale and reposition the SVG to center the octocat */
-  width: 60px;
-  height: 60px;
-  transform: translate(-10px, -10px); /* Adjust to pull the icon into view */
-  color: var(--text-color); /* Override default icon color for better contrast */
+/* Hide the corner banner SVG and show the simple icon SVG */
+.widget-slot .github-corner .github-corner-svg {
+  display: none;
+}
+.widget-slot .github-corner .github-icon-svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  color: var(--text-color);
 }
 
 .widget-slot .github-corner .bg-path {
-  /* Hide the corner banner background */
   fill: transparent;
 }
 
 .widget-slot .github-corner:hover .octo-arm {
-  /* Disable the wave animation which looks odd in a small circle */
   animation: none;
 }
