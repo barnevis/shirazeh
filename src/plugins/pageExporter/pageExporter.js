@@ -3,6 +3,7 @@
  * Allows exporting the current page to different formats like PDF, HTML, and Markdown.
  */
 import { injectCSS } from '../../core/pluginManager.js';
+import { fetchContent } from '../../core/fileReader.js';
 import * as markdownExporter from './exporters/markdownExporter.js';
 import * as htmlExporter from './exporters/htmlExporter.js';
 import * as pdfExporter from './exporters/pdfExporter.js';
@@ -33,21 +34,24 @@ export default class PageExporterPlugin {
         this._createUi();
     }
 
-    onPageLoad(contentElement) {
+    async onPageLoad(contentElement) {
         if (!this.config.enabled) return;
 
         this.currentPage.contentElement = contentElement;
         this.currentPage.filePath = this.app.router.getFilePath(this.app.router.getCurrentPath());
 
-        // Fetch raw markdown for the current page
-        const resolvedPath = this.app.resolvePath(this.currentPage.filePath);
-        fetch(resolvedPath)
-            .then(res => res.text())
-            .then(md => this.currentPage.rawMarkdown = md)
-            .catch(err => {
-                console.error('PageExporter: Could not fetch raw markdown.', err);
-                this.currentPage.rawMarkdown = 'محتوای مارک‌داون یافت نشد.';
-            });
+        // Fetch raw markdown for the current page using the app's utility
+        // This ensures the CORS proxy is used for remote files, if configured.
+        const isRemote = this.currentPage.filePath.startsWith('http');
+        const resolvedPath = isRemote ? this.currentPage.filePath : this.app.resolvePath(this.currentPage.filePath);
+        
+        try {
+            const md = await fetchContent(resolvedPath, this.app.config);
+            this.currentPage.rawMarkdown = md;
+        } catch (err) {
+            console.error('PageExporter: Could not fetch raw markdown.', err);
+            this.currentPage.rawMarkdown = 'محتوای مارک‌داون یافت نشد.';
+        }
 
         this.titleManager = this.app.titleManager;
         
