@@ -51,10 +51,10 @@
 /* --- اسلات ویجت‌های هدر (زیر هدر) --- */
 #widget-slot-sidebar-header-actions {
   display: flex;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 0.5rem 1.5rem;
+  /* border-bottom: 1px solid var(--border-color); */
   flex-shrink: 0;
-  justify-content: space-around; /* ویجت‌ها را با فاصله یکسان توزیع می‌کند */
+  justify-content: flex-start; /* ویجت‌ها را با فاصله یکسان توزیع می‌کند */
 }
 #widget-slot-sidebar-header-actions:empty {
   display: none; /* در صورت خالی بودن، فضا اشغال نکند */
@@ -63,10 +63,10 @@
 /* --- اسلات ویجت‌های فوتر (پایین سایدبار) --- */
 #widget-slot-sidebar-footer-actions {
   display: flex;
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   margin-top: auto; /* Push to the bottom */
-  border-top: 1px solid var(--border-color);
-  justify-content: space-around;
+  /* border-top: 1px solid var(--border-color); */
+  justify-content: flex-start;
 }
 #widget-slot-sidebar-footer-actions:empty {
   display: none;
@@ -74,7 +74,7 @@
 
 /* --- نویگیشن و آیتم‌های منو --- */
 .sidebar-nav {
-  padding: 1rem 0;
+  padding: 0rem 0;
   overflow-y: auto;
   flex: 1; /* فضای باقی‌مانده را پر می‌کند و امکان اسکرول را فراهم می‌کند */
 }
