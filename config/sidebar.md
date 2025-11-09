@@ -7,6 +7,7 @@
 - توسعه و مفاهیم پیشرفته
   - [معماری پروژه](/docs/architecture)
   - [سیستم افزونه‌نویسی](/docs/plugins)
+  - [سیستم مدیریت ویجت‌ها](/docs/widgetSystem)
   - [مفسرهای مارک‌داون](/docs/parsers)
 - افزونه‌های داخلی
   - [افزونه نوار ناوبری](/docs/plugins/navbar)
