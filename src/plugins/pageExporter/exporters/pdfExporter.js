@@ -35,7 +35,7 @@ async function loadLibrary(app) {
  * @param {string} data.filename - The desired filename without extension.
  * @param {App} data.app - The main application instance.
  */
-export async function exportToPdf(data) {
+export async function export_(data) {
     const { contentElement, filename, app } = data;
 
     const html2pdf = await loadLibrary(app);
@@ -66,6 +66,3 @@ export async function exportToPdf(data) {
     // The library handles the download process itself.
     await html2pdf().from(clonedContent).set(options).save();
 }
-
-// Alias the main function for the plugin orchestrator
-export const export_ = exportToPdf;

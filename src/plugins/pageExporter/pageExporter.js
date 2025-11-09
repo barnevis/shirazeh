@@ -179,7 +179,7 @@ export default class PageExporterPlugin {
         
         try {
             const filename = this._getFilename();
-            await exporter.export({
+            await exporter.export_({
                 contentElement: this.currentPage.contentElement,
                 rawMarkdown: this.currentPage.rawMarkdown,
                 filename: filename,

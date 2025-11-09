@@ -9,7 +9,7 @@
  * @param {string} data.filename - The desired filename without extension.
  * @param {string} data.title - The title of the page.
  */
-export async function exportToHtml(data) {
+export async function export_(data) {
     const { contentElement, filename, title } = data;
 
     // 1. Gather all CSS rules from the document
@@ -77,6 +77,3 @@ function triggerDownload(blob, filename) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
-
-// Alias the main function for the plugin orchestrator
-export const export_ = exportToHtml;

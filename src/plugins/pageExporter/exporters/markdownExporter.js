@@ -8,7 +8,7 @@
  * @param {string} data.rawMarkdown - The raw markdown content of the page.
  * @param {string} data.filename - The desired filename without extension.
  */
-export async function exportToMarkdown(data) {
+export async function export_(data) {
     const { rawMarkdown, filename } = data;
 
     const blob = new Blob([rawMarkdown], { type: 'text/markdown;charset=utf-8' });
@@ -30,6 +30,3 @@ function triggerDownload(blob, filename) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
-
-// Alias the main function for the plugin orchestrator
-export const export_ = exportToMarkdown;

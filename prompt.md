@@ -1528,3 +1528,22 @@ navbar: {
 - ARIA labels مناسب
 - کاملاً یکپارچه با سیستم ویجت
 - در فایل پیکربندی کاربر بتونه نام فایل دانلود شده را مشخص کنه
+
+## پرامپت ۱۲۱
+با دانلود هر کدام از فایل‌ها خطای زیر در کنسول مرورگر نمایش داده می‌شه:
+
+```js
+Failed to export as html: TypeError: exporter.export is not a function
+    _triggerExport http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:182
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:133
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:131
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:122
+    _createUi http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:80
+    onInit http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:33
+    loadPlugins http://127.0.0.1:8000/src/core/pluginManager.js:49
+    loadPlugins http://127.0.0.1:8000/src/core/pluginManager.js:37
+    start http://127.0.0.1:8000/src/core/app.js:54
+    main http://127.0.0.1:8000/src/index.js:14
+    async* http://127.0.0.1:8000/src/index.js:18
+pageExporter.js:190:21
+```
