@@ -3,6 +3,20 @@
  */
 
 /**
+ * Converts a Blob to a Base64 encoded Data URL.
+ * @param {Blob} blob - The blob to convert.
+ * @returns {Promise<string>} A promise that resolves with the Data URL.
+ */
+function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+/**
  * Fetches and concatenates the CSS content needed for the exported HTML file.
  * @param {App} app - The main application instance.
  * @returns {Promise<string>} A string containing all necessary CSS rules.
@@ -63,13 +77,47 @@ async function _getStyles(app) {
 export async function export_(data) {
     const { contentElement, filename, title, app } = data;
 
-    // 1. Get only the relevant CSS for the content.
+    // 1. Create a clone to work on, to avoid modifying the live page.
+    const contentClone = contentElement.cloneNode(true);
+    
+    // 2. Find all images and embed them as Data URLs to make the HTML self-contained.
+    const images = Array.from(contentClone.querySelectorAll('img'));
+    const imagePromises = images.map(async (img) => {
+        // The `src` attribute is a fully resolved URL by the browser.
+        const src = img.src;
+        if (!src || src.startsWith('data:')) {
+            return; // Skip if it's already a data URL or has no src.
+        }
+
+        try {
+            // Only embed images from the same origin. External images are left as is.
+            if (new URL(src).origin === window.location.origin) {
+                const response = await fetch(src);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const blob = await response.blob();
+                const dataUrl = await blobToBase64(blob);
+                img.src = dataUrl;
+            }
+        } catch (error) {
+            console.warn(`Could not embed image "${src}" for HTML export:`, error);
+        }
+    });
+    
+    // Wait for all images to be processed before proceeding.
+    await Promise.all(imagePromises);
+
+    // 3. Get the modified HTML content with embedded images.
+    const finalHtmlContent = contentClone.innerHTML;
+
+    // 4. Get all necessary styles.
     const styles = await _getStyles(app);
 
-    // 2. Get the current theme to apply to the exported HTML tag.
+    // 5. Get the current theme to apply to the exported HTML tag.
     const theme = document.documentElement.getAttribute('data-theme') || 'light';
 
-    // 3. Get dynamically set typography variables from the live document.
+    // 6. Get dynamically set typography variables from the live document.
     const rootStyles = getComputedStyle(document.documentElement);
     const fontVars = `
         :root {
@@ -80,7 +128,7 @@ export async function export_(data) {
         }
     `;
 
-    // 4. Create the final HTML structure.
+    // 7. Create the final HTML structure.
     const htmlString = `
         <!DOCTYPE html>
         <html lang="fa" dir="rtl" data-theme="${theme}">
@@ -108,13 +156,13 @@ export async function export_(data) {
         </head>
         <body>
             <main class="prose content">
-                ${contentElement.innerHTML}
+                ${finalHtmlContent}
             </main>
         </body>
         </html>
     `;
 
-    // 5. Create a blob and trigger download.
+    // 8. Create a blob and trigger download.
     const blob = new Blob([htmlString], { type: 'text/html;charset=utf-8' });
     triggerDownload(blob, `${filename}.html`);
 }
