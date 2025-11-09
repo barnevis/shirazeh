@@ -541,8 +541,8 @@ window.shirazeh = {
       // - 'hide': Hide on mobile.
       // - 'menu': Move to the mobile navbar menu (if navbar plugin is active).
       // - 'dock': Force it to stay in its docked position.
-      'theme-toggle': { desktop: 'navbar-right', mobile: 'menu', priority: 90 },
-      'github-corner': { desktop: 'dock-top-right', mobile: 'hide', priority: 80 },
+      'theme-toggle': { desktop: 'navbar-left', mobile: 'hide', priority: 90 },
+      'github-corner': { desktop: 'navbar-left', mobile: 'hide', priority: 80 },
     },
   },
 };
