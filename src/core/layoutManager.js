@@ -32,6 +32,8 @@ export class LayoutManager {
 
         rootElement.innerHTML = ''; // Clear any existing content
 
+        this._createWidgetSlots(rootElement); // Create global slots first.
+
         const appContainer = document.createElement('div');
         appContainer.className = 'app-container';
 
@@ -85,11 +87,22 @@ export class LayoutManager {
                 sidebarHeader.appendChild(appTitleLink);
             }
 
+            const sidebarHeaderActions = document.createElement('div');
+            sidebarHeaderActions.id = 'widget-slot-sidebar-header-actions';
+            sidebarHeaderActions.className = 'widget-slot';
+            sidebarHeader.appendChild(sidebarHeaderActions);
+
             const sidebarNav = document.createElement('nav');
             sidebarNav.className = 'sidebar-nav';
 
             sidebar.appendChild(sidebarHeader);
             sidebar.appendChild(sidebarNav);
+
+            const sidebarFooterActions = document.createElement('div');
+            sidebarFooterActions.id = 'widget-slot-sidebar-footer-actions';
+            sidebarFooterActions.className = 'widget-slot sidebar-footer';
+            sidebar.appendChild(sidebarFooterActions);
+
             appContainer.appendChild(sidebar);
 
             // Create Toggle Button, append to root so it's a sibling of app-container
@@ -102,6 +115,33 @@ export class LayoutManager {
         
         appContainer.appendChild(content);
         rootElement.appendChild(appContainer);
+    }
+
+    /**
+     * Creates the global widget slot containers.
+     * @param {HTMLElement} rootElement - The main app root element.
+     * @private
+     */
+    _createWidgetSlots(rootElement) {
+        if (!this.config.widgets || !this.config.widgets.enabled) return;
+
+        const slotIds = [
+            'dock-top-left', 'dock-top-right',
+            'dock-bottom-left', 'dock-bottom-right',
+            'fallback-right-stack'
+        ];
+
+        const container = document.createElement('div');
+        container.className = 'widget-slots-container';
+
+        slotIds.forEach(id => {
+            const slot = document.createElement('div');
+            slot.id = `widget-slot-${id}`;
+            slot.className = `widget-slot slot-${id}`;
+            container.appendChild(slot);
+        });
+
+        rootElement.appendChild(container);
     }
 
     /**

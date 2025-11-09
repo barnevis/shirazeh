@@ -10,6 +10,7 @@ import { ParserManager } from './parserManager.js';
 import { TitleManager } from './titleManager.js';
 import { LayoutManager } from './layoutManager.js';
 import { PageManager } from './pageManager.js';
+import { WidgetManager } from './widgetManager.js';
 import { resolvePath as resolvePathUtil } from './utils.js';
 
 /**
@@ -32,6 +33,7 @@ export class App {
         this.parserManager = new ParserManager(this.config.markdown, this);
         this.titleManager = new TitleManager(this.config);
         this.layoutManager = new LayoutManager(this.config, this);
+        this.widgetManager = new WidgetManager(this);
     }
 
     /**
@@ -51,10 +53,15 @@ export class App {
             // 4. Load all configured plugins.
             await this.pluginManager.loadPlugins(this.config.plugins);
 
-            // 5. Get a reference to the main content element after it's created.
+            // 5. Render registered widgets into their slots.
+            if (this.config.widgets && this.config.widgets.enabled) {
+                this.widgetManager.renderAll();
+            }
+
+            // 6. Get a reference to the main content element after it's created.
             this.contentElement = getElement(this.config.selectors.content);
 
-            // 6. Initialize the sidebar if enabled.
+            // 7. Initialize the sidebar if enabled.
             if (this.config.sidebar && this.config.sidebar.enabled) {
                 const resolvedSidebarFile = this.resolvePath(this.config.files.sidebar);
                 this.sidebar = new Sidebar({
@@ -70,7 +77,7 @@ export class App {
                 this.sidebar = null;
             }
 
-            // 7. Initialize the page manager which handles loading content.
+            // 8. Initialize the page manager which handles loading content.
             this.pageManager = new PageManager({
                 config: this.config,
                 contentElement: this.contentElement,
@@ -81,7 +88,7 @@ export class App {
                 app: this, // Pass app instance for path resolving
             });
 
-            // 8. Initialize the router and connect it to the page manager.
+            // 9. Initialize the router and connect it to the page manager.
             this.router = new Router({
                 defaultPage: this.config.files.defaultPage,
                 onNavigate: (filePath, path) => {

@@ -84,15 +84,18 @@ export default class NavbarPlugin {
         const wrapper = document.createElement('div');
         wrapper.className = 'navbar-wrapper';
         
-        // ایجاد سه بخش اصلی: چپ، وسط و راست
+        // ایجاد سه بخش اصلی: چپ، وسط و راست به عنوان اسلات‌های ویجت
         this.leftSection = document.createElement('div');
-        this.leftSection.className = 'navbar-section navbar-left';
+        this.leftSection.className = 'navbar-section navbar-left widget-slot';
+        this.leftSection.id = 'widget-slot-navbar-left';
         
         this.centerSection = document.createElement('div');
         this.centerSection.className = 'navbar-section navbar-center';
+        // Note: The center section itself is not a slot, but contains menu items and the mobile actions slot.
 
         this.rightSection = document.createElement('div');
-        this.rightSection.className = 'navbar-section navbar-right';
+        this.rightSection.className = 'navbar-section navbar-right widget-slot';
+        this.rightSection.id = 'widget-slot-navbar-right';
 
         // ایجاد دکمه همبرگری برای موبایل
         this.hamburgerBtn = document.createElement('button');
@@ -226,6 +229,12 @@ export default class NavbarPlugin {
         this.leftSection.appendChild(this._buildMenuList(structure.left));
         this.centerSection.appendChild(this._buildMenuList(structure.center));
         this.rightSection.appendChild(this._buildMenuList(structure.right));
+
+        // Add the mobile actions slot to the center section, which becomes the mobile menu.
+        const mobileActions = document.createElement('div');
+        mobileActions.id = 'widget-slot-navbar-mobile-actions';
+        mobileActions.className = 'widget-slot navbar-mobile-actions';
+        this.centerSection.appendChild(mobileActions);
     }
     
     /**

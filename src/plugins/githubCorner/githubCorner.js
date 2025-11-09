@@ -13,24 +13,34 @@ export default class GithubCornerPlugin {
         this.app = app;
         this.config = app.config.githubCorner || {};
 
-        // Guard clause: Do not proceed if the plugin is disabled or the URL is missing.
         if (!this.config.enabled || !this.config.url) {
             return;
         }
 
-        // Inject the plugin's CSS file.
         const cssPath = app.resolvePath('src/plugins/githubCorner/githubCorner.css');
         injectCSS(cssPath);
 
-        // Create and append the corner element to the DOM.
-        this._createCorner();
+        const cornerElement = this._createCornerElement();
+
+        if (this.app.config.widgets && this.app.config.widgets.enabled) {
+            this.app.widgetManager.register({
+                id: 'github-corner',
+                element: cornerElement,
+            });
+        } else {
+            // Fallback to old behavior
+            const position = this.config.position === 'top-right' ? 'top-right' : 'top-left';
+            cornerElement.classList.add(position);
+            document.body.appendChild(cornerElement);
+        }
     }
 
     /**
      * Creates and configures the GitHub corner DOM element.
      * @private
+     * @returns {HTMLAnchorElement} The created anchor element.
      */
-    _createCorner() {
+    _createCornerElement() {
         const cornerLink = document.createElement('a');
         cornerLink.href = this.config.url;
         cornerLink.className = 'github-corner';
@@ -38,14 +48,8 @@ export default class GithubCornerPlugin {
         cornerLink.setAttribute('rel', 'noopener');
         cornerLink.setAttribute('aria-label', 'View source on GitHub');
         
-        // Add position class based on config, default to top-left.
-        const position = this.config.position === 'top-right' ? 'top-right' : 'top-left';
-        cornerLink.classList.add(position);
-        
-        // Apply size from config.
         cornerLink.style.setProperty('--github-corner-size', this.config.size || '80px');
         
-        // Apply custom colors from config if they exist.
         if (this.config.backgroundColor) {
             cornerLink.style.setProperty('--github-corner-bg', this.config.backgroundColor);
         }
@@ -53,7 +57,6 @@ export default class GithubCornerPlugin {
             cornerLink.style.setProperty('--github-corner-icon', this.config.iconColor);
         }
         
-        // The SVG for the GitHub corner icon.
         cornerLink.innerHTML = `
             <svg viewBox="0 0 250 250" aria-hidden="true">
                 <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z" class="bg-path"></path>
@@ -62,6 +65,6 @@ export default class GithubCornerPlugin {
             </svg>
         `;
 
-        document.body.appendChild(cornerLink);
+        return cornerLink;
     }
 }

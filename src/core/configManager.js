@@ -134,6 +134,15 @@ const DEFAULT_CONFIG = {
     },
     imageSizer: {
         enabled: true,
+    },
+    widgets: {
+      enabled: true,
+      slots: {
+        // Widget ID: { desktop: 'slot-name', mobile: 'policy' }
+        // Policies: 'show', 'hide', 'menu', 'dock'
+        'theme-toggle': { desktop: 'dock-top-left', mobile: 'menu' },
+        'github-corner': { desktop: 'dock-top-left', mobile: 'hide' },
+      }
     }
 };
 

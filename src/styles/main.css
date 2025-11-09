@@ -30,6 +30,7 @@
 @import url('components/parsneshan.css'); /*  <-- این خط اضافه شده */
 @import url('components/messages.css');
 @import url('components/themeToggle.css');
+@import url('components/widgets.css');
 
 /* 7. استایل‌های واکنش‌گرا */
 @import url('utilities/responsive.css');

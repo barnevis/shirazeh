@@ -1,0 +1,83 @@
+/*
+ * ==========================================
+ *  Styles for the Widget/Slot System
+ * ==========================================
+ */
+
+/* -- Base Slot Styles -- */
+.widget-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* -- Docked Slots -- */
+.slot-dock-top-left, .slot-dock-top-right,
+.slot-dock-bottom-left, .slot-dock-bottom-right,
+.slot-fallback-right-stack {
+  position: fixed;
+  z-index: 101; /* Above content, below navbar/modals */
+  display: flex;
+  gap: 0.75rem;
+  transition: top 0.3s ease, bottom 0.3s ease;
+}
+
+.slot-dock-top-left, .slot-dock-top-right {
+  top: 1.25rem;
+}
+.slot-dock-bottom-left, .slot-dock-bottom-right {
+  bottom: 1.25rem;
+}
+.slot-dock-top-left, .slot-dock-bottom-left {
+  inset-inline-start: 1.25rem;
+}
+.slot-dock-top-right, .slot-dock-bottom-right {
+  inset-inline-end: 1.25rem;
+}
+.slot-fallback-right-stack {
+  top: 1.25rem;
+  inset-inline-end: 1.25rem;
+  flex-direction: column;
+}
+
+/* Navbar Integration for Docked Slots */
+body.shirazeh-navbar-active .slot-dock-top-left,
+body.shirazeh-navbar-active .slot-dock-top-right,
+body.shirazeh-navbar-active .slot-fallback-right-stack {
+  top: calc(var(--navbar-height) + 1.25rem);
+}
+body.shirazeh-navbar-active.navbar-scrolled .slot-dock-top-left,
+body.shirazeh-navbar-active.navbar-scrolled .slot-dock-top-right,
+body.shirazeh-navbar-active.navbar-scrolled .slot-fallback-right-stack {
+  top: calc(var(--navbar-height-scrolled) + 1.25rem);
+}
+
+
+/* -- Sidebar Slots -- */
+#widget-slot-sidebar-header-actions {
+  justify-content: center;
+  margin-block-start: 1rem;
+}
+#widget-slot-sidebar-footer-actions {
+  padding: 1rem 1.5rem;
+  margin-top: auto; /* Push to the bottom */
+  border-top: 1px solid var(--border-color);
+  justify-content: space-around;
+}
+
+/* -- Navbar Slots -- */
+#widget-slot-navbar-mobile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  margin-top: 1rem;
+  border-top: 1px solid var(--navbar-border-color);
+  width: 100%;
+}
+
+/* -- Widget Base Styles -- */
+.widget-slot > * {
+  /* Default styles for items placed in a slot */
+  flex-shrink: 0;
+}

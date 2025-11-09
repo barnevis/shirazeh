@@ -507,4 +507,40 @@ window.shirazeh = {
      */
     enabled: true,
   },
+
+  /**
+   * @property {object} widgets
+   * Configuration for the Widget/Slot system.
+   */
+  widgets: {
+    /**
+     * @property {boolean} enabled - Whether the widget system is enabled.
+     * If false, plugins will fall back to their own positioning logic.
+     */
+    enabled: true,
+    
+    /**
+     * @property {object} slots - Defines where each widget should be placed.
+     * The key is the widget's unique ID.
+     */
+    slots: {
+      // Widget ID: { desktop: 'slot-name', mobile: 'policy' }
+      //
+      // Available desktop slots:
+      // - 'sidebar-header-actions'
+      // - 'sidebar-footer-actions'
+      // - 'navbar-left', 'navbar-center', 'navbar-right' (if navbar plugin is active)
+      // - 'dock-top-left', 'dock-top-right'
+      // - 'dock-bottom-left', 'dock-bottom-right'
+      // - 'fallback-right-stack' (default if no other slot is suitable)
+      //
+      // Available mobile policies:
+      // - 'show': Keep in the same desktop slot.
+      // - 'hide': Hide on mobile.
+      // - 'menu': Move to the mobile navbar menu (if navbar plugin is active).
+      // - 'dock': Force it to stay in its docked position.
+      'theme-toggle': { desktop: 'sidebar-footer-actions', mobile: 'menu' },
+      'github-corner': { desktop: 'dock-top-left', mobile: 'hide' },
+    },
+  },
 };

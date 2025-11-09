@@ -13,8 +13,9 @@
 .github-corner {
   --github-corner-size: 80px; /* Default size, can be overridden by config */
   
-  position: fixed;
-  z-index: 101; /* Lowered z-index to avoid overlapping theme-toggle */
+  /* Positioning is now handled by the Widget/Slot system. */
+  /* No position, top, left, right, z-index properties. */
+  
   border: 0;
   width: var(--github-corner-size);
   height: var(--github-corner-size);
@@ -22,19 +23,30 @@
 
   /* Set the color for the icon paths which use `fill="currentColor"` */
   color: var(--github-corner-icon, var(--sidebar-bg));
-  transition: color 0.3s, top 0.3s ease;
+  transition: color 0.3s;
 }
 
 /* --- Positioning --- */
+/* Fallback positioning for when widget system is disabled */
 .github-corner.top-left {
-  top: 0;
-  left: 0;
-  transform: scaleX(-1); /* Flips horizontally for left side */
+  position: fixed; top: 0; left: 0; transform: scaleX(-1);
+}
+.github-corner.top-right {
+  position: fixed; top: 0; right: 0;
+}
+body.shirazeh-navbar-active .github-corner.top-left,
+body.shirazeh-navbar-active .github-corner.top-right {
+  top: var(--navbar-height, 64px);
+}
+body.shirazeh-navbar-active.navbar-scrolled .github-corner.top-left,
+body.shirazeh-navbar-active.navbar-scrolled .github-corner.top-right {
+  top: var(--navbar-height-scrolled, 56px);
 }
 
-.github-corner.top-right {
-  top: 0;
-  right: 0;
+/* Visual flipping for left-side slots in widget system */
+.slot-dock-top-left .github-corner,
+.slot-dock-bottom-left .github-corner {
+  transform: scaleX(-1);
 }
 
 /* --- SVG Styling & Theme Integration --- */
@@ -47,22 +59,4 @@
 /* --- Hover Animation --- */
 .github-corner:hover .octo-arm {
   animation: octocat-wave 560ms ease-in-out;
-}
-
-/* --- Responsiveness --- */
-@media (max-width: 767px) {
-  /* Hide the corner on small screens to save space */
-  .github-corner {
-    display: none;
-  }
-}
-
-/* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
-body.shirazeh-navbar-active .github-corner {
-  /* Push the corner down below the navbar */
-  top: var(--navbar-height, 64px);
-}
-
-body.shirazeh-navbar-active.navbar-scrolled .github-corner {
-  top: var(--navbar-height-scrolled, 56px);
 }

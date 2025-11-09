@@ -5,12 +5,7 @@
  */
 
 .theme-toggle {
-  /* موقعیت ثابت در گوشه بالا-چپ صفحه */
-  position: fixed;
-  top: 30px;
-  left: 65px;
-  right: auto; /* برای لغو هر استایل قبلی */
-  z-index: 102; /* بالاتر از دکمه سایدبار (که 101 بود) */
+  /* Position, z-index, etc. are now handled by the Widget/Slot system. */
 
   /* استایل‌های ظاهری */
   background: none;
@@ -23,7 +18,7 @@
   justify-content: center;
   cursor: pointer;
   color: var(--text-color);
-  transition: background-color 0.2s, top 0.3s ease;
+  transition: background-color 0.2s;
   padding: 0;
   margin: 0;
 }
@@ -42,13 +37,3 @@
 [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 [data-theme="light"] .theme-toggle .icon-sun { display: none; }
 [data-theme="light"] .theme-toggle .icon-moon { display: block; }
-
-/* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
-body.shirazeh-navbar-active .theme-toggle {
-  /* دکمه را به زیر نوار ناوبری منتقل کن */
-  top: calc(var(--navbar-height, 64px) + 20px);
-}
-
-body.shirazeh-navbar-active.navbar-scrolled .theme-toggle {
-  top: calc(var(--navbar-height-scrolled, 56px) + 20px);
-}

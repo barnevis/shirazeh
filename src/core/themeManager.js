@@ -254,7 +254,16 @@ ${variablesString}
             </span>
         `;
         
-        document.body.appendChild(this.toggleButton);
+        // --- Widget System Integration ---
+        if (this.app.config.widgets && this.app.config.widgets.enabled) {
+            this.app.widgetManager.register({
+                id: 'theme-toggle',
+                element: this.toggleButton
+            });
+        } else {
+            // Fallback to old behavior
+            document.body.appendChild(this.toggleButton);
+        }
 
         this.toggleButton.addEventListener('click', () => this.toggleTheme());
     }
