@@ -2,30 +2,61 @@
  * @file PDF Exporter for the Page Exporter plugin.
  */
 
-let html2pdfLib = null;
+// A module-level promise to ensure the library is loaded only once.
+let loadPromise = null;
 
 /**
- * Dynamically loads the html2pdf.js library.
+ * Dynamically loads the html2pdf.js library script and waits for it to be ready.
  * @param {App} app - The main application instance.
- * @returns {Promise<object>} The html2pdf library object.
+ * @returns {Promise<void>} A promise that resolves when the library is ready.
  */
-async function loadLibrary(app) {
-    if (html2pdfLib) {
-        return html2pdfLib;
+function ensureLibraryLoaded(app) {
+    // If the loading process has already been initiated, return the existing promise.
+    if (loadPromise) {
+        return loadPromise;
     }
 
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = app.resolvePath('src/lib/vendor/html2pdf.bundle.min.js');
-        script.onload = () => {
-            html2pdfLib = window.html2pdf;
-            resolve(html2pdfLib);
-        };
-        script.onerror = () => {
-            reject(new Error('Failed to load html2pdf.js library.'));
-        };
-        document.head.appendChild(script);
+    loadPromise = new Promise((resolve, reject) => {
+        // If the library is already available, resolve immediately.
+        if (typeof window.html2pdf === 'function') {
+            return resolve();
+        }
+        
+        // --- Start Polling for the library ---
+        const checkInterval = 100; // ms
+        const timeout = 7000; // 7 seconds
+        let elapsedTime = 0;
+        
+        const intervalId = setInterval(() => {
+            if (typeof window.html2pdf === 'function') {
+                clearInterval(intervalId);
+                resolve();
+            } else {
+                elapsedTime += checkInterval;
+                if (elapsedTime >= timeout) {
+                    clearInterval(intervalId);
+                    loadPromise = null; // Allow retry on failure
+                    reject(new Error('html2pdf.js library failed to initialize within the timeout period.'));
+                }
+            }
+        }, checkInterval);
+
+        // --- Inject the script if it doesn't exist ---
+        const scriptId = 'shirazeh-html2pdf-script';
+        if (!document.getElementById(scriptId)) {
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = app.resolvePath('src/lib/vendor/html2pdf.bundle.min.js');
+            script.onerror = () => {
+                clearInterval(intervalId);
+                loadPromise = null; // Allow retry on failure
+                reject(new Error('Failed to load the html2pdf.js script file.'));
+            };
+            document.head.appendChild(script);
+        }
     });
+    
+    return loadPromise;
 }
 
 /**
@@ -38,7 +69,11 @@ async function loadLibrary(app) {
 export async function export_(data) {
     const { contentElement, filename, app } = data;
 
-    const html2pdf = await loadLibrary(app);
+    // First, ensure the script has been loaded and initialized.
+    await ensureLibraryLoaded(app);
+    
+    // The ensureLibraryLoaded promise guarantees that html2pdf is now a function.
+    const html2pdf = window.html2pdf;
 
     const clonedContent = contentElement.cloneNode(true);
     

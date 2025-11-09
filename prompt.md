@@ -1554,3 +1554,57 @@ pageExporter.js:190:21
 به طور مثال استایل‌ها نوارهای کناری و ناوبری نباید باشه× فقط همون بخش محتوا (content) کافیه.
 
 برای فونت هم می‌تونی آدرس CDN وزیر متن را بزاری.
+
+## پرامپت ۱۲۳
+موقع دانلود PDF خطای زیر در کنسول مرورگر نمایش داده می‌شه:
+
+```js
+Failed to export as pdf: TypeError: html2pdf is not a function
+    export_ http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:67
+    _triggerExport http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:182
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:133
+pageExporter.js:190:21
+```
+
+## پرامپت ۱۲۴
+حالا خطای زیر نمایش داده می‌شه:
+
+```js
+Failed to export as pdf: TypeError: html2pdf is not a function. The library may have failed to initialize correctly.
+    export_ http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:57
+    _triggerExport http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:182
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:133
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:131
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:122
+    _createUi http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:80
+    onInit http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:33
+    loadPlugins http://127.0.0.1:8000/src/core/pluginManager.js:49
+    loadPlugins http://127.0.0.1:8000/src/core/pluginManager.js:37
+    start http://127.0.0.1:8000/src/core/app.js:54
+    main http://127.0.0.1:8000/src/index.js:14
+    async* http://127.0.0.1:8000/src/index.js:18
+```
+
+## پرامپت ۱۲۵
+باز هم خطا داده می‌ده:
+
+```js
+Failed to export as pdf: Error: html2pdf.js was loaded, but the global function is not available.
+    onload http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:37
+    setTimeout handler*ensureLibraryLoaded/loadPromise</script.onload http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:32
+    loadPromise http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:28
+    ensureLibraryLoaded http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:19
+    export_ http://127.0.0.1:8000/src/plugins/pageExporter/exporters/pdfExporter.js:63
+    _triggerExport http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:182
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:133
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:131
+    _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:122
+    _createUi http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:80
+    onInit http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:33
+    loadPlugins http://127.0.0.1:8000/src/core/pluginManager.js:49
+    loadPlugins http://127.0.0.1:8000/src/core/pluginManager.js:37
+    start http://127.0.0.1:8000/src/core/app.js:54
+    main http://127.0.0.1:8000/src/index.js:14
+    async* http://127.0.0.1:8000/src/index.js:18
+pageExporter.js:190:21
+```
