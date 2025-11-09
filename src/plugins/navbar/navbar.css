@@ -50,11 +50,12 @@ body.navbar-scrolled .navbar-container.is-sticky {
 
 /* -- چیدمان داخلی -- */
 .navbar-wrapper {
+  position: relative;
   height: 100%;
   padding: 0 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .navbar-section {
@@ -63,10 +64,20 @@ body.navbar-scrolled .navbar-container.is-sticky {
   gap: 0.5rem;
 }
 
+.navbar-left {
+  position: absolute;
+  left: 1.5rem;
+}
+
+.navbar-right {
+  position: absolute;
+  right: 1.5rem;
+}
+
 .navbar-center {
-  flex-grow: 1;
   justify-content: center;
 }
+
 
 /* -- برندینگ (لوگو و نام) -- */
 .navbar-brand {
@@ -266,9 +277,17 @@ body.navbar-scrolled .navbar-container.is-sticky {
 }
 
 @media (max-width: 768px) {
-  .navbar-wrapper { padding: 0 1rem; }
+  .navbar-wrapper { 
+    padding: 0 1rem;
+    justify-content: space-between;
+  }
+  .navbar-left, .navbar-right {
+    position: static;
+  }
   .navbar-section.navbar-center,
-  .navbar-section.navbar-right .navbar-menu { display: none; }
+  .navbar-section.navbar-right {
+    display: none; 
+  }
   .hamburger-button { display: block; }
   
   .mobile-menu-open .navbar-section.navbar-center {
