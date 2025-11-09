@@ -196,7 +196,7 @@ export default class NavbarPlugin {
      * @private
      */
     _renderStructure(structure) {
-        // افزودن لوگو و نام برنامه به بخش چپ (بر اساس کانفیگ)
+        // افزودن لوگو و نام برنامه به بخش راست (بر اساس کانفیگ)
         const logoConfig = this.config.logo;
         const appNameConfig = this.config.appName;
         if (logoConfig.show || appNameConfig.show) {
@@ -222,7 +222,7 @@ export default class NavbarPlugin {
                 appNameEl.textContent = appNameText;
                 brandLink.appendChild(appNameEl);
             }
-            this.leftSection.appendChild(brandLink);
+            this.rightSection.prepend(brandLink);
         }
 
         // رندر کردن منوهای چپ، وسط و راست
