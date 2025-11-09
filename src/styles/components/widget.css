@@ -11,51 +11,68 @@
   gap: 0.5rem;
 }
 
-/* -- Docked Slots -- */
-.slot-dock-top-left, .slot-dock-top-right,
-.slot-dock-bottom-left, .slot-dock-bottom-right,
+/*
+ * ==========================================
+ *  Docked Slots - Using Logical Properties for RTL
+ * ==========================================
+ */
+.slot-dock-top-left,
+.slot-dock-top-right,
+.slot-dock-bottom-left,
+.slot-dock-bottom-right,
 .slot-fallback-right-stack {
   position: fixed;
-  z-index: 999; /* Above content, below modals */
+  z-index: 999;
   display: flex;
   gap: 0.75rem;
-  transition: top 0.3s ease, bottom 0.3s ease, inset-inline-start 0.3s ease, inset-inline-end 0.3s ease;
+  transition: all 0.3s ease; /* Transition all inset properties */
 }
 
-.slot-dock-top-left, .slot-dock-top-right {
-  top: 1.25rem;
-}
-.slot-dock-bottom-left, .slot-dock-bottom-right {
-  bottom: 1.25rem;
-}
-
-/* FIX: Swapped logical properties for correct RTL positioning */
-/* left = end, right = start in RTL */
-.slot-dock-top-left, .slot-dock-bottom-left {
-  inset-inline-end: 1.25rem;
-}
-.slot-dock-top-right, .slot-dock-bottom-right {
-  inset-inline-start: 1.25rem;
-}
 .slot-fallback-right-stack {
-  top: 1.25rem;
-  inset-inline-start: 1.25rem; /* Fallback should be on the right (start) */
   flex-direction: column;
 }
+
+/* -- Logical Positioning for each Dock Slot (RTL Aware) -- */
+/* inset-block-start  -> top */
+/* inset-block-end    -> bottom */
+/* inset-inline-start -> right (in RTL) */
+/* inset-inline-end   -> left (in RTL) */
+
+.slot-dock-top-right {
+  inset-block-start: 1.25rem;
+  inset-inline-start: 1.25rem;
+}
+.slot-dock-top-left {
+  inset-block-start: 1.25rem;
+  inset-inline-end: 1.25rem;
+}
+.slot-dock-bottom-right {
+  inset-block-end: 1.25rem;
+  inset-inline-start: 1.25rem;
+}
+.slot-dock-bottom-left {
+  inset-block-end: 1.25rem;
+  inset-inline-end: 1.25rem;
+}
+.slot-fallback-right-stack {
+  inset-block-start: 1.25rem;
+  inset-inline-start: 1.25rem;
+}
+
 
 /* Navbar Integration for Docked Slots */
 body.shirazeh-navbar-active .slot-dock-top-left,
 body.shirazeh-navbar-active .slot-dock-top-right,
 body.shirazeh-navbar-active .slot-fallback-right-stack {
-  top: calc(var(--navbar-height) + 1.25rem);
+  inset-block-start: calc(var(--navbar-height) + 1.25rem);
 }
 body.shirazeh-navbar-active.navbar-scrolled .slot-dock-top-left,
 body.shirazeh-navbar-active.navbar-scrolled .slot-dock-top-right,
 body.shirazeh-navbar-active.navbar-scrolled .slot-fallback-right-stack {
-  top: calc(var(--navbar-height-scrolled) + 1.25rem);
+  inset-block-start: calc(var(--navbar-height-scrolled) + 1.25rem);
 }
 
-/* FIX: Sidebar Integration for Docked Slots on desktop */
+/* Sidebar Integration for Docked Slots on desktop */
 @media (min-width: 768px) {
   /* When sidebar is open, push right-side docks over */
   body:not(.sidebar-collapsed):not(.sidebar-disabled) .slot-dock-top-right,
@@ -64,7 +81,6 @@ body.shirazeh-navbar-active.navbar-scrolled .slot-fallback-right-stack {
     inset-inline-start: calc(var(--sidebar-width) + 1.25rem);
   }
 }
-
 
 /* -- Navbar Slots -- */
 #widget-slot-navbar-mobile-actions {
