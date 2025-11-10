@@ -1642,3 +1642,23 @@ Failed to export as pdf: Error: html2pdf.js library failed to initialize within 
     _createDropdown http://127.0.0.1:8000/src/plugins/pageExporter/pageExporter.js:137
 pageExporter.js:246:21
 ```
+
+## پرامپت ۱۳۱
+زمانی که در فایل پیکربندی نوار کناری یک پیوند (link) خارجی برای نمایش یک صفحه استفاده می‌کنم با کلیک بر روی اون صفحه از منوی کناری یک تب جدید در مرورگر ایجاد می‌شه، که این اشتباهه و باید در همون تب صفحه نمایش داده بشه.
+
+نمونه پیوند:
+
+```markdown
+- [راهنمای کاربر](https://raw.githubusercontent.com/barnevis/parsiNegar/refs/heads/main/docs/userGuide.md)
+```
+
+## پرامپت ۱۳۲
+من گزینه نمایش remote را فعال کرده بودم و هیچ مشکل برای نمایش محتوا نیست. به چیزی که گفتم دقت کن.
+
+وقتی از منوی کنار روی یکی از صفحه‌هایی که به remote وصل هستند کلیک می‌کنم ویکی را در یک تب جدید باز می‌کنه.
+
+چیزی که در کنسول مرورگر نمایش داده می‌شه اینه:
+
+```html
+<a href="#/remote/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2Jhcm5ldmlzL1NoYWhOZXNoYW4vcmVmcy9oZWFkcy9tYWluL1JFQURNRS5tZA==" target="_blank" rel="noopener noreferrer">شروع به کار</a>
+```

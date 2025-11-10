@@ -65,6 +65,10 @@ export class Sidebar {
                         // If enabled, convert external URLs to the special remote route
                         const encodedUrl = utf8ToBase64(href);
                         a.setAttribute('href', `#/remote/${encodedUrl}`);
+                        // CRITICAL FIX: Remove attributes that force opening in a new tab,
+                        // which might have been added by the markdown parser's link rewriter.
+                        a.removeAttribute('target');
+                        a.removeAttribute('rel');
                     } else {
                         // If disabled, treat as a standard external link opening in a new tab
                         a.setAttribute('target', '_blank');
