@@ -1,10 +1,9 @@
 # شیرازه
-![پارسی‌نگار](https://img.shields.io/badge/shirazeh-v0.7.0-blue)
+![پارسی‌نگار](https://img.shields.io/badge/shirazeh-v0.7.1-blue)
 ![زبان](https://img.shields.io/badge/Language-Persian-green)
 ![مجوز](https://img.shields.io/badge/License-MIT-yellow)
 
 یک ویکی ساز ساده، سریع و سمت کاربر با پشتیبانی کامل از زبان فارسی.
-
 
 <center><img src="assets/icon/shirazehLogo.png" alt="logo" width="120" height="120"></center>
 
