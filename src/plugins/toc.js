@@ -1,3 +1,4 @@
+
 /**
  * @file Smart Table of Contents (TOC) plugin for Shirazeh.
  */
@@ -12,6 +13,7 @@ export default class TocPlugin {
         this.app = app;
         this.config = app.config.toc || {};
         this.usedIds = new Set(); // To track IDs on a per-page basis
+        this.userInteracting = false; // Track if user is interacting with TOC
 
         if (!this.config.enabled) {
             return;
@@ -94,8 +96,7 @@ export default class TocPlugin {
     }
     
     /**
-     * This function is an exact copy of the one in the headingAnchor plugin
-     * to ensure that the generated IDs are identical.
+     * Generates a unique ID for a heading.
      * @param {string} text - The heading text.
      * @returns {string} A unique, URL-friendly ID.
      * @private
@@ -140,8 +141,7 @@ export default class TocPlugin {
             // Generate the ID using the exact same logic as the headingAnchor plugin.
             const id = this._generateUniqueId(cleanText);
             
-            // CRITICAL: Set the generated ID on the heading element itself.
-            // This makes it the single source of truth for links and anchors.
+            // Set the generated ID on the heading element itself.
             heading.id = id;
 
             while (stack[stack.length - 1].level >= level) {
@@ -150,6 +150,12 @@ export default class TocPlugin {
 
             let parent = stack[stack.length - 1].el;
             let list = parent.querySelector('ul');
+            
+            // If the parent is a 'toc-sub-wrapper', we need to find the UL inside it
+            // or if it's the root fragment, we look directly.
+            // But since we are building linearly, 'parent' here is either the fragment or an LI.
+            // If it's an LI, we append the UL to it directly. The wrapping happens later in _initializeToggles.
+            
             if (!list) {
                 list = document.createElement('ul');
                 parent.appendChild(list);
@@ -158,7 +164,7 @@ export default class TocPlugin {
             const listItem = document.createElement('li');
             const link = document.createElement('a');
             
-            // ✅ FIX: Build complete URL like HeadingAnchor plugin
+            // Build complete URL like HeadingAnchor plugin
             const currentUrl = window.location.href;
             const baseUrl = currentUrl.split('#')[0];
             const hashPath = (window.location.hash || '#/').substring(1).split('#')[0];
@@ -178,17 +184,19 @@ export default class TocPlugin {
     }
     
     /**
-     * Post-processes the TOC to add toggle buttons for collapsible sections.
+     * Post-processes the TOC to add toggle buttons and wrap submenus for animation.
      * @private
      */
     _initializeToggles() {
+        // Iterate over all LIs that have a submenu
         this.container.querySelectorAll('li').forEach(li => {
             const submenu = li.querySelector('ul');
             if (submenu) {
                 li.classList.add('toc-item--parent', 'is-open');
     
-                const wrapper = document.createElement('div');
-                wrapper.className = 'toc-item-wrapper';
+                // 1. Create wrapper for the Toggle + Link
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'toc-item-wrapper';
     
                 const toggleButton = document.createElement('button');
                 toggleButton.className = 'toc-toggle';
@@ -198,10 +206,20 @@ export default class TocPlugin {
     
                 const link = li.querySelector('a');
                 if (link) {
-                    li.insertBefore(wrapper, link);
-                    wrapper.appendChild(toggleButton);
-                    wrapper.appendChild(link);
+                    // Move the link inside the wrapper and add the button
+                    li.insertBefore(itemWrapper, link);
+                    itemWrapper.appendChild(toggleButton);
+                    itemWrapper.appendChild(link);
                 }
+                
+                // 2. Wrap the submenu UL in a grid wrapper for animation
+                const subWrapper = document.createElement('div');
+                subWrapper.className = 'toc-sub-wrapper';
+                
+                // Insert subWrapper before the submenu (which is currently a child of LI)
+                li.insertBefore(subWrapper, submenu);
+                // Move submenu inside the subWrapper
+                subWrapper.appendChild(submenu);
             }
         });
     }
@@ -211,6 +229,15 @@ export default class TocPlugin {
      * @private
      */
     _setupEventListeners() {
+        // Track user interaction to pause auto-scroll
+        this.container.addEventListener('mouseenter', () => {
+            this.userInteracting = true;
+        });
+
+        this.container.addEventListener('mouseleave', () => {
+            this.userInteracting = false;
+        });
+
         this.container.addEventListener('click', (e) => {
             const toggle = e.target.closest('.toc-toggle');
             if (toggle) {
@@ -237,6 +264,18 @@ export default class TocPlugin {
                 if (targetElement) {
                     targetElement.scrollIntoView({ behavior: 'smooth' });
                     window.history.replaceState(null, '', href);
+                    
+                    // Update active state manually
+                    if (this.lastActiveLink) this.lastActiveLink.classList.remove('active');
+                    link.classList.add('active');
+                    this.lastActiveLink = link;
+                    
+                    // Force scroll to item even if hovering, because user explicitly clicked it
+                    // We disable the 'interacting' lock momentarily for this action
+                    const wasInteracting = this.userInteracting;
+                    this.userInteracting = false;
+                    this._scrollToActiveItem(link);
+                    this.userInteracting = wasInteracting;
                 }
             }
         });
@@ -266,12 +305,33 @@ export default class TocPlugin {
                 }
                 activeLink.classList.add('active');
                 this.lastActiveLink = activeLink;
+                
+                // Only auto-scroll the TOC container if the user isn't interacting with it.
+                if (!this.userInteracting) {
+                    this._scrollToActiveItem(activeLink);
+                }
             }
         }
     }
+    
+    /**
+     * Scrolls the TOC container so that the active item is visible.
+     * @param {HTMLElement} activeLink - The currently active link element in the TOC.
+     * @private
+     */
+    _scrollToActiveItem(activeLink) {
+        if (!this.container) return;
+        
+        // Use 'nearest' to minimize jumping. It scrolls just enough to bring the item into view.
+        activeLink.scrollIntoView({
+            block: 'nearest',
+            inline: 'nearest',
+            behavior: 'smooth'
+        });
+    }
 
     /**
-     * Called when the application is shutting down (for future use).
+     * Called when the application is shutting down.
      */
     onDestroy() {
         if (this.observer) {

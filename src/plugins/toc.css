@@ -1,23 +1,25 @@
+
 /*
  * Styles for the Table of Contents (TOC) plugin.
  */
 .toc-container {
     position: fixed;
-    top: 80px;
+    top: 6rem;
+    bottom: 2rem;
     left: 20px;
     width: 240px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    padding: 1rem 1rem 1rem 0; /* T R B L */
+    
+    display: none;
+    flex-direction: column;
+    
+    padding: 1rem 0;
     z-index: 50;
     border-right: 1px solid var(--border-color);
-    transition: top 0.3s ease, max-height 0.3s ease;
-}
-
-/* Base state: hidden until proven useful */
-.toc-container,
-body:not(.toc-active) .toc-container {
-    display: none;
+    
+    /* کانتینر اصلی اسکرول نمی‌شود */
+    overflow: hidden;
+    
+    transition: top 0.3s ease, bottom 0.3s ease;
 }
 
 .toc-title {
@@ -28,22 +30,43 @@ body:not(.toc-active) .toc-container {
     color: var(--text-color-strong);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    flex-shrink: 0;
+    padding-right: 1rem;
 }
 
-.toc-container ul {
+/* 
+ * استایل لیست اصلی که اسکرول می‌شود 
+ */
+.toc-container > ul {
     list-style: none;
     padding: 0;
+    /* حذف مارجین‌ها برای جلوگیری از تداخل در محاسبه ارتفاع */
     margin: 0;
+    
+    flex-grow: 1;
+    overflow-y: auto;
+    
+    padding-right: 1rem;
+    padding-left: 0.5rem;
+    
+    /* فضای اضافه پایین برای راحتی اسکرول */
+    padding-bottom: 2rem;
+    
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    overscroll-behavior: contain;
 }
 
 .toc-container li {
-    margin-bottom: 0.25rem;
+    /* حذف مارجین آیتم‌ها، فاصله با پدینگ لینک مدیریت می‌شود */
+    margin: 0;
 }
 
 .toc-item-wrapper {
     display: flex;
     align-items: center;
     width: 100%;
+    margin-bottom: 0.25rem;
 }
 
 .toc-toggle {
@@ -51,9 +74,10 @@ body:not(.toc-active) .toc-container {
     border: none;
     cursor: pointer;
     padding: 0;
-    margin-left: 0.5rem; /* Space on the left (visual right in RTL) */
+    margin-left: 0.5rem;
     color: var(--text-color);
     line-height: 1;
+    flex-shrink: 0;
 }
 
 .toc-toggle-icon {
@@ -63,7 +87,7 @@ body:not(.toc-active) .toc-container {
 }
 
 .toc-item--parent.is-open .toc-toggle-icon {
-    transform: rotate(-90deg); /* Points down */
+    transform: rotate(-90deg);
 }
 
 .toc-container a {
@@ -75,14 +99,12 @@ body:not(.toc-active) .toc-container {
     border-radius: 4px;
     transition: color 0.2s, background-color 0.2s;
     
-    /* For long titles */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    /* Make link take up available space */
     flex-grow: 1;
-    min-width: 0; /* Important for text-overflow in flexbox */
+    min-width: 0;
 }
 
 .toc-container a:hover {
@@ -95,54 +117,51 @@ body:not(.toc-active) .toc-container {
     font-weight: 600;
 }
 
-/* Indentation for nested lists and collapsing */
-.toc-container ul ul {
-    margin-top: 0.25rem;
-    padding-right: 1.25rem; /* Increased indentation */
-    max-height: 0;
+/* 
+ * انیمیشن گرید برای زیرمنوها
+ */
+.toc-sub-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease-out;
+}
+
+.toc-item--parent.is-open > .toc-sub-wrapper {
+    grid-template-rows: 1fr;
+}
+
+/* استایل لیست داخلی */
+.toc-sub-wrapper > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-right: 1.25rem;
+    
+    /* این دو خط برای انیمیشن گرید حیاتی هستند */
     overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    width: 100%; /* Ensure it takes full width of parent li */
+    min-height: 0;
 }
 
-/* Open state for nested list */
-.toc-item--parent.is-open > ul {
-    max-height: 1000px; /* A large enough value to show content */
-}
-
-/* Adjust layout only on large screens when TOC is active */
+/* --- تنظیمات نمایش در دسکتاپ --- */
 @media (min-width: 1201px) {
-    /* Show TOC container only if it is active */
     body.toc-active .toc-container {
-        display: block;
+        display: flex;
     }
 
-    /* Add padding to the main content to avoid overlap with the fixed TOC */
     body.toc-active .content {
-        /* This value ensures the content's inner box starts after the TOC,
-           while maintaining its original padding for visual consistency. */
         padding-left: calc(240px + 20px + 1.5rem);
     }
     
-    /*
-     * ==========================================
-     *     ↓↓↓ The fix for content width ↓↓↓
-     * ==========================================
-     * Increase the max-width of the prose area when the TOC is visible.
-     * This makes the content column wider and better utilizes the available space.
-     */
     body.toc-active .prose {
         max-width: 960px;
     }
 }
 
-/* --- یکپارچه‌سازی با افزونه نوار ناوبری --- */
+/* --- یکپارچه‌سازی با نوار ناوبری --- */
 body.shirazeh-navbar-active .toc-container {
-  top: calc(var(--navbar-height, 64px) + 60px);
-  max-height: calc(100vh - var(--navbar-height, 64px) - 40px);
+  top: calc(var(--navbar-height, 64px) + 2rem);
 }
 
 body.shirazeh-navbar-active.navbar-scrolled .toc-container {
-  top: calc(var(--navbar-height-scrolled, 56px) + 60px);
-  max-height: calc(100vh - var(--navbar-height-scrolled, 56px) - 40px);
+  top: calc(var(--navbar-height-scrolled, 56px) + 2rem);
 }
