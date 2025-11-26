@@ -1,3 +1,4 @@
+
 // پلاگین سفارشی برای هایلایت کردن متن (==text==)
 function highlight_plugin(md) {
   function highlight_rule(state, silent) {
@@ -389,6 +390,16 @@ function link_rewriter_plugin(md) {
   };
 }
 
+// پلاگین برای قرار دادن جدول در یک دیو (برای اسکرول افقی)
+function table_wrapper_plugin(md) {
+  md.renderer.rules.table_open = function(tokens, idx, options, env, self) {
+    return '<div class="table-wrapper">' + self.renderToken(tokens, idx, options);
+  };
+  md.renderer.rules.table_close = function(tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options) + '</div>';
+  };
+}
+
 
 export function createParsNeshan(options = {}) {
   const { plugins = [], ...mdOptions } = options;
@@ -403,6 +414,7 @@ export function createParsNeshan(options = {}) {
   md.use(checklist_plugin);
   md.use(persian_ordered_list_plugin);
   md.use(poetry_plugin);
+  md.use(table_wrapper_plugin); // wrapping before auto_direction captures the rule
   md.use(auto_direction_plugin);
   md.use(link_rewriter_plugin);
 

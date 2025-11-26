@@ -1,3 +1,4 @@
+
 /*
  * ==========================================
  *  استایل‌های محتوای مارک‌داون (Prose)
@@ -106,4 +107,51 @@
   border-radius: 0.5rem; /* گرد کردن گوشه‌های تصویر */
   display: block; /* برای امکان وسط‌چین کردن با مارجین */
   margin: 2rem auto; /* فاصله عمودی و وسط‌چین کردن افقی */
+}
+
+/* --- استایل‌های جدول --- */
+
+/* نگهدارنده جدول برای اسکرول و وسط‌چین کردن */
+.prose .table-wrapper {
+  margin: 2rem auto;
+  overflow-x: auto; /* اسکرول افقی در صورت نیاز */
+  width: 100%;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: lining-nums tabular-nums;
+  /* display: table; - رفتار پیش‌فرض جدول */
+}
+
+.prose thead tr {
+  background-color: var(--sidebar-bg);
+}
+
+.prose th {
+  font-weight: 700;
+  color: var(--text-color-strong);
+  padding: 0.75rem 1rem;
+  text-align: right;
+  white-space: nowrap;
+  border: 1px solid var(--border-color); /* حاشیه برای هدر */
+}
+
+.prose td {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color); /* حاشیه برای سلول‌ها */
+  color: var(--text-color);
+}
+
+.prose tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] .prose tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.prose tr:hover {
+  background-color: var(--border-color);
 }

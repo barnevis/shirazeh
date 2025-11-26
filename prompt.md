@@ -1662,3 +1662,12 @@ pageExporter.js:246:21
 ```html
 <a href="#/remote/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2Jhcm5ldmlzL1NoYWhOZXNoYW4vcmVmcy9oZWFkcy9tYWluL1JFQURNRS5tZA==" target="_blank" rel="noopener noreferrer">شروع به کار</a>
 ```
+
+## پرامپت ۱۳۳
+استایل جدول‌ها پیاده‌سازی نشده.
+
+## پرامپت ۱۳۴
+می‌خوام همه ستون‌های جدول حاشیه داشته باشند.
+
+## پرامپت ۱۳۵
+جدول را در وسط صفحه نمایش بده. (لندازه جدول خوبه تغییرش نده)
