@@ -1,3 +1,4 @@
+
 - [خانه](/)
 - [معرفی و ویژگی‌ها](/docs/features)
 - راهنمای کاربر
@@ -18,4 +19,5 @@
   - [افزونه رنگی کردن کد](/docs/plugins/highlight)
   - [افزونه تنظیم اندازه تصویر](/docs/plugins/imageSizer)
   - [افزونه خروجی صفحه](/docs/plugins/pageExporter)
+  - [افزونه نمودار Mermaid](/docs/plugins/mermaid)
 - [تاریخچه تغییرات](changelog)

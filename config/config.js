@@ -114,6 +114,7 @@ window.shirazeh = {
     'src/plugins/highlight/highlight.js', // افزونه هایلایت کد
     'src/plugins/imageSizer/imageSizer.js', // افزونه تنظیم اندازه تصویر
     'src/plugins/pageExporter/pageExporter.js', // افزونه خروجی صفحه
+    'src/plugins/mermaid/mermaid.js', // فعال‌سازی افزونه نمودار Mermaid (اصلاح مسیر)
   ],
 
   /**

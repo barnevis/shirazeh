@@ -1,0 +1,35 @@
+
+/**
+ * Styles for Mermaid.js diagrams in Shirazeh.
+ */
+
+.mermaid {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: var(--sidebar-bg);
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    min-height: 50px;
+    transition: background-color 0.3s ease;
+}
+
+/* Ensure the SVG scales nicely */
+.mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
+
+[data-theme="dark"] .mermaid {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Scrollbar styling for wide diagrams */
+.mermaid::-webkit-scrollbar {
+    height: 6px;
+}
+.mermaid::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 3px;
+}
