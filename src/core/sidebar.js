@@ -104,8 +104,14 @@ export class Sidebar {
             li.classList.add('has-submenu');
             submenu.classList.add('submenu');
 
+            // Wrap submenu for animation
+            const wrapper = document.createElement('div');
+            wrapper.className = 'submenu-wrapper';
+            li.insertBefore(wrapper, submenu);
+            wrapper.appendChild(submenu);
+
             const firstChildNode = Array.from(li.childNodes).find(node =>
-                (node.nodeType === Node.ELEMENT_NODE) ||
+                (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'DIV') ||
                 (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0)
             );
 

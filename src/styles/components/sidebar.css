@@ -141,20 +141,30 @@
   transform: rotate(-90deg);
 }
 
-.sidebar-nav .submenu {
+/* 
+ * انیمیشن گرید برای زیرمنوها
+ * این روش محدودیت ارتفاع (مانند 1000 پیکسل) را حذف کرده و
+ * باعث می‌شود اسکرول‌بار دقیقاً با محتوا مطابقت داشته باشد.
+ */
+.sidebar-nav .submenu-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease-out;
   background-color: rgba(0,0,0,0.05); /* Lighter for light mode, darker for dark */
-  max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-out;
-  padding-right: 1rem; /* ایجاد تورفتگی برای هر سطح از زیرمنو */
 }
 
-[data-theme="dark"] .sidebar-nav .submenu {
+[data-theme="dark"] .sidebar-nav .submenu-wrapper {
   background-color: rgba(0,0,0,0.15);
 }
 
-.has-submenu.open > .submenu {
-  max-height: 1000px; /* یک مقدار بزرگ برای نمایش کامل محتوا */
+.sidebar-nav .has-submenu.open > .submenu-wrapper {
+  grid-template-rows: 1fr;
+}
+
+.sidebar-nav .submenu {
+  min-height: 0;
+  padding-right: 1rem; /* ایجاد تورفتگی برای هر سطح از زیرمنو */
 }
 
 /* --- دکمه باز و بست کردن سایدبار --- */
