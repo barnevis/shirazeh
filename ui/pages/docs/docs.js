@@ -73,7 +73,6 @@ class DocsPage extends PeyElement {
 
   #path = '/';
   #anchorTarget = null;
-  #toastTimer = null;
 
   connectedCallback() {
     super.connectedCallback();
