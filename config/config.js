@@ -39,6 +39,17 @@ export default {
    */
   sidebarFile: '_sidebar.md',
 
+  /**
+   * دستور پارسنشان (گویش مارک‌داون فارسی شیرازه).
+   * هر بخش را می‌توانید جداگانه خاموش کنید.
+   */
+  extensions: {
+    admonitions: true,   // جعبه‌های هشدار/توجه/نکته/مهم/احتیاط
+    persianList: true,   // فهرست با اعداد فارسی (۱. ۲. ۳.)
+    persianPoem: true,   // بلوک شعر دوستونی
+    persianFootnote: true, // پانویس با برچسب فارسی
+  },
+
   // کلیدهای بیشتری در نسخه‌های بعدی اضافه می‌شوند:
-  // appName، logo، favicon، toc، codeCopy، title، notFoundPage، extensions…
+  // appName، logo، favicon، toc، codeCopy، title، notFoundPage…
 };

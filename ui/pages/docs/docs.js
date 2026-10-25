@@ -287,6 +287,52 @@ class DocsPage extends PeyElement {
         .markdown-body img {
           max-inline-size: 100%;
         }
+        .markdown-body [class^='parsneshan-']:not(.parsneshan-poem):not(.parsneshan-verse):not(.parsneshan-hemistich) {
+          border-inline-start: 3px solid var(--pey-color-accent);
+          border-radius: var(--pey-radius-md);
+          background-color: var(--pey-color-surface);
+          padding: var(--pey-space-3) var(--pey-space-4);
+          margin-block: var(--pey-space-4);
+        }
+        .markdown-body .parsneshan-caution { border-inline-start-color: var(--pey-color-status-error); }
+        .markdown-body .parsneshan-warning { border-inline-start-color: #d97706; }
+        .markdown-body .parsneshan-important { border-inline-start-color: var(--pey-color-accent); }
+        .markdown-body .parsneshan-tip { border-inline-start-color: #059669; }
+        .markdown-body .parsneshan-note { border-inline-start-color: var(--pey-color-text-muted); }
+        .markdown-body .parsneshan-poem {
+          margin-block: var(--pey-space-6);
+          padding: var(--pey-space-4) var(--pey-space-6);
+          background-color: var(--pey-color-surface);
+          border-radius: var(--pey-radius-md);
+          display: grid;
+          gap: var(--pey-space-3);
+          justify-items: center;
+        }
+        .markdown-body .parsneshan-verse {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: var(--pey-space-8);
+          inline-size: 100%;
+          justify-items: center;
+        }
+        .markdown-body .parsneshan-hemistich {
+          text-align: center;
+        }
+        @media (max-width: 37.5rem) {
+          .markdown-body .parsneshan-verse {
+            grid-template-columns: minmax(0, 1fr);
+            gap: var(--pey-space-1);
+          }
+        }
+        .markdown-body .footnotes {
+          margin-block-start: var(--pey-space-8);
+          padding-block-start: var(--pey-space-4);
+          border-block-start: 1px solid var(--pey-color-border);
+          font-size: var(--pey-font-size-sm);
+        }
+        .markdown-body .data-footnote-backref {
+          text-decoration: none;
+        }
         .pager {
           display: flex;
           justify-content: space-between;

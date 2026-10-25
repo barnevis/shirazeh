@@ -55,6 +55,39 @@ function createBoundDocs({ files = {}, publish = () => {} } = {}) {
   return { docs, http, markdown };
 }
 
+test('should_pass_parsneshan_extensions_when_page_is_rendered', async () => {
+  const { docs, markdown } = createBoundDocs({
+    files: { './docs/README.md': '# خانه', './docs/_sidebar.md': SIDEBAR_MARKDOWN },
+  });
+
+  await docs.service.getPage('/');
+
+  const call = markdown.calls[0];
+  assert.equal(Array.isArray(call.syntaxExtensions), true);
+  assert.equal(Array.isArray(call.htmlExtensions), true);
+  assert.equal(call.syntaxExtensions.length, 7);
+  assert.equal(call.footnoteOptions?.label, 'پاورقی');
+});
+
+test('should_skip_extensions_when_disabled_in_config', async () => {
+  const http = createFakeHttp({ './docs/README.md': '# خانه' });
+  const markdown = createFakeMarkdown();
+  const docs = createDocsService({
+    config: { extensions: { admonitions: false, persianList: false, persianPoem: false, persianFootnote: false } },
+    publish: () => {},
+  });
+  docs.bindDependencies({
+    'shirazeh.http.service': http,
+    'pey.markdown.service': markdown,
+  });
+
+  await docs.service.getPage('/');
+
+  const call = markdown.calls[0];
+  assert.deepEqual(call.syntaxExtensions, []);
+  assert.equal(call.footnoteOptions, null);
+});
+
 test('should_return_rendered_page_when_get_page_is_called_for_home', async () => {
   const { docs } = createBoundDocs({
     files: {

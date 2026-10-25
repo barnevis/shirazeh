@@ -1,6 +1,7 @@
 - [خانه](/)
   - [راهنما](guide)
     - [نوشتن مارک‌داون](guide/markdown)
+    - [دستور پارسنشان](guide/parsneshan)
     - [پیکربندی](guide/config)
   - [شیرازه از نزدیک](features)
   - [پیکربندی شیرازه](configuration)

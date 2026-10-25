@@ -16,6 +16,24 @@ const SAMPLE_FILES = {
   './docs/_sidebar.md': '- [خانه](/)\n  - [راهنما](guide)\n- [درباره](about)',
   './docs/guide.md': '# راهنما\n\n## بخش\n\nمتن راهنما',
   './docs/about.md': '# درباره\n\nدرباره شیرازه',
+  './docs/parsneshan.md': [
+    '# پارسنشان',
+    '',
+    '... هشدار',
+    'متن هشدار',
+    '...',
+    '',
+    '۱. نخست',
+    '۲. دوم',
+    '',
+    '...شعر',
+    'مصرع یک     مصرع دو',
+    '...',
+    '',
+    'پانویس[^۱]',
+    '',
+    '[^۱]: توضیح',
+  ].join('\n'),
 };
 
 function createFakeFetch(files) {
@@ -149,6 +167,21 @@ test('should_return_sidebar_through_bound_services_when_ui_calls_get_sidebar', a
     const links = await uiContext.services['shirazeh.docs.service'].getSidebar();
     assert.equal(links.length, 3);
     assert.deepEqual(links[0], { href: '/', title: 'خانه', level: 1 });
+  } finally {
+    await shutdown();
+  }
+});
+
+test('should_render_parsneshan_dialect_when_page_uses_it', async () => {
+  const { uiContext, shutdown } = await bootShirazeh();
+
+  try {
+    const page = await uiContext.services['shirazeh.docs.service'].getPage('/parsneshan');
+    assert.equal(page.title, 'پارسنشان');
+    assert.equal(page.html.includes('class="parsneshan-warning"'), true);
+    assert.equal(page.html.includes('<ol>'), true);
+    assert.equal(page.html.includes('class="parsneshan-poem"'), true);
+    assert.equal(page.html.includes('پاورقی'), true);
   } finally {
     await shutdown();
   }

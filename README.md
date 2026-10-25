@@ -1,5 +1,10 @@
 # شیرازه
 
+[![version](https://img.shields.io/badge/version-0.1.0-blue)](#)
+[![AI](https://img.shields.io/badge/Built%20with-AI-blueviolet)](#)
+[![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Bonyan Architecture](https://img.shields.io/badge/bonyan-0.11-56c3bf)](https://github.com/barnevis/bonyan)
+
 **شیرازه** یک مستندساز وب شبیه docsify است: پوشه‌ای از پرونده‌های مارک‌داون را به یک سایت مستندات زنده تبدیل می‌کند — بدون ساخت، بدون پایگاه داده، فقط پرونده‌های استاتیک.
 
 شیرازه روی [معماری بنیان](https://github.com/barnevis/bonyan) (نسخه 0.11) و چارچوب [پی](https://github.com/peyjs) پیاده‌سازی شده است: هر توانایی یک افزونه است و هسته پی (`pey-core`) آنها را راه می‌اندازد.
@@ -42,7 +47,8 @@ shirazeh/
 پیش‌نیاز: Node.js نسخه ۲۲ یا بالاتر.
 
 ```bash
-# نصب وابستگی اجرایی افزونه مارک‌داون
+# نصب وابستگی‌ها (ریزه: وابستگی‌های اجرایی وندور پارسنشان؛ افزونه مارک‌داون)
+npm install
 cd plugins/pey.markdown && npm install --omit=dev && cd ../..
 
 # اجرای آزمون‌ها (کل مجموعه)

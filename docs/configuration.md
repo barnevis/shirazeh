@@ -31,6 +31,15 @@ export default {
 | `docsRoot` | `'./docs'` | پوشه پرونده‌های مارک‌داون نسبت به ریشه سایت |
 | `homePage` | `'README.md'` | پرونده‌ای که برای مسیر `/` نمایش داده می‌شود |
 | `sidebarFile` | `'_sidebar.md'` | پرونده فهرست navigation |
+| `extensions` | همه روشن | فعال/غیرفعال کردن دستور پارسنشان — شیءای با کلیدهای `admonitions`، `persianList`، `persianPoem` و `persianFootnote` (هرکدام `true`/`false`) |
+
+مثال خاموش‌کردن شعر و جعبه‌ها:
+
+```js
+export default {
+  extensions: { admonitions: false, persianPoem: false },
+};
+```
 
 ## امنیت لایه کاربر
 

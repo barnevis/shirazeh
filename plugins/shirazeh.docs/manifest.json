@@ -1,6 +1,6 @@
 {
   "name": "shirazeh.docs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "architecture": "0.11",
   "description": "Core documentation logic for Shirazeh: resolves page paths, loads markdown sources, and returns rendered pages with navigation context.",
   "type": "product",
@@ -25,7 +25,7 @@
         },
         {
           "name": "getPage",
-          "description": "Resolves a documentation route path (like '/guide/setup' or '/' for the home page) to a rendered page: fetches the underlying markdown document via the HTTP transport, renders it to sanitized HTML through the markdown service, and returns the page with its table of contents, title, and previous/next links derived from the sidebar. Publishes docs:page-loaded only on success.",
+          "description": "Resolves a documentation route path (like '/guide/setup' or '/' for the home page) to a rendered page: fetches the underlying markdown document via the HTTP transport, renders it to sanitized HTML through the markdown service — with the parsneshan Persian dialect extensions injected per the `extensions` configuration — and returns the page with its table of contents, title, and previous/next links derived from the sidebar. Publishes docs:page-loaded only on success.",
           "params": [
             { "name": "path", "type": "string — route path, '/' maps to the configured homePage" }
           ],
@@ -47,6 +47,12 @@
   "config": {
     "docsRoot": "./docs",
     "homePage": "README.md",
-    "sidebarFile": "_sidebar.md"
+    "sidebarFile": "_sidebar.md",
+    "extensions": {
+      "admonitions": true,
+      "persianList": true,
+      "persianPoem": true,
+      "persianFootnote": true
+    }
   }
 }

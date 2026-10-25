@@ -8,6 +8,7 @@ import {
   EVENT_NAMES,
 } from './constants.js';
 import { createDocsError } from './error.js';
+import { createParsneshanOptions } from './parsneshan-extensions.js';
 import {
   neighborsForPath,
   parseSidebar,
@@ -59,6 +60,7 @@ function normalizeConfig(config) {
  */
 export function createDocsService({ config, publish }) {
   const { docsRoot, homePage, sidebarFile } = normalizeConfig(config);
+  const parsneshanOptions = createParsneshanOptions(config.extensions);
   let available = true;
   let httpService = null;
   let markdownService = null;
@@ -159,7 +161,12 @@ export function createDocsService({ config, publish }) {
         }
         let rendered;
         try {
-          rendered = markdown.renderFragment({ markdown: document.body });
+          rendered = markdown.renderFragment({
+            markdown: document.body,
+            syntaxExtensions: parsneshanOptions.syntaxExtensions,
+            htmlExtensions: parsneshanOptions.htmlExtensions,
+            footnoteOptions: parsneshanOptions.footnoteOptions,
+          });
         } catch {
           return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page could not be rendered');
         }

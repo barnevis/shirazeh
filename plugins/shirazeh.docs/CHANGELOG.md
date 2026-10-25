@@ -2,6 +2,12 @@
 
 All notable changes to `shirazeh.docs` are documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows the Bonyan architecture rules.
 
+## [0.2.0] - 2026-10-26
+
+### Added
+
+- Persian markdown dialect (parsneshan) injection into every `getPage` render: admonitions (`هشدار/توجه/نکته/مهم/احتیاط`), Persian ordered lists (`۱.`), Persian poetry blocks, and Persian footnote labels (`پاورقی`), each toggleable through the new `extensions` configuration flags (`admonitions`, `persianList`, `persianPoem`, `persianFootnote`; all default to true). Extensions are injected through `pey.markdown.service`'s `syntaxExtensions`/`htmlExtensions`/`footnoteOptions` parameters; the parsneshan package is vendored at `vendor/node_modules/parsneshan`.
+
 ## [0.1.0] - 2026-10-25
 
 Initial experimental release. The 0.x range marks a plugin whose contract may still change.
