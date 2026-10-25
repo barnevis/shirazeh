@@ -1,0 +1,46 @@
+{
+  "name": "shirazeh.ui",
+  "version": "1.0.0",
+  "architecture": "0.11",
+  "description": "Shirazeh documentation UI built with pey.webui",
+  "dependencies": {
+    "required": [
+      "pey.router.service",
+      "shirazeh.docs.service"
+    ],
+    "optional": []
+  },
+  "events": [
+    {
+      "name": "ui:language-changed",
+      "description": "The user switched the interface language",
+      "data": [
+        {
+          "name": "language",
+          "type": "string — BCP 47 tag, e.g. 'fa' or 'en'"
+        }
+      ]
+    },
+    {
+      "name": "ui:component-error",
+      "description": "A component render or event handler failed and was contained by PeyElement",
+      "data": [
+        {
+          "name": "componentTag",
+          "type": "string"
+        },
+        {
+          "name": "code",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "config": {
+    "theme": "light",
+    "language": "fa",
+    "direction": "rtl",
+    "fallbackPath": "/",
+    "assetBaseUrl": "./assets"
+  }
+}

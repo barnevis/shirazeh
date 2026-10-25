@@ -1,0 +1,28 @@
+/* Shirazeh application-level styles (outside component shadow roots). */
+
+:root {
+  /* Persian-friendly typography stack layered on the kit defaults. */
+  --pey-font-family-base: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  block-size: 100%;
+}
+
+body {
+  background-color: var(--pey-color-canvas);
+  color: var(--pey-color-text);
+  font-family: var(--pey-font-family-base);
+}
+
+.boot-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 100vh;
+  color: var(--pey-color-text-muted);
+  font-size: var(--pey-font-size-lg);
+}

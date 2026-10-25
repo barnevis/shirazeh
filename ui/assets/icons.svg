@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <!--
+    Shared SVG sprite container for the pey.webui kit.
+
+    This package file ships as an empty, reusable container: the kit publishes
+    no product symbols. A consuming application must not edit this package
+    file — it authors its own sprite at its own assetBaseUrl directory (e.g.
+    <ui assets>/icons.svg) following this container's shape, and defines its
+    product icons there as <symbol id="name">.
+
+    Reference a symbol with:
+      <svg aria-hidden="true" focusable="false"><use href="<assetBaseUrl>/icons.svg#name"></use></svg>
+    The URL is resolved only from assetBaseUrl by pey.webui/base/icon-sprite,
+    and symbol ids must be lowercase kebab-case (the base helper rejects
+    anything else with PEY_ICON_SYMBOL_INVALID).
+  -->
+</svg>

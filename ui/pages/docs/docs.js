@@ -1,0 +1,320 @@
+// Documentation page: sidebar navigation, rendered markdown content, and
+// previous/next links. Data comes from shirazeh.docs.service; this component
+// only displays it and forwards navigation.
+
+import { PeyElement } from 'pey.webui/base/pey-element';
+
+const TAG = 'app-page-docs';
+const DOCS_SERVICE = 'shirazeh.docs.service';
+const PARAM_KEYS = ['page', 'sub1', 'sub2', 'sub3', 'sub4'];
+
+function routePathFromParams(params) {
+  if (params === null || typeof params !== 'object') {
+    return '/';
+  }
+
+  const segments = [];
+  for (const key of PARAM_KEYS) {
+    const value = params[key];
+    if (typeof value !== 'string' || value.length === 0) {
+      break;
+    }
+    segments.push(value);
+  }
+
+  return `/${segments.join('/')}`;
+}
+
+function isBonyanError(value) {
+  return value !== null
+    && typeof value === 'object'
+    && typeof value.code === 'string'
+    && typeof value.message === 'string';
+}
+
+function normalizeHref(href) {
+  const withoutDot = href.startsWith('./') ? href.slice(2) : href;
+  return withoutDot.startsWith('/') ? withoutDot : `/${withoutDot}`;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+class DocsPage extends PeyElement {
+  #docsService = null;
+  #router = null;
+  #t = null;
+  #state = { status: 'loading' };
+  #sidebarLinks = null;
+
+  onConnect(refs) {
+    this.#docsService = refs.services?.[DOCS_SERVICE] ?? null;
+    this.#router = refs.router ?? null;
+    this.#t = typeof refs.t === 'function' ? refs.t : (key) => key;
+    this.#path = routePathFromParams(refs.routeParams);
+  }
+
+  #path = '/';
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.#loadPage();
+  }
+
+  async #loadPage() {
+    const path = this.#path;
+
+    if (this.#docsService === null) {
+      this.#state = { status: 'error', code: 'SERVICE_UNAVAILABLE' };
+      this.requestRender({ preserve: false });
+      return;
+    }
+
+    const [page, sidebar] = await Promise.all([
+      this.#docsService.getPage(path),
+      this.#docsService.getSidebar().catch(() => null),
+    ]);
+
+    // A newer route may have mounted while the fetch was in flight.
+    if (path !== this.#path) {
+      return;
+    }
+
+    if (isBonyanError(page)) {
+      this.#state = { status: 'error', code: page.code };
+    } else {
+      this.#state = { status: 'ready', page };
+    }
+    this.#sidebarLinks = Array.isArray(sidebar) ? sidebar : null;
+    this.requestRender({ preserve: false });
+  }
+
+  eventTypes() {
+    return ['click'];
+  }
+
+  handleEvent(event) {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const anchor = target.closest('a');
+    if (anchor === null) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href') ?? '';
+
+    // Router-owned fragment links (#!/route style hrefs produced by this
+    // page) navigate through the router, never through the raw hash.
+    if (href.startsWith('#/')) {
+      event.preventDefault();
+      this.#navigate(href.slice(1));
+      return;
+    }
+
+    // In-page heading anchors scroll within the page; they must never reach
+    // the URL fragment, which the hash router owns.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const anchorId = href.slice(1);
+      if (anchorId.length > 0) {
+        this.shadowRoot.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
+
+    // Absolute URLs and other schemes keep their default browser behavior.
+    if (/^[a-z][a-z0-9+.-]*:/i.test(href)) {
+      return;
+    }
+
+    // Relative document links route through the router instead of reloading.
+    event.preventDefault();
+    this.#navigate(normalizeHref(href));
+  }
+
+  #navigate(path) {
+    if (this.#router && typeof this.#router.navigate === 'function') {
+      this.#router.navigate(path);
+    }
+  }
+
+  #renderSidebar() {
+    if (this.#sidebarLinks === null) {
+      return '<aside part="sidebar" hidden></aside>';
+    }
+
+    const currentPath = this.#path;
+    const items = this.#sidebarLinks.map((link) => {
+      const route = normalizeHref(link.href);
+      const isCurrent = route === currentPath ? ' aria-current="page"' : '';
+      const indentStyle = `margin-inline-start: ${(link.level - 1) * 0.9}rem`;
+      return `<li style="${indentStyle}"><a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(link.title)}</a></li>`;
+    }).join('');
+
+    return `
+      <aside part="sidebar">
+        <nav aria-label="documentation">
+          <ul>${items}</ul>
+        </nav>
+      </aside>
+    `;
+  }
+
+  #renderState() {
+    const t = this.#t;
+
+    if (this.#state.status === 'loading') {
+      return `<div part="content" class="content loading">${escapeHtml(t('shirazeh.page.loading'))}</div>`;
+    }
+
+    if (this.#state.status === 'error') {
+      const isNotFound = this.#state.code === 'DOC_PAGE_NOT_FOUND';
+      const title = isNotFound ? t('shirazeh.page.not-found-title') : t('shirazeh.page.error-title');
+      const body = isNotFound ? t('shirazeh.page.not-found-body') : escapeHtml(this.#state.code);
+      return `
+        <div part="content" class="content">
+          <h1>${escapeHtml(title)}</h1>
+          <p>${body}</p>
+          <p><a href="#/" data-route="/">${escapeHtml(t('shirazeh.page.go-home'))}</a></p>
+        </div>
+      `;
+    }
+
+    const page = this.#state.page;
+    const previous = page.previous
+      ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}">${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}</a>`
+      : '<span></span>';
+    const next = page.next
+      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}">${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}</a>`
+      : '<span></span>';
+
+    return `
+      <article part="content" class="content markdown-body">${page.html}</article>
+      <nav part="pager" class="pager" aria-label="pagination">
+        ${previous}
+        ${next}
+      </nav>
+    `;
+  }
+
+  render() {
+    return `
+      <style>
+        :host {
+          display: block;
+        }
+        .layout {
+          display: grid;
+          grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+          gap: var(--pey-space-8);
+          inline-size: min(100% - 2rem, 72rem);
+          margin-inline: auto;
+          padding-block: var(--pey-space-6) var(--pey-space-8);
+        }
+        @media (max-width: 55rem) {
+          .layout {
+            grid-template-columns: minmax(0, 1fr);
+          }
+          aside[part="sidebar"] {
+            border-block-end: 1px solid var(--pey-color-border);
+            padding-block-end: var(--pey-space-4);
+          }
+        }
+        aside[part="sidebar"] ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: var(--pey-space-1);
+        }
+        aside[part="sidebar"] a {
+          display: block;
+          padding: var(--pey-space-1) var(--pey-space-2);
+          border-radius: var(--pey-radius-sm);
+          color: var(--pey-color-text);
+          text-decoration: none;
+          font-size: var(--pey-font-size-sm);
+        }
+        aside[part="sidebar"] a:hover {
+          background-color: var(--pey-color-surface);
+        }
+        aside[part="sidebar"] a[aria-current="page"] {
+          font-weight: 600;
+          color: var(--pey-color-accent);
+        }
+        .content {
+          min-inline-size: 0;
+        }
+        .content.loading {
+          color: var(--pey-color-text-muted);
+          padding-block: var(--pey-space-8);
+        }
+        .markdown-body {
+          line-height: var(--pey-line-height-base);
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+          line-height: 1.3;
+        }
+        .markdown-body pre {
+          direction: ltr;
+          text-align: start;
+          background-color: var(--pey-color-surface);
+          border: 1px solid var(--pey-color-border);
+          border-radius: var(--pey-radius-md);
+          padding: var(--pey-space-4);
+          overflow-x: auto;
+          font-size: var(--pey-font-size-sm);
+        }
+        .markdown-body code {
+          font-family: ui-monospace, monospace;
+        }
+        .markdown-body table {
+          border-collapse: collapse;
+          inline-size: 100%;
+        }
+        .markdown-body th, .markdown-body td {
+          border: 1px solid var(--pey-color-border);
+          padding: var(--pey-space-2) var(--pey-space-3);
+        }
+        .markdown-body img {
+          max-inline-size: 100%;
+        }
+        .pager {
+          display: flex;
+          justify-content: space-between;
+          gap: var(--pey-space-4);
+          margin-block-start: var(--pey-space-8);
+          padding-block-start: var(--pey-space-4);
+          border-block-start: 1px solid var(--pey-color-border);
+        }
+        .pager a {
+          color: var(--pey-color-accent);
+          text-decoration: none;
+        }
+        a {
+          color: var(--pey-color-accent);
+        }
+        a:focus-visible {
+          outline: 2px solid var(--pey-color-focus-ring);
+          outline-offset: 1px;
+        }
+      </style>
+      <div class="layout">
+        ${this.#renderSidebar()}
+        ${this.#renderState()}
+      </div>
+    `;
+  }
+}
+
+customElements.define(TAG, DocsPage);
+
+export { DocsPage, TAG };
