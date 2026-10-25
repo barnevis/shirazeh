@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  documentTitleForPath,
   neighborsForPath,
   normalizeHref,
   parseSidebar,
@@ -20,17 +21,31 @@ test('should_parse_links_when_sidebar_contains_nested_lists', () => {
   ].join('\n'));
 
   assert.deepEqual(links, [
-    { href: '/', title: 'خانه', level: 1 },
-    { href: 'guide/setup', title: 'راهنما', level: 2 },
-    { href: 'guide/config.md', title: 'پیکربندی', level: 3 },
-    { href: 'about', title: 'درباره', level: 1 },
+    { href: '/', title: 'خانه', attrTitle: null, level: 1 },
+    { href: 'guide/setup', title: 'راهنما', attrTitle: null, level: 2 },
+    { href: 'guide/config.md', title: 'پیکربندی', attrTitle: null, level: 3 },
+    { href: 'about', title: 'درباره', attrTitle: null, level: 1 },
   ]);
+});
+
+test('should_parse_attr_title_when_link_has_title_attribute', () => {
+  const { links } = parseSidebar('- [خانه](/ "صفحه اصلی شیرازه")');
+
+  assert.deepEqual(links, [
+    { href: '/', title: 'خانه', attrTitle: 'صفحه اصلی شیرازه', level: 1 },
+  ]);
+});
+
+test('should_return_null_attr_title_when_title_attribute_is_empty', () => {
+  const { links } = parseSidebar('- [خانه](/ "")');
+
+  assert.equal(links[0].attrTitle, null);
 });
 
 test('should_skip_plain_items_when_sidebar_contains_text_without_links', () => {
   const { links } = parseSidebar('- بخش\n- [تنظیمات](settings)\n\nمتن آزاد');
 
-  assert.deepEqual(links, [{ href: 'settings', title: 'تنظیمات', level: 1 }]);
+  assert.deepEqual(links, [{ href: 'settings', title: 'تنظیمات', attrTitle: null, level: 1 }]);
 });
 
 test('should_reject_parse_error_when_sidebar_has_no_links', () => {
@@ -125,4 +140,32 @@ test('should_normalize_href_when_it_has_relative_prefix', () => {
   assert.equal(normalizeHref('./guide'), '/guide');
   assert.equal(normalizeHref('guide'), '/guide');
   assert.equal(normalizeHref('/guide'), '/guide');
+});
+
+test('should_prefer_attr_title_when_link_has_one', () => {
+  const links = [{ href: '/', title: 'خانه', attrTitle: 'صفحه اصلی' }];
+
+  assert.equal(documentTitleForPath(links, '/', 'تیتر محتوا'), 'صفحه اصلی');
+});
+
+test('should_fall_back_to_label_when_attr_title_is_missing', () => {
+  const links = [{ href: '/', title: 'خانه', attrTitle: null }];
+
+  assert.equal(documentTitleForPath(links, '/', 'تیتر محتوا'), 'خانه');
+});
+
+test('should_fall_back_to_heading_when_link_is_missing_from_sidebar', () => {
+  const links = [{ href: '/', title: 'خانه', attrTitle: null }];
+
+  assert.equal(documentTitleForPath(links, '/guide', 'راهنمای شیرازه'), 'راهنمای شیرازه');
+});
+
+test('should_return_heading_when_link_has_no_label', () => {
+  const links = [{ href: '/guide', title: '', attrTitle: null }];
+
+  assert.equal(documentTitleForPath(links, '/guide', 'تیتر'), 'تیتر');
+});
+
+test('should_return_empty_title_when_no_source_exists', () => {
+  assert.equal(documentTitleForPath([], '/', ''), '');
 });

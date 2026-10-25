@@ -4,7 +4,7 @@ import { ERROR_CODES } from './constants.js';
 import { createDocsError } from './error.js';
 
 const LIST_ITEM_PATTERN = /^\s*(?:[-*+]|\d+\.)\s+(.*)$/;
-const MARKDOWN_LINK_PATTERN = /^\[([^\]]*)\]\(([^)\s]+)\)(.*)$/;
+const MARKDOWN_LINK_PATTERN = /^\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)(.*)$/;
 
 /**
  * Parses a docsify-style sidebar markdown into a flat link list.
@@ -34,9 +34,13 @@ export function parseSidebar(sidebarMarkdown) {
     }
 
     const indent = line.match(/^\s*/)[0].length;
+    const attrTitle = typeof linkMatch[3] === 'string' && linkMatch[3].trim().length > 0
+      ? linkMatch[3].trim()
+      : null;
     links.push({
       href: linkMatch[2],
       title: linkMatch[1].trim(),
+      attrTitle,
       level: Math.max(1, Math.floor(indent / 2) + 1),
     });
   }
@@ -116,6 +120,29 @@ export function neighborsForPath(links, path) {
     previous: index > 0 ? links[index - 1] : null,
     next: index < links.length - 1 ? links[index + 1] : null,
   };
+}
+
+/**
+ * Resolves the browser document title for a path.
+ *
+ * Source chain: the sidebar link's title attribute (`attrTitle`), then the
+ * sidebar link's label text, then the page's first h1/h2 heading text, then
+ * an empty string.
+ *
+ * @param {Array<{href: string, title: string, attrTitle: string|null}>} links Sidebar links.
+ * @param {string} path Current route path.
+ * @param {string} headingTitle First h1/h2 heading text of the rendered page ('' when none).
+ * @returns {string} Document title ('' when no source produced one).
+ */
+export function documentTitleForPath(links, path, headingTitle) {
+  const link = links.find((entry) => normalizeHref(entry.href) === path) ?? null;
+  if (link !== null && link.attrTitle !== null) {
+    return link.attrTitle;
+  }
+  if (link !== null && typeof link.title === 'string' && link.title.length > 0) {
+    return link.title;
+  }
+  return typeof headingTitle === 'string' ? headingTitle : '';
 }
 
 /**

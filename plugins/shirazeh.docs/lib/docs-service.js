@@ -10,6 +10,7 @@ import {
 import { createDocsError } from './error.js';
 import { createParsneshanOptions } from './parsneshan-extensions.js';
 import {
+  documentTitleForPath,
   neighborsForPath,
   parseSidebar,
   pathToDocumentUrl,
@@ -182,12 +183,14 @@ export function createDocsService({ config, publish }) {
           // page itself rendered successfully.
         }
         const { previous, next } = neighborsForPath(links, path);
+        const headingTitle = titleFromToc(rendered.toc);
 
         const page = {
           path,
           html: rendered.html,
           toc: rendered.toc,
-          title: titleFromToc(rendered.toc),
+          title: headingTitle,
+          documentTitle: documentTitleForPath(links, path, headingTitle),
           previous,
           next,
         };

@@ -88,14 +88,28 @@ class DocsPage extends PeyElement {
 
     if (isBonyanError(page)) {
       this.#state = { status: 'error', code: page.code };
+      this.#applyDocumentTitle(null);
     } else {
       this.#state = { status: 'ready', page };
+      this.#applyDocumentTitle(page.documentTitle);
     }
     this.#sidebarLinks = Array.isArray(sidebar) ? sidebar : null;
     this.requestRender({ preserve: false });
     // The base class flushes the render in a microtask; queueMicrotask is
     // FIFO, so this post-processing runs against the freshly rendered DOM.
     queueMicrotask(() => this.#enhanceContent());
+  }
+
+  // The browser tab title: the page's resolved document title (sidebar
+  // title attribute → sidebar label → first heading), else the app name
+  // alone for error and not-found states.
+  #applyDocumentTitle(documentTitle) {
+    const appName = this.#t('shirazeh.app-name');
+    if (typeof documentTitle === 'string' && documentTitle.length > 0) {
+      document.title = `${documentTitle} | ${appName}`;
+    } else {
+      document.title = appName;
+    }
   }
 
   #enhanceContent() {

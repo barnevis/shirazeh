@@ -1,6 +1,6 @@
 {
   "name": "shirazeh.docs",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "architecture": "0.11",
   "description": "Core documentation logic for Shirazeh: resolves page paths, loads markdown sources, and returns rendered pages with navigation context.",
   "type": "product",
@@ -18,18 +18,18 @@
       "methods": [
         {
           "name": "getSidebar",
-          "description": "Returns the parsed sidebar navigation tree. The sidebar markdown file is fetched once and cached; subsequent calls reuse the cache. Links are reported exactly as authored (href, title, indent); path-to-route mapping is the caller's concern.",
+          "description": "Returns the parsed sidebar navigation tree. The sidebar markdown file is fetched once and cached; subsequent calls reuse the cache. Links are reported exactly as authored (href, label text as title, optional markdown title attribute as attrTitle, indent level); path-to-route mapping is the caller's concern.",
           "params": [],
-          "returns": "Promise<SidebarLink[] | object> — SidebarLink { href: string, title: string, level: number } on success, or a standard Bonyan error object",
+          "returns": "Promise<SidebarLink[] | object> — SidebarLink { href: string, title: string, attrTitle: string|null, level: number } on success, or a standard Bonyan error object",
           "errors": ["SIDEBAR_NOT_FOUND", "SIDEBAR_PARSE_FAILED", "DOC_RENDER_FAILED", "SERVICE_UNAVAILABLE"]
         },
         {
           "name": "getPage",
-          "description": "Resolves a documentation route path (like '/guide/setup' or '/' for the home page) to a rendered page: fetches the underlying markdown document via the HTTP transport, renders it to sanitized HTML through the markdown service — with the parsneshan Persian dialect extensions injected per the `extensions` configuration — and returns the page with its table of contents, title, and previous/next links derived from the sidebar. Publishes docs:page-loaded only on success.",
+          "description": "Resolves a documentation route path (like '/guide/setup' or '/' for the home page) to a rendered page: fetches the underlying markdown document via the HTTP transport, renders it to sanitized HTML through the markdown service — with the parsneshan Persian dialect extensions injected per the `extensions` configuration — and returns the page with its table of contents, title, and previous/next links derived from the sidebar. `title` is the first h1/h2 heading text; `documentTitle` follows the sidebar title-attribute → sidebar label → heading chain and is intended for the browser tab title. Publishes docs:page-loaded only on success.",
           "params": [
             { "name": "path", "type": "string — route path, '/' maps to the configured homePage" }
           ],
-          "returns": "Promise<PageData | object> — PageData { path, html, toc: Array<{id,level,text}>, title: string, previous: SidebarLink|null, next: SidebarLink|null } or a standard Bonyan error object",
+          "returns": "Promise<PageData | object> — PageData { path, html, toc: Array<{id,level,text}>, title: string, documentTitle: string, previous: SidebarLink|null, next: SidebarLink|null } or a standard Bonyan error object",
           "errors": ["DOC_PAGE_NOT_FOUND", "DOC_PATH_INVALID", "DOC_RENDER_FAILED", "SERVICE_UNAVAILABLE"]
         }
       ]

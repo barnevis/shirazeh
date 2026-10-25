@@ -13,7 +13,7 @@ const PROJECT_ROOT = new URL('../../', import.meta.url);
 
 const SAMPLE_FILES = {
   './docs/README.md': '# خانه\n\nمتن **مهم** و [لینک](guide)',
-  './docs/_sidebar.md': '- [خانه](/)\n  - [راهنما](guide)\n- [درباره](about)',
+  './docs/_sidebar.md': '- [خانه](/ "صفحه اصلی شیرازه")\n  - [راهنما](guide)\n- [درباره](about)',
   './docs/guide.md': '# راهنما\n\n## بخش\n\nمتن راهنما',
   './docs/about.md': '# درباره\n\nدرباره شیرازه',
   './docs/parsneshan.md': [
@@ -148,9 +148,10 @@ test('should_render_home_page_through_bound_services_when_ui_calls_get_page', as
     const page = await docsService.getPage('/');
     assert.equal(page.path, '/');
     assert.equal(page.title, 'خانه');
+    assert.equal(page.documentTitle, 'صفحه اصلی شیرازه');
     assert.equal(page.html.includes('<h1'), true);
     assert.equal(page.toc.length, 1);
-    assert.deepEqual(page.next, { href: 'guide', title: 'راهنما', level: 2 });
+    assert.deepEqual(page.next, { href: 'guide', title: 'راهنما', attrTitle: null, level: 2 });
 
     const loadedEvent = events.find((event) => event.type === 'docs:page-loaded');
     assert.deepEqual(loadedEvent.data, { path: '/' });
@@ -166,7 +167,7 @@ test('should_return_sidebar_through_bound_services_when_ui_calls_get_sidebar', a
   try {
     const links = await uiContext.services['shirazeh.docs.service'].getSidebar();
     assert.equal(links.length, 3);
-    assert.deepEqual(links[0], { href: '/', title: 'خانه', level: 1 });
+    assert.deepEqual(links[0], { href: '/', title: 'خانه', attrTitle: 'صفحه اصلی شیرازه', level: 1 });
   } finally {
     await shutdown();
   }

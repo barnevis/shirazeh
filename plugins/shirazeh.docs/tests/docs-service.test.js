@@ -88,6 +88,51 @@ test('should_skip_extensions_when_disabled_in_config', async () => {
   assert.equal(call.footnoteOptions, null);
 });
 
+test('should_resolve_document_title_from_attr_title_when_present', async () => {
+  const { docs } = createBoundDocs({
+    files: {
+      './docs/guide.md': '# تیتر محتوا',
+      './docs/_sidebar.md': '- [راهنما](guide "راهنمای کامل شیرازه")',
+    },
+  });
+
+  const page = await docs.service.getPage('/guide');
+
+  assert.equal(page.title, 'تیتر محتوا');
+  assert.equal(page.documentTitle, 'راهنمای کامل شیرازه');
+});
+
+test('should_resolve_document_title_from_label_when_attr_title_is_absent', async () => {
+  const { docs } = createBoundDocs({
+    files: {
+      './docs/README.md': '# تیتر محتوا',
+      './docs/_sidebar.md': '- [خانه](/)',
+    },
+  });
+
+  const page = await docs.service.getPage('/');
+
+  assert.equal(page.documentTitle, 'خانه');
+});
+
+test('should_resolve_document_title_from_heading_when_path_not_in_sidebar', async () => {
+  const { docs } = createBoundDocs({
+    files: { './docs/lonely.md': '# تیتر تنها', './docs/_sidebar.md': '- [خانه](/)' },
+  });
+
+  const page = await docs.service.getPage('/lonely');
+
+  assert.equal(page.documentTitle, 'تیتر تنها');
+});
+
+test('should_return_empty_document_title_when_sidebar_missing_and_no_headings', async () => {
+  const { docs } = createBoundDocs({ files: { './docs/plain.md': 'فقط متن' } });
+
+  const page = await docs.service.getPage('/plain');
+
+  assert.equal(page.documentTitle, '');
+});
+
 test('should_return_rendered_page_when_get_page_is_called_for_home', async () => {
   const { docs } = createBoundDocs({
     files: {
@@ -103,7 +148,7 @@ test('should_return_rendered_page_when_get_page_is_called_for_home', async () =>
   assert.equal(page.html, '<h1>شیرازه</h1>');
   assert.equal(page.toc.length, 1);
   assert.deepEqual(page.previous, null);
-  assert.deepEqual(page.next, { href: 'guide', title: 'راهنما', level: 2 });
+  assert.deepEqual(page.next, { href: 'guide', title: 'راهنما', attrTitle: null, level: 2 });
 });
 
 test('should_return_neighbors_when_page_is_middle_of_sidebar', async () => {
@@ -116,8 +161,8 @@ test('should_return_neighbors_when_page_is_middle_of_sidebar', async () => {
 
   const page = await docs.service.getPage('/guide');
 
-  assert.deepEqual(page.previous, { href: '/', title: 'خانه', level: 1 });
-  assert.deepEqual(page.next, { href: 'about', title: 'درباره', level: 1 });
+  assert.deepEqual(page.previous, { href: '/', title: 'خانه', attrTitle: null, level: 1 });
+  assert.deepEqual(page.next, { href: 'about', title: 'درباره', attrTitle: null, level: 1 });
 });
 
 test('should_publish_page_loaded_when_page_is_rendered', async () => {
@@ -174,7 +219,7 @@ test('should_return_sidebar_links_when_get_sidebar_is_called', async () => {
   const links = await docs.service.getSidebar();
 
   assert.equal(links.length, 3);
-  assert.deepEqual(links[0], { href: '/', title: 'خانه', level: 1 });
+  assert.deepEqual(links[0], { href: '/', title: 'خانه', attrTitle: null, level: 1 });
 });
 
 test('should_fetch_sidebar_once_when_get_sidebar_is_called_twice', async () => {

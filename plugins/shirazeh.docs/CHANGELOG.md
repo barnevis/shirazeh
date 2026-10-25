@@ -2,6 +2,12 @@
 
 All notable changes to `shirazeh.docs` are documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows the Bonyan architecture rules.
 
+## [0.3.0] - 2026-10-26
+
+### Added
+
+- Document-title resolution: sidebar links now carry the optional markdown title attribute as `attrTitle` (`[label](path "title")`), and `getPage` returns a `documentTitle` field following the chain sidebar title attribute → sidebar label → first h1/h2 heading → empty string, intended for the browser tab title.
+
 ## [0.2.0] - 2026-10-26
 
 ### Added
