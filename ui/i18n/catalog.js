@@ -17,6 +17,9 @@ export default {
     'shirazeh.page.next': 'بعدی',
     'shirazeh.anchor.copied': 'پیوند رونوشت شد',
     'shirazeh.anchor.copy-failed': 'رونوشت پیوند ممکن نشد',
+    'shirazeh.code-copy.copy': 'رونوشت',
+    'shirazeh.code-copy.copied': 'رونوشت شد',
+    'shirazeh.code-copy.copy-failed': 'خطا',
   },
   en: {
     'shirazeh.app-name': 'Shirazeh',
@@ -32,5 +35,8 @@ export default {
     'shirazeh.page.next': 'Next',
     'shirazeh.anchor.copied': 'Link copied',
     'shirazeh.anchor.copy-failed': 'Could not copy the link',
+    'shirazeh.code-copy.copy': 'Copy',
+    'shirazeh.code-copy.copied': 'Copied',
+    'shirazeh.code-copy.copy-failed': 'Error',
   },
 };

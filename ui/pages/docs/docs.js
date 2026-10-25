@@ -3,7 +3,7 @@
 // only displays it and forwards navigation.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
-import { addHeadingAnchors, wrapTables } from './enhance-content.js';
+import { addCodeCopyButtons, addHeadingAnchors, wrapTables } from './enhance-content.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
@@ -125,6 +125,7 @@ class DocsPage extends PeyElement {
     if (content !== null && content !== undefined) {
       wrapTables(content);
       addHeadingAnchors(content, { path: this.#path });
+      addCodeCopyButtons(content, { label: this.#t('shirazeh.code-copy.copy') });
     }
 
     // A deep link (#/path?a=<heading id>) scrolls to its heading after the
@@ -171,6 +172,29 @@ class DocsPage extends PeyElement {
     }, 2000);
   }
 
+  // Copy buttons confirm on themselves (label swap) instead of a toast, so
+  // the feedback sits next to the block that was copied.
+  #copyCode(button, code) {
+    const setLabel = (key, stateClass) => {
+      button.textContent = this.#t(key);
+      button.classList.add(stateClass);
+      setTimeout(() => {
+        button.textContent = this.#t('shirazeh.code-copy.copy');
+        button.classList.remove(stateClass);
+      }, 2000);
+    };
+
+    const clipboard = globalThis.navigator?.clipboard;
+    if (clipboard && typeof clipboard.writeText === 'function') {
+      clipboard.writeText(code).then(
+        () => setLabel('shirazeh.code-copy.copied', 'is-success'),
+        () => setLabel('shirazeh.code-copy.copy-failed', 'is-error'),
+      );
+      return;
+    }
+    setLabel('shirazeh.code-copy.copy-failed', 'is-error');
+  }
+
   eventTypes() {
     return ['click'];
   }
@@ -185,6 +209,13 @@ class DocsPage extends PeyElement {
     if (headingAnchor !== null) {
       event.preventDefault();
       this.#copyHeadingLink(headingAnchor.getAttribute('href') ?? '');
+      return;
+    }
+
+    const copyButton = target.closest('button.copy-code-button');
+    if (copyButton !== null) {
+      const code = copyButton.closest('pre')?.querySelector('code')?.textContent ?? '';
+      this.#copyCode(copyButton, code);
       return;
     }
 
@@ -379,6 +410,39 @@ class DocsPage extends PeyElement {
           padding: var(--pey-space-4);
           overflow-x: auto;
           font-size: var(--pey-font-size-sm);
+          position: relative;
+        }
+        .markdown-body pre .copy-code-button {
+          position: absolute;
+          inset-block-start: var(--pey-space-2);
+          inset-inline-end: var(--pey-space-2);
+          opacity: 0;
+          font-family: var(--pey-font-family-base);
+          font-size: var(--pey-font-size-sm);
+          padding: var(--pey-space-1) var(--pey-space-3);
+          border: 1px solid var(--pey-color-border);
+          border-radius: var(--pey-radius-md);
+          background-color: var(--pey-color-canvas);
+          color: var(--pey-color-text);
+          cursor: pointer;
+        }
+        .markdown-body pre:hover .copy-code-button,
+        .markdown-body pre .copy-code-button:focus-visible {
+          opacity: 1;
+        }
+        .markdown-body pre .copy-code-button.is-success {
+          color: #059669;
+          border-color: #059669;
+        }
+        .markdown-body pre .copy-code-button.is-error {
+          color: var(--pey-color-status-error);
+          border-color: var(--pey-color-status-error);
+        }
+        @media print {
+          .markdown-body pre .copy-code-button,
+          .page-toast {
+            display: none;
+          }
         }
         .markdown-body code {
           font-family: ui-monospace, monospace;

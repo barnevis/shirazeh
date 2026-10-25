@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { JSDOM } from 'jsdom';
-import { addHeadingAnchors, wrapTables } from '../../ui/pages/docs/enhance-content.js';
+import { addCodeCopyButtons, addHeadingAnchors, wrapTables } from '../../ui/pages/docs/enhance-content.js';
 
 function createRoot(html) {
   const dom = new JSDOM(`<body>${html}</body>`);
@@ -58,6 +58,39 @@ test('should_skip_headings_when_they_have_no_id', () => {
 
 test('should_return_zero_when_root_is_missing_for_anchors', () => {
   assert.equal(addHeadingAnchors(null, { path: '/' }), 0);
+});
+
+test('should_add_copy_button_when_pre_blocks_exist', () => {
+  const root = createRoot('<pre><code>x</code></pre><pre><code>y</code></pre>');
+
+  const added = addCodeCopyButtons(root, { label: 'رونوشت' });
+
+  assert.equal(added, 2);
+  const buttons = [...root.querySelectorAll('.copy-code-button')];
+  assert.equal(buttons[0].textContent, 'رونوشت');
+  assert.equal(buttons[0].closest('pre') !== null, true);
+});
+
+test('should_not_duplicate_copy_buttons_when_run_twice', () => {
+  const root = createRoot('<pre><code>x</code></pre>');
+
+  addCodeCopyButtons(root, { label: 'a' });
+  const second = addCodeCopyButtons(root, { label: 'a' });
+
+  assert.equal(second, 0);
+  assert.equal(root.querySelectorAll('.copy-code-button').length, 1);
+});
+
+test('should_use_empty_label_when_option_is_missing', () => {
+  const root = createRoot('<pre><code>x</code></pre>');
+
+  addCodeCopyButtons(root, {});
+
+  assert.equal(root.querySelector('.copy-code-button').textContent, '');
+});
+
+test('should_return_zero_when_root_is_missing_for_copy_buttons', () => {
+  assert.equal(addCodeCopyButtons(null, { label: 'x' }), 0);
 });
 
 test('should_wrap_tables_when_content_contains_them', () => {

@@ -44,6 +44,41 @@ export function addHeadingAnchors(root, { path } = {}) {
 }
 
 /**
+ * Appends a copy button to every code block of the root.
+ *
+ * The button carries no state: clicking is handled by the page, which reads
+ * the sibling code text, copies it, and swaps the label briefly.
+ *
+ * @param {Element} root Rendered content root.
+ * @param {object} options Options.
+ * @param {string} options.label Visible button label (translated).
+ * @returns {number} Number of buttons added.
+ */
+export function addCodeCopyButtons(root, { label } = {}) {
+  if (!root || typeof root.querySelectorAll !== 'function') {
+    return 0;
+  }
+
+  const blocks = [...root.querySelectorAll('pre')];
+  let added = 0;
+
+  for (const block of blocks) {
+    if (block.querySelector('.copy-code-button') !== null) {
+      continue;
+    }
+
+    const button = block.ownerDocument.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code-button';
+    button.textContent = label ?? '';
+    block.append(button);
+    added += 1;
+  }
+
+  return added;
+}
+
+/**
  * Wraps direct tables of the root in a horizontally scrollable container.
  *
  * Wide tables stay readable on narrow screens instead of overflowing the
