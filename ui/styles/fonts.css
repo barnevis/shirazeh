@@ -1,0 +1,28 @@
+/* Shirazeh font faces — Vazirmatn (SIL OFL 1.1, rastikerdar/vazirmatn).
+   Vendored woff2 files live in ui/assets/fonts/ and are preloaded by
+   index.html. The family is the first entry of --pey-font-family-base in
+   ui/styles/app.css, so every component inherits it across shadow roots. */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/Vazirmatn-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/Vazirmatn-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/Vazirmatn-Bold.woff2') format('woff2');
+}
