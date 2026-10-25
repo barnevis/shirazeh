@@ -4,10 +4,12 @@
 
 import { PeyElement } from 'pey.webui/base/pey-element';
 import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from './enhance-content.js';
+import { activeBranchIds, buildTocTree } from './toc-tree.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
 const PARAM_KEYS = ['page', 'sub1', 'sub2', 'sub3', 'sub4'];
+const TOC_MIN_HEADINGS = 2;
 
 function routePathFromParams(params) {
   if (params === null || typeof params !== 'object') {
@@ -50,13 +52,21 @@ class DocsPage extends PeyElement {
   #docsService = null;
   #router = null;
   #t = null;
+  #config = {};
   #state = { status: 'loading' };
   #sidebarLinks = null;
+  #tocTree = [];
+  #tocOpenIds = new Set();
+  #tocActiveId = null;
+  #tocObserver = null;
+  #tocHovered = false;
+  #toastTimer = null;
 
   onConnect(refs) {
     this.#docsService = refs.services?.[DOCS_SERVICE] ?? null;
     this.#router = refs.router ?? null;
     this.#t = typeof refs.t === 'function' ? refs.t : (key) => key;
+    this.#config = refs.config ?? {};
     this.#path = routePathFromParams(refs.routeParams);
     this.#anchorTarget = typeof refs.routeQuery?.a === 'string' ? refs.routeQuery.a : null;
   }
@@ -72,6 +82,7 @@ class DocsPage extends PeyElement {
 
   disconnectedCallback() {
     clearTimeout(this.#toastTimer);
+    this.#teardownScrollspy();
     super.disconnectedCallback();
   }
 
@@ -127,6 +138,9 @@ class DocsPage extends PeyElement {
       addHeadingAnchors(content, { path: this.#path });
       addCodeCopyButtons(content, { label: this.#t('shirazeh.code-copy.copy') });
       applyImageSizes(content);
+      this.#setupScrollspy(content);
+    } else {
+      this.#teardownScrollspy();
     }
 
     // A deep link (#/path?a=<heading id>) scrolls to its heading after the
@@ -136,6 +150,69 @@ class DocsPage extends PeyElement {
       this.#anchorTarget = null;
       this.shadowRoot?.getElementById(decodeURIComponent(id))
         ?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  // Scrollspy follows the topmost heading visible in the reading area and
+  // highlights its TOC entry; the panel itself follows the active entry
+  // unless the user is hovering it.
+  #setupScrollspy(content) {
+    this.#teardownScrollspy();
+
+    const headings = [...content.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]')];
+    if (headings.length === 0 || typeof IntersectionObserver !== 'function') {
+      return;
+    }
+
+    const panel = this.shadowRoot?.querySelector('.toc-panel');
+    if (panel !== null && panel !== undefined) {
+      panel.addEventListener('mouseenter', () => { this.#tocHovered = true; });
+      panel.addEventListener('mouseleave', () => { this.#tocHovered = false; });
+    }
+
+    const visible = new Set();
+    const applyActive = () => {
+      const topmost = headings.find((heading) => visible.has(heading));
+      this.#setTocActive(topmost?.id ?? null);
+    };
+
+    this.#tocObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          visible.add(entry.target);
+        } else {
+          visible.delete(entry.target);
+        }
+      }
+      applyActive();
+    }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+
+    for (const heading of headings) {
+      this.#tocObserver.observe(heading);
+    }
+  }
+
+  #teardownScrollspy() {
+    this.#tocObserver?.disconnect();
+    this.#tocObserver = null;
+  }
+
+  #setTocActive(id) {
+    if (id === this.#tocActiveId) {
+      return;
+    }
+    this.#tocActiveId = id;
+
+    const branch = id === null ? new Set() : activeBranchIds(this.#tocTree, id);
+    for (const link of this.shadowRoot?.querySelectorAll('[data-toc-link]') ?? []) {
+      const linkId = link.dataset.tocLink;
+      link.classList.toggle('is-active', linkId === id);
+      link.classList.toggle('is-on-branch', branch.has(linkId) && linkId !== id);
+    }
+
+    if (!this.#tocHovered) {
+      this.shadowRoot?.querySelector('[data-toc-link].is-active')
+        ?.scrollIntoView({ block: 'nearest' });
     }
   }
 
@@ -220,6 +297,31 @@ class DocsPage extends PeyElement {
       return;
     }
 
+    const tocToggle = target.closest('button[data-toc-toggle]');
+    if (tocToggle !== null) {
+      event.preventDefault();
+      const id = tocToggle.dataset.tocToggle;
+      if (this.#tocOpenIds.has(id)) {
+        this.#tocOpenIds.delete(id);
+      } else {
+        this.#tocOpenIds.add(id);
+      }
+      const listItem = tocToggle.closest('li');
+      const submenu = listItem?.querySelector('ul');
+      submenu?.classList.toggle('is-open');
+      tocToggle.setAttribute('aria-expanded', String(submenu?.classList.contains('is-open') ?? false));
+      return;
+    }
+
+    const tocLink = target.closest('a[data-toc-link]');
+    if (tocLink !== null) {
+      event.preventDefault();
+      this.shadowRoot?.getElementById(decodeURIComponent(tocLink.dataset.tocLink))
+        ?.scrollIntoView({ behavior: 'smooth' });
+      this.#setTocActive(tocLink.dataset.tocLink);
+      return;
+    }
+
     const anchor = target.closest('a');
     if (anchor === null) {
       return;
@@ -284,6 +386,55 @@ class DocsPage extends PeyElement {
     `;
   }
 
+  // The on-page table of contents: a fixed side panel (wide screens only)
+  // rebuilt per page from the rendered toc, with scrollspy highlighting.
+  #tocEnabled() {
+    return this.#config.toc?.enabled !== false;
+  }
+
+  #tocPanelHtml() {
+    const page = this.#state.page;
+    const tocConfig = this.#config.toc ?? {};
+    const maxDepth = Number.isInteger(tocConfig.maxDepth) ? tocConfig.maxDepth : 3;
+
+    if (!this.#tocEnabled() || !Array.isArray(page?.toc) || page.toc.length < TOC_MIN_HEADINGS) {
+      return '';
+    }
+
+    this.#tocTree = buildTocTree(page.toc, maxDepth);
+    if (this.#tocTree.length === 0) {
+      return '';
+    }
+
+    const branch = this.#tocActiveId === null
+      ? new Set()
+      : activeBranchIds(this.#tocTree, this.#tocActiveId);
+
+    const renderNodes = (nodes) => nodes.map((node) => {
+      const hasChildren = node.children.length > 0;
+      const isOpen = this.#tocOpenIds.size === 0 || this.#tocOpenIds.has(node.id);
+      const isActive = node.id === this.#tocActiveId;
+      const onBranch = branch.has(node.id) && !isActive;
+      const toggle = hasChildren
+        ? `<button type="button" class="toc-toggle" data-toc-toggle="${escapeHtml(node.id)}" aria-expanded="${isOpen}">›</button>`
+        : '';
+      const link = `<a href="#${this.#path}?a=${encodeURIComponent(node.id)}" data-toc-link="${escapeHtml(node.id)}" class="${isActive ? 'is-active' : ''}${onBranch ? ' is-on-branch' : ''}">${escapeHtml(node.text)}</a>`;
+      const children = hasChildren
+        ? `<ul class="${isOpen ? 'is-open' : ''}">${renderNodes(node.children)}</ul>`
+        : '';
+      return `<li>${toggle}${link}${children}</li>`;
+    }).join('');
+
+    return `
+      <aside class="toc-panel" part="toc">
+        <nav aria-label="${escapeHtml(this.#t('shirazeh.toc.title'))}">
+          <p class="toc-title">${escapeHtml(this.#t('shirazeh.toc.title'))}</p>
+          <ul class="toc-list">${renderNodes(this.#tocTree)}</ul>
+        </nav>
+      </aside>
+    `;
+  }
+
   #renderState() {
     const t = this.#t;
 
@@ -318,6 +469,7 @@ class DocsPage extends PeyElement {
         ${previous}
         ${next}
       </nav>
+      ${this.#tocPanelHtml()}
     `;
   }
 
@@ -441,9 +593,75 @@ class DocsPage extends PeyElement {
         }
         @media print {
           .markdown-body pre .copy-code-button,
-          .page-toast {
+          .page-toast,
+          .toc-panel {
             display: none;
           }
+        }
+        .toc-panel {
+          display: none;
+        }
+        @media (min-width: 75rem) {
+          .toc-panel {
+            display: block;
+            position: fixed;
+            inset-block-start: 6rem;
+            inset-inline-end: var(--pey-space-6);
+            inline-size: 15rem;
+            max-block-size: calc(100vh - 8rem);
+            overflow-y: auto;
+            font-size: var(--pey-font-size-sm);
+            border-inline-start: 1px solid var(--pey-color-border);
+            padding-inline-start: var(--pey-space-4);
+          }
+          .layout {
+            padding-inline-end: 16rem;
+          }
+        }
+        .toc-title {
+          margin: 0 0 var(--pey-space-2);
+          font-weight: 600;
+        }
+        .toc-list,
+        .toc-list ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        .toc-list ul {
+          padding-inline-start: var(--pey-space-4);
+        }
+        .toc-list ul:not(.is-open) {
+          display: none;
+        }
+        .toc-list li {
+          margin-block: var(--pey-space-1);
+        }
+        .toc-list a {
+          color: var(--pey-color-text-muted);
+          text-decoration: none;
+        }
+        .toc-list a:hover {
+          color: var(--pey-color-text);
+        }
+        .toc-list a.is-on-branch {
+          color: var(--pey-color-text);
+        }
+        .toc-list a.is-active {
+          color: var(--pey-color-accent);
+          font-weight: 600;
+        }
+        .toc-toggle {
+          border: none;
+          background: none;
+          padding: 0 var(--pey-space-1);
+          color: var(--pey-color-text-muted);
+          cursor: pointer;
+          font-size: inherit;
+        }
+        .toc-toggle[aria-expanded='true'] {
+          transform: rotate(90deg);
+          display: inline-block;
         }
         .markdown-body code {
           font-family: ui-monospace, monospace;

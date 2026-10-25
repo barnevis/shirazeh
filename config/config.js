@@ -50,6 +50,14 @@ export default {
     persianFootnote: true, // پانویس با برچسب فارسی
   },
 
+  /**
+   * پنل «در این صفحه» (فهرست مطالب) کنار محتوا در صفحه‌های پهن.
+   */
+  toc: {
+    enabled: true,
+    maxDepth: 3, // عمق تیترهای نمایش‌داده‌شده (۱ تا ۶)
+  },
+
   // کلیدهای بیشتری در نسخه‌های بعدی اضافه می‌شوند:
-  // appName، logo، favicon، toc، codeCopy، title، notFoundPage…
+  // appName، logo، favicon، codeCopy، title، notFoundPage…
 };

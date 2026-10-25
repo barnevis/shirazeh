@@ -98,6 +98,7 @@ export const setup = createApplicationSetup({
         services: resources.required,
         router: resources.router,
         sharedState,
+        config: resources.config,
         t: i18n.t,
         format: i18n.format,
       },

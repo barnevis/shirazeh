@@ -20,6 +20,7 @@ export default {
     'shirazeh.code-copy.copy': 'رونوشت',
     'shirazeh.code-copy.copied': 'رونوشت شد',
     'shirazeh.code-copy.copy-failed': 'خطا',
+    'shirazeh.toc.title': 'در این صفحه',
   },
   en: {
     'shirazeh.app-name': 'Shirazeh',
@@ -38,5 +39,6 @@ export default {
     'shirazeh.code-copy.copy': 'Copy',
     'shirazeh.code-copy.copied': 'Copied',
     'shirazeh.code-copy.copy-failed': 'Error',
+    'shirazeh.toc.title': 'On this page',
   },
 };
