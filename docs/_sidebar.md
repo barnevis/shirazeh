@@ -2,4 +2,6 @@
   - [راهنما](guide)
     - [نوشتن مارک‌داون](guide/markdown)
     - [پیکربندی](guide/config)
+  - [شیرازه از نزدیک](features)
+  - [پیکربندی شیرازه](configuration)
   - [درباره معماری](about)

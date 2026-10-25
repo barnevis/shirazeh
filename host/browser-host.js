@@ -3,10 +3,12 @@
 // for the browser, constructs the platform-neutral Pey Core, and starts it.
 
 import { PeyCore } from '../core/pey-core/index.js';
+import { applyUserConfig, loadUserConfig } from './user-config.js';
 
 const APP_ROOT = new URL('../', import.meta.url);
 const MANIFEST_FILE = 'manifest.json';
 const ENTRY_FILE = 'index.js';
+const USER_CONFIG_URL = new URL('../config/config.js', import.meta.url).href;
 
 function toAbsoluteUrl(ref, fileName) {
   const cleanRef = typeof ref === 'string' ? ref.replace(/^\.\//, '').replace(/\/+$/, '') : '';
@@ -22,7 +24,11 @@ const configSource = {
     if (!response.ok) {
       throw new Error(`bootstrap.json could not be loaded (status ${response.status})`);
     }
-    return response.json();
+    const bootstrapContent = await response.json();
+    const userConfig = await loadUserConfig(USER_CONFIG_URL);
+    return applyUserConfig(bootstrapContent, userConfig, (message) => {
+      console.warn(`[shirazeh] ${message}`);
+    });
   },
 };
 
