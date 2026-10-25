@@ -3,7 +3,7 @@
 // only displays it and forwards navigation.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
-import { wrapTables } from './enhance-content.js';
+import { addHeadingAnchors, wrapTables } from './enhance-content.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
@@ -58,13 +58,21 @@ class DocsPage extends PeyElement {
     this.#router = refs.router ?? null;
     this.#t = typeof refs.t === 'function' ? refs.t : (key) => key;
     this.#path = routePathFromParams(refs.routeParams);
+    this.#anchorTarget = typeof refs.routeQuery?.a === 'string' ? refs.routeQuery.a : null;
   }
 
   #path = '/';
+  #anchorTarget = null;
+  #toastTimer = null;
 
   connectedCallback() {
     super.connectedCallback();
     this.#loadPage();
+  }
+
+  disconnectedCallback() {
+    clearTimeout(this.#toastTimer);
+    super.disconnectedCallback();
   }
 
   async #loadPage() {
@@ -116,7 +124,51 @@ class DocsPage extends PeyElement {
     const content = this.shadowRoot?.querySelector('.markdown-body');
     if (content !== null && content !== undefined) {
       wrapTables(content);
+      addHeadingAnchors(content, { path: this.#path });
     }
+
+    // A deep link (#/path?a=<heading id>) scrolls to its heading after the
+    // content and its anchors exist; consumed once per mount.
+    if (this.#anchorTarget !== null) {
+      const id = this.#anchorTarget;
+      this.#anchorTarget = null;
+      this.shadowRoot?.getElementById(decodeURIComponent(id))
+        ?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  // Heading-anchor clicks copy the shareable deep-link URL and confirm with
+  // a short toast instead of navigating (the page is already here).
+  #copyHeadingLink(href) {
+    const url = new URL(href, globalThis.location?.href ?? 'https://shirazeh.invalid').href;
+    const clipboard = globalThis.navigator?.clipboard;
+    if (clipboard && typeof clipboard.writeText === 'function') {
+      clipboard.writeText(url).then(
+        () => this.#showToast(this.#t('shirazeh.anchor.copied')),
+        () => this.#showToast(this.#t('shirazeh.anchor.copy-failed')),
+      );
+      return;
+    }
+    this.#showToast(this.#t('shirazeh.anchor.copy-failed'));
+  }
+
+  #showToast(message) {
+    const root = this.shadowRoot;
+    if (root === null || root === undefined) {
+      return;
+    }
+
+    root.querySelector('.page-toast')?.remove();
+    const toast = root.ownerDocument?.createElement('div') ?? document.createElement('div');
+    toast.className = 'page-toast';
+    toast.setAttribute('role', 'status');
+    toast.textContent = message;
+    root.append(toast);
+
+    clearTimeout(this.#toastTimer);
+    this.#toastTimer = setTimeout(() => {
+      toast.remove();
+    }, 2000);
   }
 
   eventTypes() {
@@ -126,6 +178,13 @@ class DocsPage extends PeyElement {
   handleEvent(event) {
     const target = event.target;
     if (!(target instanceof Element)) {
+      return;
+    }
+
+    const headingAnchor = target.closest('a.heading-anchor');
+    if (headingAnchor !== null) {
+      event.preventDefault();
+      this.#copyHeadingLink(headingAnchor.getAttribute('href') ?? '');
       return;
     }
 
@@ -287,6 +346,29 @@ class DocsPage extends PeyElement {
         }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 {
           line-height: 1.3;
+        }
+        .markdown-body :is(h1, h2, h3, h4, h5, h6) .heading-anchor {
+          margin-inline-start: var(--pey-space-2);
+          opacity: 0;
+          text-decoration: none;
+          font-weight: 400;
+        }
+        .markdown-body :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor,
+        .markdown-body :is(h1, h2, h3, h4, h5, h6):focus-within .heading-anchor {
+          opacity: 1;
+        }
+        .page-toast {
+          position: fixed;
+          inset-block-end: var(--pey-space-6);
+          inset-inline: 0;
+          margin-inline: auto;
+          inline-size: fit-content;
+          padding: var(--pey-space-2) var(--pey-space-4);
+          border-radius: var(--pey-radius-md);
+          background-color: var(--pey-color-text);
+          color: var(--pey-color-canvas);
+          box-shadow: var(--pey-shadow-sm);
+          font-size: var(--pey-font-size-sm);
         }
         .markdown-body pre {
           direction: ltr;

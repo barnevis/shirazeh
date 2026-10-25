@@ -15,6 +15,8 @@ export default {
     'shirazeh.page.error-title': 'خطا در بارگذاری صفحه',
     'shirazeh.page.previous': 'قبلی',
     'shirazeh.page.next': 'بعدی',
+    'shirazeh.anchor.copied': 'پیوند رونوشت شد',
+    'shirazeh.anchor.copy-failed': 'رونوشت پیوند ممکن نشد',
   },
   en: {
     'shirazeh.app-name': 'Shirazeh',
@@ -28,5 +30,7 @@ export default {
     'shirazeh.page.error-title': 'Failed to load the page',
     'shirazeh.page.previous': 'Previous',
     'shirazeh.page.next': 'Next',
+    'shirazeh.anchor.copied': 'Link copied',
+    'shirazeh.anchor.copy-failed': 'Could not copy the link',
   },
 };

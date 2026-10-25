@@ -3,12 +3,62 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { JSDOM } from 'jsdom';
-import { wrapTables } from '../../ui/pages/docs/enhance-content.js';
+import { addHeadingAnchors, wrapTables } from '../../ui/pages/docs/enhance-content.js';
 
 function createRoot(html) {
   const dom = new JSDOM(`<body>${html}</body>`);
   return dom.window.document.body;
 }
+
+test('should_add_anchors_when_headings_have_ids', () => {
+  const root = createRoot('<h1 id="a">یک</h1><h2 id="b">دو</h2><h3>بدون شناسه</h3>');
+
+  const anchored = addHeadingAnchors(root, { path: '/guide' });
+
+  assert.equal(anchored, 2);
+  const anchors = [...root.querySelectorAll('.heading-anchor')];
+  assert.equal(anchors.length, 2);
+  assert.equal(anchors[0].getAttribute('href'), '#/guide?a=a');
+  assert.equal(anchors[1].getAttribute('href'), '#/guide?a=b');
+});
+
+test('should_encode_anchor_href_when_id_has_unicode', () => {
+  const root = createRoot('<h2 id="user-content-h-%D8%B3%D9%84%D8%A7%D9%85">سلام</h2>');
+
+  addHeadingAnchors(root, { path: '/' });
+
+  const anchor = root.querySelector('.heading-anchor');
+  assert.equal(anchor.getAttribute('href'), '#/?a=user-content-h-%25D8%25B3%25D9%2584%25D8%25A7%25D9%2585');
+});
+
+test('should_use_root_path_when_path_option_is_missing', () => {
+  const root = createRoot('<h1 id="a">یک</h1>');
+
+  addHeadingAnchors(root, {});
+
+  assert.equal(root.querySelector('.heading-anchor').getAttribute('href'), '#/?a=a');
+});
+
+test('should_not_duplicate_anchors_when_run_twice', () => {
+  const root = createRoot('<h1 id="a">یک</h1>');
+
+  addHeadingAnchors(root, { path: '/' });
+  const second = addHeadingAnchors(root, { path: '/' });
+
+  assert.equal(second, 0);
+  assert.equal(root.querySelectorAll('.heading-anchor').length, 1);
+});
+
+test('should_skip_headings_when_they_have_no_id', () => {
+  const root = createRoot('<h1>بدون شناسه</h1>');
+
+  assert.equal(addHeadingAnchors(root, { path: '/' }), 0);
+  assert.equal(root.querySelector('.heading-anchor'), null);
+});
+
+test('should_return_zero_when_root_is_missing_for_anchors', () => {
+  assert.equal(addHeadingAnchors(null, { path: '/' }), 0);
+});
 
 test('should_wrap_tables_when_content_contains_them', () => {
   const root = createRoot('<table id="t1"></table><p>x</p><table id="t2"></table>');
