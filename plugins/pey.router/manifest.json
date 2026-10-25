@@ -1,6 +1,6 @@
 {
   "name": "pey.router",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "architecture": "0.11",
   "description": "Provides client-side navigation and current-route state through a routing adapter, decoupled from the underlying navigation technology (browser History API, native navigation on mobile/desktop). Route patterns are not known to this plugin in advance; they must be registered by the plugins that own them via registerRoutes.",
   "type": "infrastructure",

@@ -1,7 +1,7 @@
 // Shared contract values for the pey.router plugin.
 
 export const PLUGIN_NAME = 'pey.router';
-export const PLUGIN_VERSION = '1.0.0';
+export const PLUGIN_VERSION = '1.1.0';
 export const SERVICE_NAME = 'pey.router.service';
 
 export const EVENT_NAMES = Object.freeze({

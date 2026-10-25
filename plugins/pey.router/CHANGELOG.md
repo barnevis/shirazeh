@@ -2,6 +2,12 @@
 
 All notable changes to `pey.router` are documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0] - 2026-10-25
+
+### Added
+
+- `HashHistoryAdapter`, a second built-in Router adapter that keeps the application path in the URL fragment (`/#/docs/intro`), selected via `adapters.router: "HashHistoryAdapter"` in `bootstrap.json`. Entries are pushed through the History API so programmatic navigation fires no `hashchange`; only externally reached fragment changes notify the service. This lets applications deploy to static hosts (including GitHub Pages) without server-side rewrite rules. Both built-in adapters pass the same shared adapter-contract suite.
+
 ## [1.0.0] - 2026-08-08
 
 Initial release of `pey.router`, an infrastructure plugin for Bonyan architecture `0.11` providing client-side navigation, route registration, route matching, and current-route state through a replaceable Router adapter.

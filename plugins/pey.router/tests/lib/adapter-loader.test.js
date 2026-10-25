@@ -26,6 +26,40 @@ test('should_return_adapter_when_identifier_is_supported', async () => {
   assert.equal(loadedAdapter, adapter);
 });
 
+test('should_load_hash_adapter_when_default_identifier_is_hash_history_adapter', async () => {
+  const adapter = await loadRouterAdapter('HashHistoryAdapter', { host: createMinimalHashHost() });
+
+  for (const methodName of ROUTER_ADAPTER_METHODS) {
+    assert.equal(typeof adapter[methodName], 'function');
+  }
+});
+
+test('should_load_browser_adapter_when_default_identifier_is_browser_history_adapter', async () => {
+  const adapter = await loadRouterAdapter('BrowserHistoryAdapter', { host: createMinimalBrowserHost() });
+
+  for (const methodName of ROUTER_ADAPTER_METHODS) {
+    assert.equal(typeof adapter[methodName], 'function');
+  }
+});
+
+function createMinimalHashHost() {
+  return {
+    location: { hash: '#/start' },
+    history: { pushState() {}, replaceState() {}, back() {}, forward() {} },
+    addEventListener() {},
+    removeEventListener() {},
+  };
+}
+
+function createMinimalBrowserHost() {
+  return {
+    location: { pathname: '/start', search: '' },
+    history: { pushState() {}, replaceState() {}, back() {}, forward() {} },
+    addEventListener() {},
+    removeEventListener() {},
+  };
+}
+
 test('should_pass_adapter_config_when_supported_adapter_is_loaded', async () => {
   const adapterConfig = { mode: 'memory' };
   let receivedConfig;

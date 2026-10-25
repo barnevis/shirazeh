@@ -14,6 +14,10 @@ const DEFAULT_ADAPTER_LOADERS = Object.freeze({
     const { createBrowserHistoryAdapter } = await import('../adapters/browser-history-adapter.js');
     return createBrowserHistoryAdapter(adapterConfig);
   },
+  HashHistoryAdapter: async (adapterConfig) => {
+    const { createHashHistoryAdapter } = await import('../adapters/hash-history-adapter.js');
+    return createHashHistoryAdapter(adapterConfig);
+  },
 });
 
 function startupError(code, message) {
