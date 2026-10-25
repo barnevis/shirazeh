@@ -1,0 +1,52 @@
+{
+  "name": "shirazeh.docs",
+  "version": "1.0.0",
+  "architecture": "0.11",
+  "description": "Core documentation logic for Shirazeh: resolves page paths, loads markdown sources, and returns rendered pages with navigation context.",
+  "type": "product",
+  "dependencies": {
+    "required": [
+      "shirazeh.http.service",
+      "pey.markdown.service"
+    ],
+    "optional": []
+  },
+  "provides": [
+    {
+      "name": "shirazeh.docs.service",
+      "description": "Access to documentation pages and the sidebar navigation tree.",
+      "methods": [
+        {
+          "name": "getSidebar",
+          "description": "Returns the parsed sidebar navigation tree. The sidebar markdown file is fetched once and cached; subsequent calls reuse the cache. Links are reported exactly as authored (href, title, indent); path-to-route mapping is the caller's concern.",
+          "params": [],
+          "returns": "Promise<SidebarLink[] | object> — SidebarLink { href: string, title: string, level: number } on success, or a standard Bonyan error object",
+          "errors": ["SIDEBAR_NOT_FOUND", "SIDEBAR_PARSE_FAILED", "DOC_RENDER_FAILED", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "getPage",
+          "description": "Resolves a documentation route path (like '/guide/setup' or '/' for the home page) to a rendered page: fetches the underlying markdown document via the HTTP transport, renders it to sanitized HTML through the markdown service, and returns the page with its table of contents, title, and previous/next links derived from the sidebar. Publishes docs:page-loaded only on success.",
+          "params": [
+            { "name": "path", "type": "string — route path, '/' maps to the configured homePage" }
+          ],
+          "returns": "Promise<PageData | object> — PageData { path, html, toc: Array<{id,level,text}>, title: string, previous: SidebarLink|null, next: SidebarLink|null } or a standard Bonyan error object",
+          "errors": ["DOC_PAGE_NOT_FOUND", "DOC_PATH_INVALID", "DOC_RENDER_FAILED", "SERVICE_UNAVAILABLE"]
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "docs:page-loaded",
+      "description": "Published after a documentation page has been successfully loaded and rendered.",
+      "data": [
+        { "name": "path", "type": "string — the route path that was loaded" }
+      ]
+    }
+  ],
+  "config": {
+    "docsRoot": "./docs",
+    "homePage": "README.md",
+    "sidebarFile": "_sidebar.md"
+  }
+}
