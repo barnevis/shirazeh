@@ -1,0 +1,20 @@
+{
+    "name": "@pey/core",
+    "version": "0.2.0",
+    "description": "Pey Core — platform-neutral communication infrastructure for the Pey plugin architecture",
+    "type": "module",
+    "main": "index.js",
+    "exports": {
+        ".": "./index.js"
+    },
+    "scripts": {
+        "test": "node --test tests/*.test.js"
+    },
+    "keywords": [
+        "pey",
+        "core",
+        "plugin",
+        "architecture"
+    ],
+    "license": "MIT"
+}

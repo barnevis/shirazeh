@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+#box {
+  border-top: 3px solid var(--spike-color, #bada55);
+  padding: 4px;
+}
+
+.light-probe {
+  border-top: 1px solid red;
+}

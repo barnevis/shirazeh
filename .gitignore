@@ -1,0 +1,15 @@
+# Node
+node_modules/
+package-lock.json.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+.idea/
+.vscode/
+
+# Local runtime artifacts
+*.log

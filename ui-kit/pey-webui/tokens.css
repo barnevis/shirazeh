@@ -1,0 +1,44 @@
+/* Global design tokens for pey.webui UI components.
+   Tokens are CSS Custom Properties on :root so they cascade across the Shadow
+   DOM boundary into every component via var(). Values are neutral kit defaults;
+   a consuming application may override any token by redefining the same
+   custom property at :root or under a theme scope it applies from its `theme`
+   configuration. Components consume tokens with CSS logical properties only. */
+
+:root {
+  /* Typography */
+  --pey-font-family-base: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --pey-font-size-sm: 0.875rem;
+  --pey-font-size-base: 1rem;
+  --pey-font-size-lg: 1.25rem;
+  --pey-line-height-base: 1.5;
+
+  /* Spacing scale */
+  --pey-space-1: 0.25rem;
+  --pey-space-2: 0.5rem;
+  --pey-space-3: 0.75rem;
+  --pey-space-4: 1rem;
+  --pey-space-6: 1.5rem;
+  --pey-space-8: 2rem;
+
+  /* Color */
+  --pey-color-canvas: #ffffff;
+  --pey-color-surface: #f7f7f8;
+  --pey-color-text: #1c2026;
+  --pey-color-text-muted: #5c6672;
+  --pey-color-border: #d7dbe0;
+  --pey-color-accent: #0f6fff;
+  --pey-color-status-error: #d24545;
+  --pey-color-focus-ring: rgba(15, 111, 255, 0.4);
+
+  /* Radius */
+  --pey-radius-sm: 0.25rem;
+  --pey-radius-md: 0.5rem;
+
+  /* Motion */
+  --pey-duration-fast: 120ms;
+  --pey-duration-base: 200ms;
+
+  /* Elevation */
+  --pey-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08);
+}

@@ -1,0 +1,101 @@
+{
+  "name": "pey.router",
+  "version": "1.0.0",
+  "architecture": "0.11",
+  "description": "Provides client-side navigation and current-route state through a routing adapter, decoupled from the underlying navigation technology (browser History API, native navigation on mobile/desktop). Route patterns are not known to this plugin in advance; they must be registered by the plugins that own them via registerRoutes.",
+  "type": "infrastructure",
+  "adapterType": "router",
+  "dependencies": {
+    "required": [],
+    "optional": []
+  },
+  "provides": [
+    {
+      "name": "pey.router.service",
+      "description": "Navigation, current-route access, and route registration for the rest of the application.",
+      "methods": [
+        {
+          "name": "registerRoutes",
+          "description": "Registers one or more route patterns as valid, owned by the calling plugin. Any plugin that calls this must declare pey.router.service in its own manifest dependencies, per the standard Bonyan dependency mechanism — this is an ordinary service call, not a special exception. It may only be called during the calling plugin's local activation, after the Core has bound its declared dependencies; it cannot be called during preparation, since no plugin — application or otherwise — holds any bound service reference at that point (per plugin.md). A pattern not registered here is treated as unmatched by the plugin's internal resolution logic, which navigate, replace, back, and forward all rely on (matchRoute itself is a separate, standalone utility and is not what performs this internal resolution). After registration, the plugin re-resolves the current raw path against the updated pattern set: if the current route was previously isNotFound and now matches a newly registered pattern, the plugin updates the current route and publishes router:changed for it. Calling this multiple times accumulates patterns; it does not replace a prior registration.",
+          "params": [
+            { "name": "patterns", "type": "string[], each following this project's fixed pattern syntax, e.g. ['/accounts/:id', '/accounts']" }
+          ],
+          "returns": "void",
+          "errors": ["ROUTER_MALFORMED_PATTERN"]
+        },
+        {
+          "name": "navigate",
+          "description": "Navigates to a new path, adding a new entry to the navigation history. If the path matches no registered route, the service redirects internally to configured notFoundPath, updates the current route accordingly, and publishes router:navigation-failed before publishing router:changed for the redirected path. It does not throw and does not return an error to the caller for an unmatched path; this is a routing outcome, not a caller-facing operational failure. If the underlying adapter fails to perform the raw history operation (e.g. a browser-imposed restriction), that failure is returned to the caller as a standard Bonyan error.",
+          "params": [
+            { "name": "path", "type": "string" },
+            { "name": "options", "type": "NavigateOptions : { query?: object }" }
+          ],
+          "returns": "void",
+          "errors": ["ROUTER_MALFORMED_PATH", "ROUTER_MALFORMED_QUERY", "ROUTER_NAVIGATION_FAILED"]
+        },
+        {
+          "name": "replace",
+          "description": "Same behavior as navigate, but replaces the current history entry instead of adding a new one. This is the only method that replaces the current entry; navigate never replaces, to avoid two overlapping ways of doing the same thing. Unmatched paths are handled identically to navigate: internal redirect to notFoundPath plus router:navigation-failed. If the underlying adapter fails to perform the raw history operation, that failure is returned to the caller as a standard Bonyan error.",
+          "params": [
+            { "name": "path", "type": "string" },
+            { "name": "options", "type": "NavigateOptions : { query?: object }" }
+          ],
+          "returns": "void",
+          "errors": ["ROUTER_MALFORMED_PATH", "ROUTER_MALFORMED_QUERY", "ROUTER_NAVIGATION_FAILED"]
+        },
+        {
+          "name": "back",
+          "description": "Navigates to the previous entry in the navigation history, if any. No-op if there is no previous entry. If the entry being navigated to (including via an external event such as the browser's own back button) does not match any registered route, the same fallback logic as navigate/replace applies: internal redirect to notFoundPath, publishing router:navigation-failed followed by router:changed. This internal redirect always replaces the current history entry rather than adding a new one, so the browser's back/forward history stack is not corrupted by the fallback itself. If the underlying adapter reports an unexpected failure while moving backward, that failure is returned to the caller as a standard Bonyan error.",
+          "params": [],
+          "returns": "void",
+          "errors": ["ROUTER_NAVIGATION_FAILED"]
+        },
+        {
+          "name": "forward",
+          "description": "Navigates to the next entry in the navigation history, if any. No-op if there is no next entry. Provided for symmetry with back; both are thin wrappers over the underlying navigation adapter's history stack. The same unmatched-path fallback described for back applies here identically, including that the fallback always replaces the current history entry rather than adding a new one. If the underlying adapter reports an unexpected failure while moving forward, that failure is returned to the caller as a standard Bonyan error.",
+          "params": [],
+          "returns": "void",
+          "errors": ["ROUTER_NAVIGATION_FAILED"]
+        },
+        {
+          "name": "getCurrentRoute",
+          "description": "Returns the currently active route, synchronously. This plugin's own local activation completes before any product, feature, platform, or transport plugin has had a chance to call registerRoutes, so a fully resolved, matched Route cannot be guaranteed at that point. The guarantee this method provides is: from the point the application plugin group has committed and the UI starts, every registered product route has already had the chance to register (registration happens during each application plugin's local activation, after binding, before that group is committed), so getCurrentRoute called from the UI or from any application plugin after group commit always reflects the final registered route set. Before that point, if no pattern has matched yet, the returned Route has isNotFound true.",
+          "params": [],
+          "returns": "Route",
+          "errors": []
+        },
+        {
+          "name": "matchRoute",
+          "description": "A standalone, general-purpose matching utility: checks whether a given path matches the given pattern and extracts path parameters, using this project's fixed pattern syntax (see the Route Pattern Syntax section in the companion type reference document). The pattern is supplied directly by the caller; this utility itself does not consult the registry built from registerRoutes. The plugin's own internal resolution logic (used by navigate, replace, back, and forward) is built on top of this same utility, iterating the registered patterns and calling it for each — but that internal resolution is a distinct, separate concern from this public method, which any caller may also use directly to test an arbitrary pattern against a path. This method is synchronous and performs no I/O. If the given path simply does not match a well-formed pattern, it returns null — that is an ordinary outcome, not an error. If the pattern itself does not follow this project's fixed pattern syntax, that is a caller mistake, not a routing outcome, and the method throws synchronously with the standard Bonyan error structure instead of returning null; a malformed pattern must never be silently treated as a non-match. Does not consider or return query string data.",
+          "params": [
+            { "name": "pattern", "type": "string, e.g. '/accounts/:id'" },
+            { "name": "path", "type": "string" }
+          ],
+          "returns": "RouteMatch | null",
+          "errors": ["ROUTER_MALFORMED_PATTERN"]
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "router:changed",
+      "description": "Published whenever the active route changes, whether by navigate, replace, back, forward, or a direct URL change (e.g. browser back/forward button). Also published for the redirected path when an unmatched navigation, from any of the above sources, falls back to notFoundPath. Carries only the resolved path as identifying information; a listener that needs the matched pattern, path parameters, query, or the isNotFound flag must call getCurrentRoute directly, per the architecture's rule that event data is minimal identifying information, not complete content — this also avoids ever putting query-string content, which may carry arbitrary or sensitive values, onto the Event Bus. When a navigation is unmatched, this plugin publishes router:navigation-failed and then router:changed, in that fixed order, since both are published by this plugin's own code. Listeners must not assume the two events are delivered back-to-back without any other event interleaved, since the Event Bus gives no delivery-timing guarantee beyond publish order.",
+      "data": [
+        { "name": "path", "type": "string — the resolved path, e.g. '/accounts/42'" }
+      ]
+    },
+    {
+      "name": "router:navigation-failed",
+      "description": "Published when a requested or reached path (via navigate, replace, back, forward, or an external URL change) matched no registered route and the service fell back to notFoundPath. Publish order relative to router:changed is described there.",
+      "data": [
+        { "name": "path", "type": "string — the path that was requested or reached and failed to match" },
+        { "name": "reason", "type": "string — one of a fixed set of codes: 'ROUTE_NOT_FOUND'. This set is exhaustive at this version; any future addition is a MINOR change to this plugin." }
+      ]
+    }
+  ],
+  "config": {
+    "basePath": "/",
+    "notFoundPath": "/not-found"
+  }
+}

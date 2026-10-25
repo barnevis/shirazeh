@@ -1,0 +1,6 @@
+{
+    "name": "pey.core",
+    "version": "0.2.0",
+    "architecture": "0.11",
+    "description": "Pey Core — the platform-neutral communication infrastructure that lets plugins find each other, listen to events, and have their lifecycle managed."
+}

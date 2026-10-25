@@ -1,0 +1,35 @@
+{
+  "name": "example.ui",
+  "version": "1.0.0",
+  "architecture": "0.11",
+  "description": "Application UI built with pey.webui",
+  "dependencies": {
+    "required": [
+      "pey.router.service"
+    ],
+    "optional": []
+  },
+  "events": [
+    {
+      "name": "ui:component-error",
+      "description": "A component render or event handler failed and was contained by PeyElement",
+      "data": [
+        {
+          "name": "componentTag",
+          "type": "string"
+        },
+        {
+          "name": "code",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "config": {
+    "theme": "system",
+    "language": "en",
+    "direction": "auto",
+    "fallbackPath": null,
+    "assetBaseUrl": "./assets"
+  }
+}

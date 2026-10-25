@@ -1,0 +1,42 @@
+{
+  "name": "pey.webui",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Shared native Web Components kit for Pey application UIs",
+  "devDependencies": {
+    "jsdom": "^26.0.0",
+    "playwright": "^1.62.1"
+  },
+  "exports": {
+    "./contracts": "./contracts.js",
+    "./shared-state": "./shared-state.js",
+    "./base/pey-element": "./base/pey-element.js",
+    "./base/icon-sprite": "./base/icon-sprite.js",
+    "./base/attach-style-sheet": "./base/attach-style-sheet.js",
+    "./shell/create-application-setup": "./shell/create-application-setup.js",
+    "./shell/app-shell": "./shell/app-shell.js",
+    "./routing/page-loader": "./routing/page-loader.js",
+    "./routing/page-host": "./routing/page-host.js",
+    "./routing/page-fallback": "./routing/page-fallback.js",
+    "./i18n": "./i18n/create-i18n.js",
+    "./i18n/catalog": "./i18n/catalog.js",
+    "./templates/application-manifest": "./templates/application-manifest.json",
+    "./templates/application-entry-point": "./templates/application-entry-point.js",
+    "./tokens.css": "./tokens.css",
+    "./assets/icons.svg": "./assets/icons.svg"
+  },
+  "scripts": {
+    "check:phase-0": "node scripts/check-phase-0.js",
+    "check:phase-1": "node scripts/check-phase-1.js",
+    "check:phase-2": "node scripts/check-phase-2.js",
+    "check:phase-3": "node scripts/check-phase-3.js",
+    "check:phase-4": "node scripts/check-phase-4.js",
+    "check:phase-5": "node scripts/check-phase-5.js",
+    "check:phase-6": "node scripts/check-phase-6.js",
+    "check:phase-7": "node scripts/check-phase-7.js",
+    "spike:svg": "node scripts/browser-spikes/svg-use-spike.js",
+    "spike:css": "node scripts/browser-spikes/css-attach-spike.js",
+    "spikes": "node scripts/browser-spikes/run-spikes.js",
+    "test": "node --test"
+  }
+}
