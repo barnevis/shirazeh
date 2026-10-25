@@ -3,6 +3,7 @@
 // only displays it and forwards navigation.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
+import { wrapTables } from './enhance-content.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
@@ -92,6 +93,16 @@ class DocsPage extends PeyElement {
     }
     this.#sidebarLinks = Array.isArray(sidebar) ? sidebar : null;
     this.requestRender({ preserve: false });
+    // The base class flushes the render in a microtask; queueMicrotask is
+    // FIFO, so this post-processing runs against the freshly rendered DOM.
+    queueMicrotask(() => this.#enhanceContent());
+  }
+
+  #enhanceContent() {
+    const content = this.shadowRoot?.querySelector('.markdown-body');
+    if (content !== null && content !== undefined) {
+      wrapTables(content);
+    }
   }
 
   eventTypes() {
@@ -279,6 +290,9 @@ class DocsPage extends PeyElement {
         .markdown-body table {
           border-collapse: collapse;
           inline-size: 100%;
+        }
+        .markdown-body .table-wrapper {
+          overflow-x: auto;
         }
         .markdown-body th, .markdown-body td {
           border: 1px solid var(--pey-color-border);
