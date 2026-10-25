@@ -4,6 +4,64 @@
 // root element in place and is covered by jsdom tests.
 
 const HEADING_SELECTOR = 'h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]';
+const IMAGE_SIZE_PATTERN = /^\{\s*([0-9۰-۹]*)(?:\s*[x×]\s*([0-9۰-۹]*))?\s*\}$/;
+const PERSIAN_DIGITS = /[۰-۹]/g;
+const PERSIAN_TO_ASCII = { '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4', '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9' };
+
+function toAsciiDigits(value) {
+  return value.replaceAll(PERSIAN_DIGITS, (digit) => PERSIAN_TO_ASCII[digit]);
+}
+
+function parsePixelSize(value) {
+  if (value.length === 0) {
+    return null;
+  }
+  const size = Number.parseInt(toAsciiDigits(value), 10);
+  return Number.isFinite(size) && size > 0 ? `${size}px` : null;
+}
+
+/**
+ * Applies `![alt](src){WxH}` sizes to images.
+ *
+ * The size suffix survives markdown parsing as a `{...}` text node after
+ * the image. Forms: `{300}` (square), `{300x200}`, `{300x}`, `{x200}` —
+ * Persian digits (and ×) accepted; the consumed text node is removed.
+ *
+ * @param {Element} root Rendered content root.
+ * @returns {number} Number of images resized.
+ */
+export function applyImageSizes(root) {
+  if (!root || typeof root.querySelectorAll !== 'function') {
+    return 0;
+  }
+
+  let resized = 0;
+  for (const image of [...root.querySelectorAll('img')]) {
+    const sibling = image.nextSibling;
+    if (sibling === null || sibling.nodeType !== 3) {
+      continue;
+    }
+
+    const match = IMAGE_SIZE_PATTERN.exec(sibling.textContent.trim());
+    if (match === null) {
+      continue;
+    }
+
+    const width = parsePixelSize(match[1] ?? '');
+    const height = match[2] === undefined ? width : parsePixelSize(match[2]);
+    if (width !== null) {
+      image.style.width = width;
+    }
+    if (height !== null) {
+      image.style.height = height;
+    }
+
+    sibling.remove();
+    resized += 1;
+  }
+
+  return resized;
+}
 
 /**
  * Appends a hover anchor link to every heading that carries an id.

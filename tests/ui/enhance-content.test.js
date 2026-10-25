@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { JSDOM } from 'jsdom';
-import { addCodeCopyButtons, addHeadingAnchors, wrapTables } from '../../ui/pages/docs/enhance-content.js';
+import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from '../../ui/pages/docs/enhance-content.js';
 
 function createRoot(html) {
   const dom = new JSDOM(`<body>${html}</body>`);
@@ -91,6 +91,71 @@ test('should_use_empty_label_when_option_is_missing', () => {
 
 test('should_return_zero_when_root_is_missing_for_copy_buttons', () => {
   assert.equal(addCodeCopyButtons(null, { label: 'x' }), 0);
+});
+
+test('should_apply_square_size_when_suffix_has_one_number', () => {
+  const root = createRoot('<p><img src="a.png">{300}</p>');
+
+  const resized = applyImageSizes(root);
+
+  assert.equal(resized, 1);
+  const image = root.querySelector('img');
+  assert.equal(image.style.width, '300px');
+  assert.equal(image.style.height, '300px');
+  assert.equal(root.textContent.includes('300'), false);
+});
+
+test('should_apply_both_dimensions_when_suffix_has_two_numbers', () => {
+  const root = createRoot('<p><img src="a.png">{300x200}</p>');
+
+  applyImageSizes(root);
+
+  const image = root.querySelector('img');
+  assert.equal(image.style.width, '300px');
+  assert.equal(image.style.height, '200px');
+});
+
+test('should_apply_single_side_when_one_dimension_is_empty', () => {
+  const wide = createRoot('<p><img src="a.png">{300x}</p>');
+  const tall = createRoot('<p><img src="b.png">{x200}</p>');
+
+  applyImageSizes(wide);
+  applyImageSizes(tall);
+
+  assert.equal(wide.querySelector('img').style.width, '300px');
+  assert.equal(wide.querySelector('img').style.height, '');
+  assert.equal(tall.querySelector('img').style.width, '');
+  assert.equal(tall.querySelector('img').style.height, '200px');
+});
+
+test('should_accept_persian_digits_and_multiplication_sign', () => {
+  const root = createRoot('<p><img src="a.png">{۳۰۰×۲۰۰}</p>');
+
+  const resized = applyImageSizes(root);
+
+  assert.equal(resized, 1);
+  const image = root.querySelector('img');
+  assert.equal(image.style.width, '300px');
+  assert.equal(image.style.height, '200px');
+});
+
+test('should_ignore_text_when_suffix_is_not_a_size', () => {
+  const root = createRoot('<p><img src="a.png">{نامعتبر}</p>');
+
+  const resized = applyImageSizes(root);
+
+  assert.equal(resized, 0);
+  assert.equal(root.textContent.includes('{نامعتبر}'), true);
+});
+
+test('should_ignore_images_when_no_suffix_follows', () => {
+  const root = createRoot('<p><img src="a.png"> متن بعد</p>');
+
+  assert.equal(applyImageSizes(root), 0);
+});
+
+test('should_return_zero_when_root_is_missing_for_image_sizes', () => {
+  assert.equal(applyImageSizes(null), 0);
 });
 
 test('should_wrap_tables_when_content_contains_them', () => {

@@ -3,7 +3,7 @@
 // only displays it and forwards navigation.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
-import { addCodeCopyButtons, addHeadingAnchors, wrapTables } from './enhance-content.js';
+import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from './enhance-content.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
@@ -126,6 +126,7 @@ class DocsPage extends PeyElement {
       wrapTables(content);
       addHeadingAnchors(content, { path: this.#path });
       addCodeCopyButtons(content, { label: this.#t('shirazeh.code-copy.copy') });
+      applyImageSizes(content);
     }
 
     // A deep link (#/path?a=<heading id>) scrolls to its heading after the
