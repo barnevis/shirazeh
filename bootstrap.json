@@ -18,7 +18,7 @@
     },
     {
       "name": "shirazeh.http",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "path": "./plugins/shirazeh.http"
     },
     {
@@ -28,7 +28,7 @@
     },
     {
       "name": "shirazeh.docs",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "path": "./plugins/shirazeh.docs"
     }
   ],
@@ -61,6 +61,6 @@
   },
   "app": {
     "name": "شیرازه",
-    "version": "1.0.0"
+    "version": "0.1.0"
   }
 }

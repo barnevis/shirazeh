@@ -1,6 +1,6 @@
 {
   "name": "shirazeh.http",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "architecture": "0.11",
   "description": "Transfers document files over HTTP for the Shirazeh documentation application.",
   "type": "transport",

@@ -1,7 +1,7 @@
 // Shared constants for the shirazeh.http transport plugin.
 
 export const PLUGIN_NAME = 'shirazeh.http';
-export const PLUGIN_VERSION = '1.0.0';
+export const PLUGIN_VERSION = '0.1.0';
 export const SERVICE_NAME = 'shirazeh.http.service';
 
 export const ERROR_CODES = Object.freeze({

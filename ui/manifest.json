@@ -1,6 +1,6 @@
 {
   "name": "shirazeh.ui",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "architecture": "0.11",
   "description": "Shirazeh documentation UI built with pey.webui",
   "dependencies": {

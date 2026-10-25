@@ -1,6 +1,6 @@
 {
   "name": "shirazeh.docs",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "architecture": "0.11",
   "description": "Core documentation logic for Shirazeh: resolves page paths, loads markdown sources, and returns rendered pages with navigation context.",
   "type": "product",
