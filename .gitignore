@@ -14,3 +14,6 @@ Thumbs.db
 # Local runtime artifacts
 *.log
 .zcode/
+
+# Internal spec/planning documents (kept locally, not for the repository)
+imp/
