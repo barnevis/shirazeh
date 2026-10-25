@@ -1,0 +1,15 @@
+{
+  "name": "shirazeh",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "شیرازه — مستندساز وب روی معماری بنیان و چارچوب پی",
+  "scripts": {
+    "test": "node --test core/pey-core/tests/*.test.js plugins/pey.router/tests/*.test.js plugins/pey.router/tests/*/*.test.js plugins/pey.markdown/tests/*.test.js plugins/shirazeh.http/tests/*.test.js plugins/shirazeh.docs/tests/*.test.js tests/integration/*.test.js",
+    "serve": "python3 -m http.server 8901",
+    "build:import-map": "node scripts/build-import-map.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
