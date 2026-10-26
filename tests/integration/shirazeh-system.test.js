@@ -52,16 +52,16 @@ function createFakeFetch(files) {
 
 let capturedUiContext = null;
 
-function createBootstrapConfig() {
-  return {
+function createBootstrapConfig({ includeStorage = false } = {}) {
+  const config = {
     architecture: '0.11',
     core: { name: 'pey.core', version: '0.2.0' },
     adapters: {},
     ui: { path: './ui' },
     plugins: [
-      { name: 'shirazeh.http', version: '1.0.0', path: './plugins/shirazeh.http' },
+      { name: 'shirazeh.http', version: '0.1.0', path: './plugins/shirazeh.http' },
       { name: 'pey.markdown', version: '1.1.0', path: './plugins/pey.markdown' },
-      { name: 'shirazeh.docs', version: '1.0.0', path: './plugins/shirazeh.docs' },
+      { name: 'shirazeh.docs', version: '0.3.0', path: './plugins/shirazeh.docs' },
     ],
     config: {
       'shirazeh.http': {},
@@ -69,15 +69,35 @@ function createBootstrapConfig() {
       'shirazeh.docs': { docsRoot: './docs', homePage: 'README.md', sidebarFile: '_sidebar.md' },
       ui: {},
     },
-    app: { name: 'شیرازه', version: '1.0.0' },
+    app: { name: 'شیرازه', version: '0.2.0' },
   };
+
+  if (includeStorage) {
+    config.plugins.unshift(
+      { name: 'pey.storage', version: '0.5.0', path: './plugins/pey.storage' },
+    );
+    // The in-memory adapter runs under Node (no IndexedDB there); the browser
+    // uses IndexedDBAdapter, selected in bootstrap.json.
+    config.adapters.storage = 'InMemoryAdapter';
+    config.plugins.push(
+      { name: 'shirazeh.prefs', version: '0.1.0', path: './plugins/shirazeh.prefs' },
+    );
+    config.config['pey.storage'] = {
+      databaseName: 'shirazeh-integration-db',
+      schemaVersion: 1,
+      stores: [{ name: 'prefs', keyPath: 'key' }],
+    };
+    config.config['shirazeh.prefs'] = {};
+  }
+
+  return config;
 }
 
-function createInMemoryHost() {
+function createInMemoryHost({ includeStorage = false } = {}) {
   return {
     configSource: {
       async getConfig() {
-        return createBootstrapConfig();
+        return createBootstrapConfig({ includeStorage });
       },
     },
     envSource: {
@@ -108,7 +128,7 @@ function createInMemoryHost() {
   };
 }
 
-async function bootShirazeh(files = SAMPLE_FILES) {
+async function bootShirazeh(files = SAMPLE_FILES, { includeStorage = false } = {}) {
   capturedUiContext = null;
   const events = [];
   const originalFetch = globalThis.fetch;
@@ -116,7 +136,7 @@ async function bootShirazeh(files = SAMPLE_FILES) {
 
   let core;
   try {
-    const host = createInMemoryHost();
+    const host = createInMemoryHost({ includeStorage });
     core = new PeyCore(host);
     const { shutdown } = await core.start({
       onEvent: (event) => events.push(event),
@@ -219,4 +239,25 @@ test('should_return_unavailable_after_shutdown_when_service_is_called_on_stale_r
 
   const result = await docsService.getPage('/');
   assert.equal(result.code, 'SERVICE_UNAVAILABLE');
+});
+
+test('should_boot_storage_group_and_persist_preferences_when_enabled', async () => {
+  const { events, uiContext, shutdown } = await bootShirazeh(SAMPLE_FILES, { includeStorage: true });
+
+  try {
+    const eventTypes = events.map((event) => event.type);
+    assert.equal(eventTypes.includes('storage:ready'), true);
+    assert.equal(eventTypes.includes('prefs:ready'), true);
+    assert.equal(eventTypes[events.length - 1], 'core:ready');
+
+    // The UI context only receives optional services that are available.
+    const prefsService = uiContext.services['shirazeh.prefs.service'];
+    assert.equal(typeof prefsService.get, 'function');
+
+    assert.equal(await prefsService.set('theme', 'dark'), true);
+    assert.equal(await prefsService.get('theme'), 'dark');
+    assert.equal(await prefsService.get('missing'), null);
+  } finally {
+    await shutdown();
+  }
 });

@@ -18,6 +18,7 @@ class ShirazehNavbar extends PeyElement {
   #router = null;
   #fallbackPath = null;
   #themeController = null;
+  #prefs = null;
   #theme = 'light';
   #unsubscribers = [];
 
@@ -25,6 +26,7 @@ class ShirazehNavbar extends PeyElement {
     this.#sharedState = refs.sharedState ?? null;
     this.#router = refs.router ?? null;
     this.#themeController = refs.themeController ?? null;
+    this.#prefs = refs.prefs ?? null;
     this.#fallbackPath = typeof refs.fallbackPath === 'string' ? refs.fallbackPath : '/';
     this.#theme = this.#sharedState?.get(THEME_KEY) ?? 'light';
     this.#buildI18n(this.#sharedState?.get(LANGUAGE_KEY) ?? 'fa');
@@ -98,7 +100,9 @@ class ShirazehNavbar extends PeyElement {
 
     const themeButton = target.closest('button[data-theme-toggle]');
     if (themeButton !== null) {
-      this.#themeController?.toggle();
+      const next = this.#themeController?.currentTheme() === 'dark' ? 'light' : 'dark';
+      this.#themeController?.setTheme(next);
+      void this.#prefs?.set('theme', next);
       return;
     }
 
@@ -117,6 +121,7 @@ class ShirazehNavbar extends PeyElement {
 
     this.#sharedState.set(LANGUAGE_KEY, language);
     this.#sharedState.set(DIRECTION_KEY, direction);
+    void this.#prefs?.set('language', language);
     this.publishUIEvent('ui:language-changed', { language });
   }
 

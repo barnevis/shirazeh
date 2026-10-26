@@ -1,0 +1,138 @@
+{
+  "name": "pey.storage",
+  "version": "0.5.0",
+  "architecture": "0.11",
+  "description": "Generic storage service backed by a swappable adapter (currently IndexedDB)",
+
+  "type": "infrastructure",
+  "adapterType": "storage",
+
+  "dependencies": {
+    "required": [],
+    "optional": []
+  },
+
+  "provides": [
+    {
+      "name": "pey.storage.service",
+      "description": "Generic key-value and record storage with CRUD, query, bulk, transaction, and import/export capabilities",
+      "methods": [
+        {
+          "name": "read",
+          "description": "Read a single record by key from a collection",
+          "params": [
+            { "name": "collection", "type": "string" },
+            { "name": "key", "type": "string | number" }
+          ],
+          "returns": "Promise<object | null>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "RECORD_NOT_FOUND", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "write",
+          "description": "Write (insert or update) a single record",
+          "params": [
+            { "name": "collection", "type": "string" },
+            { "name": "record", "type": "object" }
+          ],
+          "returns": "Promise<void>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "QUOTA_EXCEEDED", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "delete",
+          "description": "Delete a single record by key",
+          "params": [
+            { "name": "collection", "type": "string" },
+            { "name": "key", "type": "string | number" }
+          ],
+          "returns": "Promise<void>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "query",
+          "description": "Query records with a raw index/range criteria. Supports exact match { field: value } and range { field: { gte, lte, gt, lt } } where each key is optional and any combination is valid. A criteria key that is not a live database index is served by a full-store scan filtered on that record field (results identical to the in-memory adapter; slow on very large stores).",
+          "params": [
+            { "name": "collection", "type": "string" },
+            { "name": "criteria", "type": "object" }
+          ],
+          "returns": "Promise<object[]>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "count",
+          "description": "Count records, optionally filtered by a raw range query criteria. Supports exact match { field: value } and range { field: { gte, lte, gt, lt } }. A criteria key that is not a live database index is served by a full-store scan filtered on that record field (slow on very large stores).",
+          "params": [
+            { "name": "collection", "type": "string" },
+            { "name": "criteria", "type": "object" }
+          ],
+          "returns": "Promise<number>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "bulkWrite",
+          "description": "Bulk insert or update multiple records atomically",
+          "params": [
+            { "name": "collection", "type": "string" },
+            { "name": "records", "type": "object[]" }
+          ],
+          "returns": "Promise<void>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "QUOTA_EXCEEDED", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "bulkDelete",
+          "description": "Bulk delete multiple records atomically",
+          "params": [
+            { "name": "collection", "type": "string" },
+            { "name": "keys", "type": "(string | number)[]" }
+          ],
+          "returns": "Promise<void>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "transaction",
+          "description": "Run multiple raw operations atomically",
+          "params": [
+            { "name": "operations", "type": "Array<{ collection: string, method: string, args: Array }>" }
+          ],
+          "returns": "Promise<void>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "QUOTA_EXCEEDED", "TRANSACTION_FAILED", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "exportData",
+          "description": "Export records as a JSON-compatible payload with metadata",
+          "params": [
+            { "name": "collections", "type": "string[] | null" }
+          ],
+          "returns": "Promise<{ metadata: object, data: object }>",
+          "errors": ["ADAPTER_NOT_OPEN", "STORE_NOT_FOUND", "SERVICE_UNAVAILABLE"]
+        },
+        {
+          "name": "importData",
+          "description": "Import a previously exported payload with replace, merge, or restore mode. Restore mode atomically replaces all target collections via a single adapter.transaction() call.",
+          "params": [
+            { "name": "payload", "type": "object" },
+            { "name": "mode", "type": "'replace' | 'merge' | 'restore'" }
+          ],
+          "returns": "Promise<{ imported: number, skipped: object[], deleted: number, errors: object[] }>",
+          "errors": ["ADAPTER_NOT_OPEN", "IMPORT_INVALID_PAYLOAD", "STORE_NOT_FOUND", "QUOTA_EXCEEDED", "SERVICE_UNAVAILABLE"]
+        }
+      ]
+    }
+  ],
+
+  "events": [
+    {
+      "name": "storage:ready",
+      "description": "Published after all configured stores have been created or migrated and the database is fully operational",
+      "data": [
+        { "name": "version", "type": "string" },
+        { "name": "stores", "type": "string[]" }
+      ]
+    }
+  ],
+
+  "config": {
+    "databaseName": "pey-app-db",
+    "schemaVersion": 1,
+    "stores": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "shirazeh.prefs",
+  "version": "0.1.0",
+  "architecture": "0.11",
+  "description": "User preference persistence for Shirazeh (theme, language) on top of the storage infrastructure service.",
+  "type": "feature",
+  "dependencies": {
+    "required": [
+      "pey.storage.service"
+    ],
+    "optional": []
+  },
+  "provides": [
+    {
+      "name": "shirazeh.prefs.service",
+      "description": "Reads and writes the user's UI preferences. Preference values are strict JSON-compatible data. The service degrades gracefully: a missing preference reads as null, and a failed write reports false — storage problems reduce capability, they never break the UI.",
+      "methods": [
+        {
+          "name": "get",
+          "description": "Returns the stored value of a preference, or null when it was never stored or storage failed. Records live as { key, value } in the configured collection.",
+          "params": [
+            { "name": "key", "type": "string — preference name, e.g. 'theme' or 'language'" }
+          ],
+          "returns": "Promise<unknown> — the stored value, or null",
+          "errors": []
+        },
+        {
+          "name": "set",
+          "description": "Stores a preference value. Returns true on success and false when the write failed or dependencies are unavailable.",
+          "params": [
+            { "name": "key", "type": "string — preference name" },
+            { "name": "value", "type": "unknown — strict JSON-compatible data" }
+          ],
+          "returns": "Promise<boolean>",
+          "errors": []
+        }
+      ]
+    }
+  ],
+  "events": [],
+  "config": {
+    "collection": "prefs"
+  }
+}

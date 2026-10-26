@@ -14,8 +14,11 @@ import appCatalog from './i18n/catalog.js';
 import { createThemeController } from './theme.js';
 
 const DOCS_SERVICE = 'shirazeh.docs.service';
+const PREFS_SERVICE = 'shirazeh.prefs.service';
 const LANGUAGE_KEY = 'language';
 const DIRECTION_KEY = 'direction';
+const DIRECTION_BY_LANGUAGE = { fa: 'rtl', en: 'ltr' };
+const SUPPORTED_LANGUAGES = ['fa', 'en'];
 
 // Documentation routes have free depth; the router pattern syntax is fixed
 // segments, so one pattern per depth (up to five) covers the address space.
@@ -36,10 +39,37 @@ function loadNotFoundPage() {
   return import('./pages/not-found/not-found.js');
 }
 
+// Applies preferences saved by shirazeh.prefs over the configured defaults.
+// Runs after the synchronous mount: a brief default-theme flash is the cost
+// of keeping the setup contract synchronous.
+async function applyStoredPreferences(resources, sharedState, themeController) {
+  const prefs = resources.optional?.[PREFS_SERVICE];
+  if (prefs === null || prefs === undefined) {
+    return;
+  }
+
+  const [savedTheme, savedLanguage] = await Promise.all([
+    prefs.get('theme'),
+    prefs.get('language'),
+  ]);
+
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    themeController.setTheme(savedTheme);
+  }
+
+  if (SUPPORTED_LANGUAGES.includes(savedLanguage)) {
+    const direction = DIRECTION_BY_LANGUAGE[savedLanguage];
+    sharedState.set(LANGUAGE_KEY, savedLanguage);
+    sharedState.set(DIRECTION_KEY, direction);
+    document.documentElement.lang = savedLanguage;
+    document.documentElement.dir = direction;
+  }
+}
+
 export const setup = createApplicationSetup({
   assetBaseUrlBase: import.meta.url,
   requiredServices: [DOCS_SERVICE],
-  optionalServices: [],
+  optionalServices: [PREFS_SERVICE],
 
   mountShell(resources) {
     document.getElementById('boot')?.remove();
@@ -79,10 +109,15 @@ export const setup = createApplicationSetup({
         sharedState,
         fallbackPath: resources.config.fallbackPath,
         themeController,
+        prefs: resources.optional?.[PREFS_SERVICE] ?? null,
       },
     });
     shell.append(navbar);
     resources.navbar = navbar;
+
+    // Stored preferences override the configured defaults right after the
+    // first paint; the prefs service degrades to null when unavailable.
+    void applyStoredPreferences(resources, sharedState, themeController);
 
     const i18n = createI18n({
       language: resources.config.language,
