@@ -1,7 +1,7 @@
 // Shared constants for the shirazeh.docs product plugin.
 
 export const PLUGIN_NAME = 'shirazeh.docs';
-export const PLUGIN_VERSION = '0.3.0';
+export const PLUGIN_VERSION = '0.4.0';
 export const SERVICE_NAME = 'shirazeh.docs.service';
 
 export const EVENT_NAMES = Object.freeze({

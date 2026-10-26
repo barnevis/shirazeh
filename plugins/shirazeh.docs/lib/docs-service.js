@@ -49,6 +49,7 @@ function normalizeConfig(config) {
     docsRoot: trimTrailingSlash(config.docsRoot || DEFAULT_DOCS_ROOT),
     homePage: config.homePage || DEFAULT_HOME_PAGE,
     sidebarFile: config.sidebarFile || DEFAULT_SIDEBAR_FILE,
+    notFoundPage: config.notFoundPage || null,
   };
 }
 
@@ -61,7 +62,7 @@ function normalizeConfig(config) {
  * @returns {{service: object, bindDependencies: Function, deactivate: Function}} Service and lifecycle controls.
  */
 export function createDocsService({ config, publish }) {
-  const { docsRoot, homePage, sidebarFile } = normalizeConfig(config);
+  const { docsRoot, homePage, sidebarFile, notFoundPage } = normalizeConfig(config);
   const parsneshanOptions = createParsneshanOptions(config.extensions);
   let available = true;
   let httpService = null;
@@ -80,6 +81,76 @@ export function createDocsService({ config, publish }) {
       throw createDocsError(SERVICE_UNAVAILABLE, 'Docs service dependencies are not bound yet');
     }
     return service;
+  }
+
+  // Fetches and renders one document; used by getPage for both the requested
+  // page (event published) and the configured not-found page (no event —
+  // nothing successfully loaded).
+  async function loadAndRender(documentUrl, path, { publishEvent = true } = {}) {
+    let http;
+    try {
+      http = requiredService(HTTP_SERVICE_NAME);
+    } catch (error) {
+      return isBonyanError(error) ? error : unavailableError();
+    }
+    let document;
+    try {
+      document = await http.getText(documentUrl);
+    } catch {
+      return unavailableError();
+    }
+    if (isBonyanError(document)) {
+      if (document.code === 'HTTP_NOT_FOUND') {
+        return createDocsError(ERROR_CODES.PAGE_NOT_FOUND, 'The requested page was not found');
+      }
+      return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page document could not be loaded');
+    }
+
+    let markdown;
+    try {
+      markdown = requiredService(MARKDOWN_SERVICE_NAME);
+    } catch (error) {
+      return isBonyanError(error) ? error : unavailableError();
+    }
+    let rendered;
+    try {
+      rendered = markdown.renderFragment({
+        markdown: document.body,
+        syntaxExtensions: parsneshanOptions.syntaxExtensions,
+        htmlExtensions: parsneshanOptions.htmlExtensions,
+        footnoteOptions: parsneshanOptions.footnoteOptions,
+      });
+    } catch {
+      return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page could not be rendered');
+    }
+    if (isBonyanError(rendered)) {
+      return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page could not be rendered');
+    }
+
+    let links = [];
+    try {
+      links = await loadSidebarLinks();
+    } catch {
+      // A missing sidebar reduces capability (no title/neighbors) but the
+      // page itself rendered successfully.
+    }
+    const { previous, next } = neighborsForPath(links, path);
+    const headingTitle = titleFromToc(rendered.toc);
+
+    const page = {
+      path,
+      html: rendered.html,
+      toc: rendered.toc,
+      title: headingTitle,
+      documentTitle: documentTitleForPath(links, path, headingTitle),
+      previous,
+      next,
+    };
+
+    if (publishEvent && path !== null) {
+      publish(EVENT_NAMES.PAGE_LOADED, { path });
+    }
+    return page;
   }
 
   async function loadSidebarLinks() {
@@ -136,69 +207,19 @@ export function createDocsService({ config, publish }) {
         }
 
         const documentUrl = pathToDocumentUrl(path, docsRoot, homePage);
+        const page = await loadAndRender(documentUrl, path);
 
-        let http;
-        try {
-          http = requiredService(HTTP_SERVICE_NAME);
-        } catch (error) {
-          return isBonyanError(error) ? error : unavailableError();
-        }
-        let document;
-        try {
-          document = await http.getText(documentUrl);
-        } catch {
-          return unavailableError();
-        }
-        if (isBonyanError(document)) {
-          if (document.code === 'HTTP_NOT_FOUND') {
-            return createDocsError(ERROR_CODES.PAGE_NOT_FOUND, 'The requested page was not found');
-          }
-          return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page document could not be loaded');
+        if (!isBonyanError(page) || page.code !== ERROR_CODES.PAGE_NOT_FOUND || notFoundPage === null) {
+          return page;
         }
 
-        let markdown;
-        try {
-          markdown = requiredService(MARKDOWN_SERVICE_NAME);
-        } catch (error) {
-          return isBonyanError(error) ? error : unavailableError();
+        // A configured 404 page renders like any other page but carries
+        // notFound: true and publishes no docs:page-loaded.
+        const notFoundResult = await loadAndRender(`${docsRoot}/${notFoundPage}`, path, { publishEvent: false });
+        if (isBonyanError(notFoundResult)) {
+          return page;
         }
-        let rendered;
-        try {
-          rendered = markdown.renderFragment({
-            markdown: document.body,
-            syntaxExtensions: parsneshanOptions.syntaxExtensions,
-            htmlExtensions: parsneshanOptions.htmlExtensions,
-            footnoteOptions: parsneshanOptions.footnoteOptions,
-          });
-        } catch {
-          return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page could not be rendered');
-        }
-        if (isBonyanError(rendered)) {
-          return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page could not be rendered');
-        }
-
-        let links = [];
-        try {
-          links = await loadSidebarLinks();
-        } catch {
-          // A missing sidebar reduces capability (no title/neighbors) but the
-          // page itself rendered successfully.
-        }
-        const { previous, next } = neighborsForPath(links, path);
-        const headingTitle = titleFromToc(rendered.toc);
-
-        const page = {
-          path,
-          html: rendered.html,
-          toc: rendered.toc,
-          title: headingTitle,
-          documentTitle: documentTitleForPath(links, path, headingTitle),
-          previous,
-          next,
-        };
-
-        publish(EVENT_NAMES.PAGE_LOADED, { path });
-        return page;
+        return { ...notFoundResult, notFound: true };
       },
     },
 

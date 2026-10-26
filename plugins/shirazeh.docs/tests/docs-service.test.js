@@ -102,6 +102,48 @@ test('should_resolve_document_title_from_attr_title_when_present', async () => {
   assert.equal(page.documentTitle, 'راهنمای کامل شیرازه');
 });
 
+test('should_render_not_found_page_when_configured_and_document_is_missing', async () => {
+  const published = [];
+  const http = createFakeHttp({
+    './docs/not-found.md': '# صفحه پیدا نشد',
+  });
+  const markdown = createFakeMarkdown();
+  const docs = createDocsService({
+    config: { notFoundPage: 'not-found.md' },
+    publish: (type, data) => published.push({ type, data }),
+  });
+  docs.bindDependencies({
+    'shirazeh.http.service': http,
+    'pey.markdown.service': markdown,
+  });
+
+  const page = await docs.service.getPage('/missing');
+
+  assert.equal(page.notFound, true);
+  assert.equal(page.title, 'صفحه پیدا نشد');
+  assert.deepEqual(published, []); // no docs:page-loaded for a 404
+});
+
+test('should_return_page_not_found_when_not_found_page_itself_is_missing', async () => {
+  const docs = createDocsService({ config: { notFoundPage: 'not-found.md' }, publish: () => {} });
+  docs.bindDependencies({
+    'shirazeh.http.service': createFakeHttp({}),
+    'pey.markdown.service': createFakeMarkdown(),
+  });
+
+  const result = await docs.service.getPage('/missing');
+
+  assert.equal(result.code, 'DOC_PAGE_NOT_FOUND');
+});
+
+test('should_return_page_not_found_when_not_found_page_is_not_configured', async () => {
+  const { docs } = createBoundDocs({ files: {} });
+
+  const result = await docs.service.getPage('/missing');
+
+  assert.equal(result.code, 'DOC_PAGE_NOT_FOUND');
+});
+
 test('should_resolve_document_title_from_label_when_attr_title_is_absent', async () => {
   const { docs } = createBoundDocs({
     files: {

@@ -134,7 +134,8 @@ class DocsPage extends PeyElement {
       this.#applyDocumentTitle(null);
     } else {
       this.#state = { status: 'ready', page };
-      this.#applyDocumentTitle(page.documentTitle);
+      // A rendered not-found page gets the app name alone as tab title.
+      this.#applyDocumentTitle(page.notFound === true ? null : page.documentTitle);
     }
     this.#sidebar = sidebar !== null && Array.isArray(sidebar?.tree) ? sidebar : null;
     this.requestRender({ preserve: false });

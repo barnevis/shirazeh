@@ -63,7 +63,8 @@
     "shirazeh.docs": {
       "docsRoot": "./docs",
       "homePage": "README.md",
-      "sidebarFile": "_sidebar.md"
+      "sidebarFile": "_sidebar.md",
+      "notFoundPage": "not-found.md"
     },
     "ui": {
       "theme": "light",
