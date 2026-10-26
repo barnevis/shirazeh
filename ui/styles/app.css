@@ -5,6 +5,21 @@
   --pey-font-family-base: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
+/* Dark theme: applied on <html data-theme="dark"> and on the app shell host
+   (which reflects the same attribute), overriding the kit's light tokens
+   wherever they cascade into shadow roots. */
+[data-theme='dark'] {
+  --pey-color-canvas: #111827;
+  --pey-color-surface: #1f2937;
+  --pey-color-text: #e5e7eb;
+  --pey-color-text-muted: #9ca3af;
+  --pey-color-border: #374151;
+  --pey-color-accent: #34d399;
+  --pey-color-status-error: #f87171;
+  --pey-color-focus-ring: rgba(52, 211, 153, 0.4);
+  --pey-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
 html,
 body {
   margin: 0;

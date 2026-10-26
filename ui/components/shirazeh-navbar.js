@@ -1,4 +1,5 @@
-// Top navigation bar: application title, home link, and language switch.
+// Top navigation bar: application title, home link, theme toggle, and
+// language switch.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
 import appCatalog from '../i18n/catalog.js';
@@ -7,6 +8,7 @@ import { createI18n } from 'pey.webui/i18n';
 const TAG = 'shirazeh-navbar';
 const LANGUAGE_KEY = 'language';
 const DIRECTION_KEY = 'direction';
+const THEME_KEY = 'theme';
 const DIRECTION_BY_LANGUAGE = { fa: 'rtl', en: 'ltr' };
 const LANGUAGES = ['fa', 'en'];
 
@@ -15,12 +17,16 @@ class ShirazehNavbar extends PeyElement {
   #i18n = null;
   #router = null;
   #fallbackPath = null;
+  #themeController = null;
+  #theme = 'light';
   #unsubscribers = [];
 
   onConnect(refs) {
     this.#sharedState = refs.sharedState ?? null;
     this.#router = refs.router ?? null;
+    this.#themeController = refs.themeController ?? null;
     this.#fallbackPath = typeof refs.fallbackPath === 'string' ? refs.fallbackPath : '/';
+    this.#theme = this.#sharedState?.get(THEME_KEY) ?? 'light';
     this.#buildI18n(this.#sharedState?.get(LANGUAGE_KEY) ?? 'fa');
   }
 
@@ -44,7 +50,13 @@ class ShirazehNavbar extends PeyElement {
       const unsubscribeDirection = this.#sharedState.subscribe(DIRECTION_KEY, (direction) => {
         document.documentElement.dir = direction;
       });
-      this.#unsubscribers.push(unsubscribeLanguage, unsubscribeDirection);
+      const unsubscribeTheme = this.#sharedState.subscribe(THEME_KEY, (theme) => {
+        if (theme === 'light' || theme === 'dark') {
+          this.#theme = theme;
+          this.requestRender({ preserve: false });
+        }
+      });
+      this.#unsubscribers.push(unsubscribeLanguage, unsubscribeDirection, unsubscribeTheme);
 
       const language = this.#sharedState.get(LANGUAGE_KEY);
       if (typeof language === 'string') {
@@ -84,6 +96,12 @@ class ShirazehNavbar extends PeyElement {
       return;
     }
 
+    const themeButton = target.closest('button[data-theme-toggle]');
+    if (themeButton !== null) {
+      this.#themeController?.toggle();
+      return;
+    }
+
     const homeLink = target.closest('a[data-home]');
     if (homeLink !== null) {
       event.preventDefault();
@@ -114,6 +132,8 @@ class ShirazehNavbar extends PeyElement {
       const label = language === 'fa' ? t('shirazeh.nav.language-fa') : t('shirazeh.nav.language-en');
       return `<button type="button" data-language="${language}">${label}</button>`;
     }).join('');
+    const themeIcon = this.#theme === 'dark' ? '☀' : '🌙';
+    const themeLabel = this.#theme === 'dark' ? t('shirazeh.theme.to-light') : t('shirazeh.theme.to-dark');
 
     return `
       <style>
@@ -168,7 +188,10 @@ class ShirazehNavbar extends PeyElement {
           <strong>${t('shirazeh.app-name')}</strong>
           <span>${t('shirazeh.nav.home')}</span>
         </a>
-        <div class="actions">${languageButtons}</div>
+        <div class="actions">
+          <button type="button" data-theme-toggle aria-label="${themeLabel}" title="${themeLabel}">${themeIcon}</button>
+          ${languageButtons}
+        </div>
       </nav>
     `;
   }

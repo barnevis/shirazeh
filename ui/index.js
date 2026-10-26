@@ -11,6 +11,7 @@ import { createApplicationSetup } from 'pey.webui/shell/create-application-setup
 import { createSharedState } from 'pey.webui/shared-state';
 import './components/shirazeh-navbar.js';
 import appCatalog from './i18n/catalog.js';
+import { createThemeController } from './theme.js';
 
 const DOCS_SERVICE = 'shirazeh.docs.service';
 const LANGUAGE_KEY = 'language';
@@ -47,6 +48,17 @@ export const setup = createApplicationSetup({
     sharedState.set(LANGUAGE_KEY, resources.config.language);
     sharedState.set(DIRECTION_KEY, resources.config.direction);
 
+    // Theme: the controller mirrors the effective theme onto <html> and the
+    // shared state (the shell reflects it as its data-theme attribute).
+    const themeController = createThemeController({
+      initialTheme: resources.config.theme,
+      sharedState,
+      documentElement: document.documentElement,
+      matchMedia: (query) => window.matchMedia(query),
+    });
+    themeController.applyInitial();
+    resources.themeController = themeController;
+
     const shell = document.createElement(APP_SHELL_TAG);
     shell.connect({
       infrastructure: { events: resources.events },
@@ -66,6 +78,7 @@ export const setup = createApplicationSetup({
       refs: {
         sharedState,
         fallbackPath: resources.config.fallbackPath,
+        themeController,
       },
     });
     shell.append(navbar);
@@ -112,6 +125,7 @@ export const setup = createApplicationSetup({
 
   cleanup(resources) {
     resources.pageHost?.dispose();
+    resources.themeController?.dispose();
     resources.navbar?.remove();
     resources.shell?.remove();
   },

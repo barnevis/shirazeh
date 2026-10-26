@@ -21,6 +21,8 @@ export default {
     'shirazeh.code-copy.copied': 'رونوشت شد',
     'shirazeh.code-copy.copy-failed': 'خطا',
     'shirazeh.toc.title': 'در این صفحه',
+    'shirazeh.theme.to-dark': 'گذر به تم تاریک',
+    'shirazeh.theme.to-light': 'گذر به تم روشن',
   },
   en: {
     'shirazeh.app-name': 'Shirazeh',
@@ -40,5 +42,7 @@ export default {
     'shirazeh.code-copy.copied': 'Copied',
     'shirazeh.code-copy.copy-failed': 'Error',
     'shirazeh.toc.title': 'On this page',
+    'shirazeh.theme.to-dark': 'Switch to dark theme',
+    'shirazeh.theme.to-light': 'Switch to light theme',
   },
 };
