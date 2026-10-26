@@ -13,6 +13,12 @@ import {
   highlightCodeBlocks,
   setHighlightTheme,
 } from './highlight.js';
+import {
+  buildExportFileName,
+  buildStandaloneHtml,
+  downloadText,
+  fetchExportStyles,
+} from './export.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
@@ -319,7 +325,7 @@ class DocsPage extends PeyElement {
     return ['click'];
   }
 
-  handleEvent(event) {
+  async handleEvent(event) {
     const target = event.target;
     if (!(target instanceof Element)) {
       return;
@@ -330,6 +336,22 @@ class DocsPage extends PeyElement {
       event.preventDefault();
       this.#copyHeadingLink(headingAnchor.getAttribute('href') ?? '');
       return;
+    }
+
+    const exportButton = target.closest('[data-export]');
+    if (exportButton !== null) {
+      event.preventDefault();
+      await this.#runExport(exportButton.dataset.export);
+      return;
+    }
+    if (target.closest('[data-export-toggle]') !== null) {
+      const menu = this.shadowRoot?.querySelector('[data-export-menu]');
+      this.#setExportMenu(menu?.hidden !== false);
+      return;
+    }
+    if (this.shadowRoot?.querySelector('[data-export-menu]')?.hidden === false
+      && target.closest('.export-bar') === null) {
+      this.#closeExportMenu();
     }
 
     const copyButton = target.closest('button.copy-code-button');
@@ -411,11 +433,91 @@ class DocsPage extends PeyElement {
 
     return `
       <article part="content" class="content markdown-body">${page.html}</article>
+      ${this.#exportBarHtml(page)}
       <nav part="pager" class="pager" aria-label="pagination">
         ${previous}
         ${next}
       </nav>
     `;
+  }
+
+  // Export bar: dropdown with the standalone-HTML and markdown exports.
+  #exportBarHtml(page) {
+    if (this.#config.export?.enabled === false || page.notFound === true) {
+      return '';
+    }
+
+    return `
+      <div class="export-bar">
+        <button type="button" class="export-button" data-export-toggle aria-haspopup="true" aria-expanded="false">
+          ⤓ ${escapeHtml(this.#t('shirazeh.export.download'))}
+        </button>
+        <div class="export-menu" data-export-menu hidden>
+          <button type="button" data-export="html">${escapeHtml(this.#t('shirazeh.export.html'))}</button>
+          <button type="button" data-export="md">${escapeHtml(this.#t('shirazeh.export.md'))}</button>
+        </div>
+      </div>
+    `;
+  }
+
+  #setExportMenu(open) {
+    const menu = this.shadowRoot?.querySelector('[data-export-menu]');
+    const button = this.shadowRoot?.querySelector('[data-export-toggle]');
+    if (menu === null || menu === undefined || button === null || button === undefined) {
+      return;
+    }
+    menu.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+  }
+
+  #closeExportMenu() {
+    this.#setExportMenu(false);
+  }
+
+  async #runExport(format) {
+    const page = this.#state.status === 'ready' ? this.#state.page : null;
+    if (page === null || this.#docsService === null) {
+      return;
+    }
+
+    this.#closeExportMenu();
+    const fileName = buildExportFileName({
+      documentTitle: page.documentTitle,
+      appName: this.#appName ?? this.#t('shirazeh.app-name'),
+    });
+
+    try {
+      if (format === 'md') {
+        const raw = await this.#docsService.getRawMarkdown(page.path);
+        if (typeof raw !== 'string') {
+          this.#showToast(this.#t('shirazeh.export.failed'));
+          return;
+        }
+        downloadText({ fileName, extension: 'md', text: raw });
+        this.#showToast(this.#t('shirazeh.export.started'));
+        return;
+      }
+
+      const theme = this.#sharedState?.get('theme') === 'dark' ? 'dark' : 'light';
+      const withHljsTheme = (this.shadowRoot?.querySelectorAll('code.hljs').length ?? 0) > 0;
+      const styles = await fetchExportStyles({
+        contentCssHref: CONTENT_STYLESHEET,
+        theme,
+        withHljsTheme,
+      });
+      const html = await buildStandaloneHtml({
+        pageHtml: page.html,
+        documentTitle: page.documentTitle,
+        appName: this.#appName ?? this.#t('shirazeh.app-name'),
+        theme,
+        contentCss: styles.contentCss,
+        hljsCss: styles.hljsCss,
+      });
+      downloadText({ fileName, extension: 'html', text: html });
+      this.#showToast(this.#t('shirazeh.export.started'));
+    } catch {
+      this.#showToast(this.#t('shirazeh.export.failed'));
+    }
   }
 
   // The content stylesheet loads through PeyElement's stylesheet runtime so

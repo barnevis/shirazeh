@@ -221,6 +221,43 @@ export function createDocsService({ config, publish }) {
         }
         return { ...notFoundResult, notFound: true };
       },
+
+      /**
+       * Returns the raw markdown source behind a route path, for exporters.
+       *
+       * @param {string} path Route path, '/' for the home page.
+       * @returns {Promise<string|object>} The markdown source, or a standard Bonyan error (DOC_PAGE_NOT_FOUND for missing documents).
+       */
+      async getRawMarkdown(path) {
+        try {
+          assertAvailable();
+          validatePath(path);
+        } catch (error) {
+          return isBonyanError(error) ? error : unavailableError();
+        }
+
+        let http;
+        try {
+          http = requiredService(HTTP_SERVICE_NAME);
+        } catch (error) {
+          return isBonyanError(error) ? error : unavailableError();
+        }
+
+        const documentUrl = pathToDocumentUrl(path, docsRoot, homePage);
+        let result;
+        try {
+          result = await http.getText(documentUrl);
+        } catch {
+          return unavailableError();
+        }
+        if (isBonyanError(result)) {
+          if (result.code === 'HTTP_NOT_FOUND') {
+            return createDocsError(ERROR_CODES.PAGE_NOT_FOUND, 'The requested page was not found');
+          }
+          return createDocsError(ERROR_CODES.RENDER_FAILED, 'The page document could not be loaded');
+        }
+        return result.body;
+      },
     },
 
     /**

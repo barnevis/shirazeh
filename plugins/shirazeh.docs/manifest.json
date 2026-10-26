@@ -1,6 +1,6 @@
 {
   "name": "shirazeh.docs",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "architecture": "0.11",
   "description": "Core documentation logic for Shirazeh: resolves page paths, loads markdown sources, and returns rendered pages with navigation context.",
   "type": "product",
@@ -38,6 +38,23 @@
             }
           ],
           "returns": "Promise<PageData | object> — PageData { path, html, toc: Array<{id,level,text}>, title: string, documentTitle: string, previous: SidebarLink|null, next: SidebarLink|null } or a standard Bonyan error object",
+          "errors": [
+            "DOC_PAGE_NOT_FOUND",
+            "DOC_PATH_INVALID",
+            "DOC_RENDER_FAILED",
+            "SERVICE_UNAVAILABLE"
+          ]
+        },
+        {
+          "name": "getRawMarkdown",
+          "description": "Returns the raw markdown source behind a route path (no rendering), for exporters. Resolves a standard Bonyan error object on failure.",
+          "params": [
+            {
+              "name": "path",
+              "type": "string — route path, '/' maps to the configured homePage"
+            }
+          ],
+          "returns": "Promise<string | object> — the markdown source, or a standard Bonyan error object",
           "errors": [
             "DOC_PAGE_NOT_FOUND",
             "DOC_PATH_INVALID",

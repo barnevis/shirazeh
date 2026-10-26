@@ -24,6 +24,11 @@ export default {
     'shirazeh.theme.to-dark': 'گذر به تم تاریک',
     'shirazeh.theme.to-light': 'گذر به تم روشن',
     'shirazeh.sidebar.open': 'گشودن فهرست مستندات',
+    'shirazeh.export.download': 'خروجی صفحه',
+    'shirazeh.export.html': 'HTML خودکفا',
+    'shirazeh.export.md': 'مارک‌داون',
+    'shirazeh.export.started': 'بارگیری آغاز شد',
+    'shirazeh.export.failed': 'خروجی ممکن نشد',
   },
   en: {
     'shirazeh.app-name': 'Shirazeh',
@@ -46,5 +51,10 @@ export default {
     'shirazeh.theme.to-dark': 'Switch to dark theme',
     'shirazeh.theme.to-light': 'Switch to light theme',
     'shirazeh.sidebar.open': 'Open documentation menu',
+    'shirazeh.export.download': 'Export page',
+    'shirazeh.export.html': 'Self-contained HTML',
+    'shirazeh.export.md': 'Markdown',
+    'shirazeh.export.started': 'Download started',
+    'shirazeh.export.failed': 'Export failed',
   },
 };

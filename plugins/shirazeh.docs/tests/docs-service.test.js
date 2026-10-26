@@ -144,6 +144,43 @@ test('should_return_page_not_found_when_not_found_page_is_not_configured', async
   assert.equal(result.code, 'DOC_PAGE_NOT_FOUND');
 });
 
+test('should_return_raw_markdown_when_get_raw_markdown_is_called', async () => {
+  const { docs } = createBoundDocs({
+    files: { './docs/guide.md': '# راهنما\n\nمتن خام' },
+  });
+
+  const raw = await docs.service.getRawMarkdown('/guide');
+
+  assert.equal(raw, '# راهنما\n\nمتن خام');
+});
+
+test('should_map_home_path_when_get_raw_markdown_is_called_for_root', async () => {
+  const { docs, http } = createBoundDocs({
+    files: { './docs/README.md': '# خانه' },
+  });
+
+  const raw = await docs.service.getRawMarkdown('/');
+
+  assert.equal(raw, '# خانه');
+  assert.deepEqual(http.calls, ['./docs/README.md']);
+});
+
+test('should_return_page_not_found_when_raw_document_is_missing', async () => {
+  const { docs } = createBoundDocs({ files: {} });
+
+  const result = await docs.service.getRawMarkdown('/missing');
+
+  assert.equal(result.code, 'DOC_PAGE_NOT_FOUND');
+});
+
+test('should_return_path_invalid_when_raw_path_is_malformed', async () => {
+  const { docs } = createBoundDocs({ files: {} });
+
+  const result = await docs.service.getRawMarkdown('no-slash');
+
+  assert.equal(result.code, 'DOC_PATH_INVALID');
+});
+
 test('should_resolve_document_title_from_label_when_attr_title_is_absent', async () => {
   const { docs } = createBoundDocs({
     files: {
