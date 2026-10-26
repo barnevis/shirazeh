@@ -32,6 +32,7 @@ export default {
 | `homePage` | `'README.md'` | پرونده‌ای که برای مسیر `/` نمایش داده می‌شود |
 | `sidebarFile` | `'_sidebar.md'` | پرونده فهرست navigation |
 | `toc` | روشن، عمق ۳ | پنل «در این صفحه» — `{ enabled: true, maxDepth: 3 }` |
+| `highlight` | روشن | برجسته‌سازی نحوی کد — `{ enabled: true }` |
 | `extensions` | همه روشن | فعال/غیرفعال کردن دستور پارسنشان — شیءای با کلیدهای `admonitions`، `persianList`، `persianPoem` و `persianFootnote` (هرکدام `true`/`false`) |
 
 مثال خاموش‌کردن شعر و جعبه‌ها:

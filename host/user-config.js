@@ -16,6 +16,7 @@ const USER_CONFIG_MAP = Object.freeze({
   favicon: ['ui', 'favicon'],
   toc: ['ui', 'toc'],
   codeCopy: ['ui', 'codeCopy'],
+  highlight: ['ui', 'highlight'],
   title: ['ui', 'title'],
   docsRoot: ['docs', 'docsRoot'],
   homePage: ['docs', 'homePage'],

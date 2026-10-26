@@ -47,6 +47,9 @@
     "toc": {
       "enabled": true,
       "maxDepth": 3
+    },
+    "highlight": {
+      "enabled": true
     }
   }
 }

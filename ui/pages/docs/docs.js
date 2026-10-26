@@ -7,6 +7,12 @@ import { PeyElement } from 'pey.webui/base/pey-element';
 import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from './enhance-content.js';
 import { TAG as SIDEBAR_TAG } from '../../components/shirazeh-sidebar.js';
 import { TAG as TOC_TAG } from '../../components/shirazeh-toc.js';
+import {
+  applyThemeInRoot,
+  ensureHighlightJs,
+  highlightCodeBlocks,
+  setHighlightTheme,
+} from './highlight.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
@@ -66,6 +72,7 @@ class DocsPage extends PeyElement {
     this.#t = typeof refs.t === 'function' ? refs.t : (key) => key;
     this.#config = refs.config ?? {};
     this.#events = refs.events ?? null;
+    this.#sharedState = refs.sharedState ?? null;
     this.#path = routePathFromParams(refs.routeParams);
     this.#anchorTarget = typeof refs.routeQuery?.a === 'string' ? refs.routeQuery.a : null;
   }
@@ -73,15 +80,34 @@ class DocsPage extends PeyElement {
   #path = '/';
   #anchorTarget = null;
   #events = null;
+  #sharedState = null;
+  #unsubscribeTheme = null;
 
   connectedCallback() {
     super.connectedCallback();
+    this.#subscribeTheme();
     this.#loadPage();
   }
 
   disconnectedCallback() {
     clearTimeout(this.#toastTimer);
+    this.#unsubscribeTheme?.();
+    this.#unsubscribeTheme = null;
     super.disconnectedCallback();
+  }
+
+  // Highlight theme flips whenever the shared theme changes; the highlight
+  // module toggles the vendored stylesheet links in the main document.
+  #subscribeTheme() {
+    if (!this.#sharedState || typeof this.#sharedState.subscribe !== 'function') {
+      return;
+    }
+    this.#unsubscribeTheme = this.#sharedState.subscribe('theme', (theme) => {
+      if (theme === 'light' || theme === 'dark') {
+        setHighlightTheme(document, theme);
+        void applyThemeInRoot(this.shadowRoot, theme);
+      }
+    });
   }
 
   async #loadPage() {
@@ -130,7 +156,8 @@ class DocsPage extends PeyElement {
   }
 
   // Runs after each render flush: wires the sidebar/TOC components, applies
-  // the display enhancements, and consumes a pending deep-link anchor.
+  // the display enhancements and syntax highlighting, and consumes a
+  // pending deep-link anchor.
   #afterRender() {
     this.#mountComponents();
     const content = this.shadowRoot?.querySelector('.markdown-body');
@@ -139,6 +166,7 @@ class DocsPage extends PeyElement {
       addHeadingAnchors(content, { path: this.#path });
       addCodeCopyButtons(content, { label: this.#t('shirazeh.code-copy.copy') });
       applyImageSizes(content);
+      void this.#highlight(content);
     }
 
     // A deep link (#/path?a=<heading id>) scrolls to its heading after the
@@ -148,6 +176,27 @@ class DocsPage extends PeyElement {
       this.#anchorTarget = null;
       this.shadowRoot?.getElementById(decodeURIComponent(id))
         ?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  // Loads the vendored highlight.js bundle lazily (only when the page has
+  // code blocks) and applies the fence syntax plus the theme styles in-root.
+  async #highlight(content) {
+    if (this.#config.highlight?.enabled === false) {
+      return;
+    }
+    if (content.querySelectorAll('pre > code[class*="language-"]').length === 0) {
+      return;
+    }
+
+    const theme = this.#sharedState?.get('theme') === 'dark' ? 'dark' : 'light';
+    try {
+      const hljs = await ensureHighlightJs({ ownerDocument: document, theme });
+      highlightCodeBlocks({ contentRoot: content, hljs });
+      await applyThemeInRoot(this.shadowRoot, theme);
+    } catch {
+      // Highlighting is an enhancement: a failed bundle load leaves the code
+      // plain and must not break the page.
     }
   }
 

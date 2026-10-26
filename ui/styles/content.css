@@ -76,6 +76,22 @@
 .markdown-body pre .hljs-file-name {
   color: var(--pey-color-text);
 }
+.markdown-body pre code .hljs-line {
+  display: block;
+  counter-increment: shirazeh-line;
+}
+.markdown-body pre code .hljs-line::before {
+  content: counter(shirazeh-line);
+  display: inline-block;
+  inline-size: 2ch;
+  margin-inline-end: var(--pey-space-3);
+  color: var(--pey-color-text-muted);
+  text-align: end;
+}
+.markdown-body pre code .hljs-line-highlight {
+  background-color: var(--pey-color-surface);
+  outline: 1px solid var(--pey-color-border);
+}
 
 /* Tables */
 .markdown-body table {

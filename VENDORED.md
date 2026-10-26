@@ -9,6 +9,7 @@
 | pey-markdown | https://github.com/peyjs/pey-markdown | `feb3d8fc677343d62d87bad89acca1d6106762bc` | 2026-10-25 | `plugins/pey.markdown/` |
 | pey-webui | https://github.com/peyjs/pey-webui | `801a3e70c6a4c63e60131c4e9c631485437419f4` | 2026-08-17 | `ui-kit/pey-webui/` |
 | pey-storage | https://github.com/peyjs/pey-storage | `9db2985a2331f3df40dc283cd8ef8a152dca28ed` | 2026-10-17 | `plugins/pey.storage/` |
+| highlight.js 11.9.0 | https://github.com/highlightjs/highlight.js (باندل UMD از cdnjs) | — (بارگیری نسخه) | 2026-10-27 | `vendor/highlight/` |
 | parsneshan | https://github.com/barnevis/parsneshan (برچسب v0.2.0) | — (کلون تگ) | 2026-10-26 | `vendor/node_modules/parsneshan/` |
 
 > بسته parsneshan (گویش مارک‌داون فارسی برای micromark) بدون کامیت‌های مفردِ تگ وندور شده است؛ آزمایش‌ها، بازیچه و سندهای بالادست آن در این کپی حذف شده‌اند. وابستگی‌های اجرایی micromark آن در مرورگر از نقشه ایمپورت `index.html` و در Node از `node_modules` ریشه (اعلام‌شده در `package.json` ریشه) حل می‌شوند.
@@ -17,6 +18,7 @@
 
 - `plugins/pey.router/` — افزودن آداپتور `HashHistoryAdapter` (پرونده `adapters/hash-history-adapter.js`) و مدخل بارگذاری آن در `lib/adapter-loader.js` به‌علاوه آزمون‌های قرارداد. سایر رفتارها بدون تغییر مانده‌اند.
 - `plugins/pey.storage/` — ثبت آداپتور درون‌حافظه‌ای (`InMemoryAdapter`) در نقشه بارگذاری آداپتورهای `index.js` (برای محیط Node بدون IndexedDB؛ مرورگر `IndexedDBAdapter` را انتخاب می‌کند) و مقایسه نسخه رویداد ready با manifest در آزمون ورودی به‌جای مقدار هاردکد.
+- `vendor/highlight/` — باندل UMD و دو تم (روشن/تاریک) با مجوز BSD-3-Clause بالادست؛ به‌صورت اسکریپت کلاسیک با تزریق تنبل بارگذاری می‌شود (UMD در ESM قابل ایمپورت نیست).
 
 ## مجوز
 
