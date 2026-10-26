@@ -147,6 +147,7 @@ export const setup = createApplicationSetup({
         router: resources.router,
         sharedState,
         config: resources.config,
+        events: resources.events,
         t: i18n.t,
         format: i18n.format,
       },

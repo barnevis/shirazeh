@@ -1,15 +1,18 @@
-// Documentation page: sidebar navigation, rendered markdown content, and
-// previous/next links. Data comes from shirazeh.docs.service; this component
-// only displays it and forwards navigation.
+// Documentation page: orchestrates loading a route's page from the docs
+// service, mounting the sidebar and TOC components, running display
+// enhancements, and forwarding navigation. Tree/panel internals live in
+// their own components; display enhancements in enhance-content.js.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
 import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from './enhance-content.js';
-import { activeBranchIds, buildTocTree } from './toc-tree.js';
+import { TAG as SIDEBAR_TAG } from '../../components/shirazeh-sidebar.js';
+import { TAG as TOC_TAG } from '../../components/shirazeh-toc.js';
 
 const TAG = 'app-page-docs';
 const DOCS_SERVICE = 'shirazeh.docs.service';
 const PARAM_KEYS = ['page', 'sub1', 'sub2', 'sub3', 'sub4'];
 const TOC_MIN_HEADINGS = 2;
+const CONTENT_STYLESHEET = new URL('../../styles/content.css', import.meta.url).href;
 
 function routePathFromParams(params) {
   if (params === null || typeof params !== 'object') {
@@ -55,11 +58,6 @@ class DocsPage extends PeyElement {
   #config = {};
   #state = { status: 'loading' };
   #sidebar = null;
-  #tocTree = [];
-  #tocOpenIds = new Set();
-  #tocActiveId = null;
-  #tocObserver = null;
-  #tocHovered = false;
   #toastTimer = null;
 
   onConnect(refs) {
@@ -67,12 +65,14 @@ class DocsPage extends PeyElement {
     this.#router = refs.router ?? null;
     this.#t = typeof refs.t === 'function' ? refs.t : (key) => key;
     this.#config = refs.config ?? {};
+    this.#events = refs.events ?? null;
     this.#path = routePathFromParams(refs.routeParams);
     this.#anchorTarget = typeof refs.routeQuery?.a === 'string' ? refs.routeQuery.a : null;
   }
 
   #path = '/';
   #anchorTarget = null;
+  #events = null;
 
   connectedCallback() {
     super.connectedCallback();
@@ -81,7 +81,6 @@ class DocsPage extends PeyElement {
 
   disconnectedCallback() {
     clearTimeout(this.#toastTimer);
-    this.#teardownScrollspy();
     super.disconnectedCallback();
   }
 
@@ -114,8 +113,8 @@ class DocsPage extends PeyElement {
     this.#sidebar = sidebar !== null && Array.isArray(sidebar?.tree) ? sidebar : null;
     this.requestRender({ preserve: false });
     // The base class flushes the render in a microtask; queueMicrotask is
-    // FIFO, so this post-processing runs against the freshly rendered DOM.
-    queueMicrotask(() => this.#enhanceContent());
+    // FIFO, so this post-render step runs against the freshly rendered DOM.
+    queueMicrotask(() => this.#afterRender());
   }
 
   // The browser tab title: the page's resolved document title (sidebar
@@ -130,16 +129,16 @@ class DocsPage extends PeyElement {
     }
   }
 
-  #enhanceContent() {
+  // Runs after each render flush: wires the sidebar/TOC components, applies
+  // the display enhancements, and consumes a pending deep-link anchor.
+  #afterRender() {
+    this.#mountComponents();
     const content = this.shadowRoot?.querySelector('.markdown-body');
     if (content !== null && content !== undefined) {
       wrapTables(content);
       addHeadingAnchors(content, { path: this.#path });
       addCodeCopyButtons(content, { label: this.#t('shirazeh.code-copy.copy') });
       applyImageSizes(content);
-      this.#setupScrollspy(content);
-    } else {
-      this.#teardownScrollspy();
     }
 
     // A deep link (#/path?a=<heading id>) scrolls to its heading after the
@@ -152,67 +151,59 @@ class DocsPage extends PeyElement {
     }
   }
 
-  // Scrollspy follows the topmost heading visible in the reading area and
-  // highlights its TOC entry; the panel itself follows the active entry
-  // unless the user is hovering it.
-  #setupScrollspy(content) {
-    this.#teardownScrollspy();
-
-    const headings = [...content.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]')];
-    if (headings.length === 0 || typeof IntersectionObserver !== 'function') {
-      return;
-    }
-
-    const panel = this.shadowRoot?.querySelector('.toc-panel');
-    if (panel !== null && panel !== undefined) {
-      panel.addEventListener('mouseenter', () => { this.#tocHovered = true; });
-      panel.addEventListener('mouseleave', () => { this.#tocHovered = false; });
-    }
-
-    const visible = new Set();
-    const applyActive = () => {
-      const topmost = headings.find((heading) => visible.has(heading));
-      this.#setTocActive(topmost?.id ?? null);
-    };
-
-    this.#tocObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          visible.add(entry.target);
-        } else {
-          visible.delete(entry.target);
-        }
+  #mountComponents() {
+    const sidebarSlot = this.shadowRoot?.querySelector('[data-sidebar-slot]');
+    if (sidebarSlot !== null && sidebarSlot !== undefined) {
+      sidebarSlot.replaceChildren();
+      if (this.#sidebar !== null) {
+        const sidebar = document.createElement(SIDEBAR_TAG);
+        sidebar.connect({
+          infrastructure: { events: this.#eventsFacade() },
+          refs: {
+            tree: this.#sidebar.tree,
+            path: this.#path,
+            router: this.#router,
+            openLabel: this.#t('shirazeh.sidebar.open'),
+          },
+        });
+        sidebarSlot.append(sidebar);
       }
-      applyActive();
-    }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+    }
 
-    for (const heading of headings) {
-      this.#tocObserver.observe(heading);
+    const tocSlot = this.shadowRoot?.querySelector('[data-toc-slot]');
+    if (tocSlot !== null && tocSlot !== undefined) {
+      tocSlot.replaceChildren();
+      const page = this.#state.status === 'ready' ? this.#state.page : null;
+      const tocConfig = this.#config.toc ?? {};
+      const content = this.shadowRoot?.querySelector('.markdown-body');
+      if (this.#tocEnabled() && page !== null && Array.isArray(page.toc) && page.toc.length >= TOC_MIN_HEADINGS && content) {
+        const toc = document.createElement(TOC_TAG);
+        toc.connect({
+          infrastructure: { events: this.#eventsFacade() },
+          refs: {
+            toc: page.toc,
+            path: this.#path,
+            maxDepth: tocConfig.maxDepth,
+            title: this.#t('shirazeh.toc.title'),
+            contentRoot: content,
+          },
+        });
+        tocSlot.append(toc);
+      }
     }
   }
 
-  #teardownScrollspy() {
-    this.#tocObserver?.disconnect();
-    this.#tocObserver = null;
+  // The real Event Bus facade flows through page refs, so the child
+  // components' contained errors still reach ui:component-error.
+  #eventsFacade() {
+    return this.#events ?? {
+      publish: () => ({ success: true }),
+      subscribe: () => () => {},
+    };
   }
 
-  #setTocActive(id) {
-    if (id === this.#tocActiveId) {
-      return;
-    }
-    this.#tocActiveId = id;
-
-    const branch = id === null ? new Set() : activeBranchIds(this.#tocTree, id);
-    for (const link of this.shadowRoot?.querySelectorAll('[data-toc-link]') ?? []) {
-      const linkId = link.dataset.tocLink;
-      link.classList.toggle('is-active', linkId === id);
-      link.classList.toggle('is-on-branch', branch.has(linkId) && linkId !== id);
-    }
-
-    if (!this.#tocHovered) {
-      this.shadowRoot?.querySelector('[data-toc-link].is-active')
-        ?.scrollIntoView({ block: 'nearest' });
-    }
+  #tocEnabled() {
+    return this.#config.toc?.enabled !== false;
   }
 
   // Heading-anchor clicks copy the shareable deep-link URL and confirm with
@@ -296,71 +287,8 @@ class DocsPage extends PeyElement {
       return;
     }
 
-    const tocToggle = target.closest('button[data-toc-toggle]');
-    if (tocToggle !== null) {
-      event.preventDefault();
-      const id = tocToggle.dataset.tocToggle;
-      if (this.#tocOpenIds.has(id)) {
-        this.#tocOpenIds.delete(id);
-      } else {
-        this.#tocOpenIds.add(id);
-      }
-      const listItem = tocToggle.closest('li');
-      const submenu = listItem?.querySelector('ul');
-      submenu?.classList.toggle('is-open');
-      tocToggle.setAttribute('aria-expanded', String(submenu?.classList.contains('is-open') ?? false));
-      return;
-    }
-
-    const tocLink = target.closest('a[data-toc-link]');
-    if (tocLink !== null) {
-      event.preventDefault();
-      this.shadowRoot?.getElementById(decodeURIComponent(tocLink.dataset.tocLink))
-        ?.scrollIntoView({ behavior: 'smooth' });
-      this.#setTocActive(tocLink.dataset.tocLink);
-      return;
-    }
-
-    const sidebarToggle = target.closest('button[data-sidebar-toggle]');
-    if (sidebarToggle !== null) {
-      event.preventDefault();
-      const key = sidebarToggle.dataset.sidebarToggle;
-      const isOpen = this.#sidebarOpenIds.has(key);
-      if (isOpen) {
-        this.#sidebarOpenIds.delete(key);
-      } else {
-        this.#sidebarOpenIds.add(key);
-      }
-      sidebarToggle.setAttribute('aria-expanded', String(!isOpen));
-      const listItem = sidebarToggle.closest('li');
-      listItem?.querySelector('.sidebar-submenu')?.classList.toggle('is-open', !isOpen);
-      return;
-    }
-
-    // Mobile drawer controls: hamburger opens, overlay closes.
-    const hamburger = target.closest('button[data-sidebar-hamburger]');
-    if (hamburger !== null) {
-      this.shadowRoot?.querySelector('aside[part="sidebar"]')?.classList.add('is-mobile-open');
-      this.shadowRoot?.querySelector('.sidebar-overlay')?.classList.add('is-visible');
-      return;
-    }
-    if (target.closest('[data-sidebar-overlay]') !== null) {
-      this.#closeMobileSidebar();
-      return;
-    }
-
-    // Navigating to a sidebar page re-opens its branch and closes the mobile
-    // drawer; the anchor's own navigation proceeds normally below.
-    const sidebarLink = target.closest('aside a[data-route]');
-    if (sidebarLink !== null) {
-      const route = sidebarLink.dataset.route;
-      this.#sidebarOpenIds.clear();
-      this.#openBranchTo(route, this.#sidebar?.tree ?? []);
-      this.#closeMobileSidebar();
-    }
-
     const anchor = target.closest('a');
-    if (anchor === null) {
+    if (anchor === null || anchor.closest('aside') !== null || anchor.closest('.toc-panel') !== null) {
       return;
     }
 
@@ -401,117 +329,6 @@ class DocsPage extends PeyElement {
     }
   }
 
-  // Sidebar: nested collapsible sections from the docs plugin's tree.
-  // Sections whose branch contains the current page start open; a plain
-  // parent (no own link) is a button, a link-parent is both link and toggle.
-  #sidebarOpenIds = new Set();
-  #sidebarEverRendered = false;
-
-  #renderSidebar() {
-    if (this.#sidebar === null) {
-      return '<aside part="sidebar" hidden></aside>';
-    }
-
-    const currentPath = this.#path;
-    if (!this.#sidebarEverRendered) {
-      this.#sidebarEverRendered = true;
-      this.#openBranchTo(currentPath, this.#sidebar.tree);
-    }
-
-    const renderNodes = (nodes) => nodes.map((node) => {
-      const route = normalizeHref(node.href);
-      const hasChildren = node.children.length > 0;
-      const isCurrent = route === currentPath ? ' aria-current="page"' : '';
-      const isOpen = this.#sidebarOpenIds.has(node.href);
-      const self = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(node.title)}</a>`;
-      const toggle = hasChildren
-        ? `<button type="button" class="sidebar-toggle-item" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}">›</button>`
-        : '';
-      const submenu = hasChildren
-        ? `<ul class="sidebar-submenu${isOpen ? ' is-open' : ''}">${renderNodes(node.children)}</ul>`
-        : '';
-      return `<li class="${hasChildren ? 'has-children' : ''}">${self}${toggle}${submenu}</li>`;
-    }).join('');
-
-    return `
-      <div class="sidebar-overlay" data-sidebar-overlay></div>
-      <button type="button" class="sidebar-hamburger" data-sidebar-hamburger aria-label="${escapeHtml(this.#t('shirazeh.sidebar.open'))}">☰</button>
-      <aside part="sidebar">
-        <nav aria-label="documentation">
-          <ul>${renderNodes(this.#sidebar.tree)}</ul>
-        </nav>
-      </aside>
-    `;
-  }
-
-  #openBranchTo(path, nodes) {
-    for (const node of nodes) {
-      if (normalizeHref(node.href) === path || this.#openBranchTo(path, node.children)) {
-        this.#sidebarOpenIds.add(node.href);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // Mobile drawer: the sidebar becomes a slide-in panel; clicking outside
-  // (on the overlay) closes it.
-  #closeMobileSidebar() {
-    this.shadowRoot?.querySelector('aside[part="sidebar"].is-mobile-open')
-      ?.classList.remove('is-mobile-open');
-    this.shadowRoot?.querySelector('.sidebar-overlay.is-visible')
-      ?.classList.remove('is-visible');
-  }
-
-  // The on-page table of contents: a fixed side panel (wide screens only)
-  // rebuilt per page from the rendered toc, with scrollspy highlighting.
-  #tocEnabled() {
-    return this.#config.toc?.enabled !== false;
-  }
-
-  #tocPanelHtml() {
-    const page = this.#state.page;
-    const tocConfig = this.#config.toc ?? {};
-    const maxDepth = Number.isInteger(tocConfig.maxDepth) ? tocConfig.maxDepth : 3;
-
-    if (!this.#tocEnabled() || !Array.isArray(page?.toc) || page.toc.length < TOC_MIN_HEADINGS) {
-      return '';
-    }
-
-    this.#tocTree = buildTocTree(page.toc, maxDepth);
-    if (this.#tocTree.length === 0) {
-      return '';
-    }
-
-    const branch = this.#tocActiveId === null
-      ? new Set()
-      : activeBranchIds(this.#tocTree, this.#tocActiveId);
-
-    const renderNodes = (nodes) => nodes.map((node) => {
-      const hasChildren = node.children.length > 0;
-      const isOpen = this.#tocOpenIds.size === 0 || this.#tocOpenIds.has(node.id);
-      const isActive = node.id === this.#tocActiveId;
-      const onBranch = branch.has(node.id) && !isActive;
-      const toggle = hasChildren
-        ? `<button type="button" class="toc-toggle" data-toc-toggle="${escapeHtml(node.id)}" aria-expanded="${isOpen}">›</button>`
-        : '';
-      const link = `<a href="#${this.#path}?a=${encodeURIComponent(node.id)}" data-toc-link="${escapeHtml(node.id)}" class="${isActive ? 'is-active' : ''}${onBranch ? ' is-on-branch' : ''}">${escapeHtml(node.text)}</a>`;
-      const children = hasChildren
-        ? `<ul class="${isOpen ? 'is-open' : ''}">${renderNodes(node.children)}</ul>`
-        : '';
-      return `<li>${toggle}${link}${children}</li>`;
-    }).join('');
-
-    return `
-      <aside class="toc-panel" part="toc">
-        <nav aria-label="${escapeHtml(this.#t('shirazeh.toc.title'))}">
-          <p class="toc-title">${escapeHtml(this.#t('shirazeh.toc.title'))}</p>
-          <ul class="toc-list">${renderNodes(this.#tocTree)}</ul>
-        </nav>
-      </aside>
-    `;
-  }
-
   #renderState() {
     const t = this.#t;
 
@@ -546,8 +363,13 @@ class DocsPage extends PeyElement {
         ${previous}
         ${next}
       </nav>
-      ${this.#tocPanelHtml()}
     `;
+  }
+
+  // The content stylesheet loads through PeyElement's stylesheet runtime so
+  // prose/enhancement styles stay out of this file.
+  stylesheetHref() {
+    return CONTENT_STYLESHEET;
   }
 
   render() {
@@ -568,109 +390,10 @@ class DocsPage extends PeyElement {
           .layout {
             grid-template-columns: minmax(0, 1fr);
           }
-          aside[part="sidebar"] {
+          [data-sidebar-slot] {
             border-block-end: 1px solid var(--pey-color-border);
             padding-block-end: var(--pey-space-4);
           }
-        }
-        aside[part="sidebar"] ul {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          display: grid;
-          gap: var(--pey-space-1);
-        }
-        aside[part="sidebar"] li.has-children {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) auto;
-          align-items: center;
-        }
-        aside[part="sidebar"] li.has-children > a {
-          grid-column: 1;
-        }
-        aside[part="sidebar"] .sidebar-toggle-item {
-          grid-column: 2;
-          border: none;
-          background: none;
-          padding: 0 var(--pey-space-1);
-          color: var(--pey-color-text-muted);
-          cursor: pointer;
-          font-size: inherit;
-        }
-        aside[part="sidebar"] .sidebar-toggle-item[aria-expanded='true'] {
-          transform: rotate(90deg);
-          display: inline-block;
-        }
-        aside[part="sidebar"] .sidebar-submenu {
-          display: none;
-          padding-inline-start: var(--pey-space-4);
-          grid-column: 1 / -1;
-        }
-        aside[part="sidebar"] .sidebar-submenu.is-open {
-          display: grid;
-        }
-        .sidebar-overlay {
-          display: none;
-        }
-        .sidebar-overlay.is-visible {
-          display: block;
-        }
-        .sidebar-hamburger {
-          display: none;
-        }
-        /* Mobile: the sidebar becomes a slide-in drawer with an overlay. */
-        @media (max-width: 48rem) {
-          .sidebar-hamburger {
-            display: block;
-            position: fixed;
-            inset-block-start: var(--pey-space-4);
-            inset-inline-start: var(--pey-space-4);
-            z-index: 25;
-            border: 1px solid var(--pey-color-border);
-            border-radius: var(--pey-radius-md);
-            background-color: var(--pey-color-canvas);
-            color: var(--pey-color-text);
-            padding: var(--pey-space-1) var(--pey-space-3);
-            cursor: pointer;
-            font-size: 1rem;
-          }
-          aside[part="sidebar"] {
-            position: fixed;
-            inset-block: 0;
-            inset-inline-start: 0;
-            inline-size: min(80vw, 18rem);
-            background-color: var(--pey-color-canvas);
-            border-inline-end: 1px solid var(--pey-color-border);
-            padding: var(--pey-space-4);
-            transform: translateX(110%);
-            transition: transform var(--pey-duration-base) ease;
-            z-index: 30;
-          }
-          aside[part="sidebar"].is-mobile-open {
-            transform: translateX(0);
-          }
-          .sidebar-overlay {
-            display: block;
-            position: fixed;
-            inset: 0;
-            background-color: rgb(0 0 0 / 0.4);
-            z-index: 20;
-          }
-        }
-        aside[part="sidebar"] a {
-          display: block;
-          padding: var(--pey-space-1) var(--pey-space-2);
-          border-radius: var(--pey-radius-sm);
-          color: var(--pey-color-text);
-          text-decoration: none;
-          font-size: var(--pey-font-size-sm);
-        }
-        aside[part="sidebar"] a:hover {
-          background-color: var(--pey-color-surface);
-        }
-        aside[part="sidebar"] a[aria-current="page"] {
-          font-weight: 600;
-          color: var(--pey-color-accent);
         }
         .content {
           min-inline-size: 0;
@@ -678,207 +401,6 @@ class DocsPage extends PeyElement {
         .content.loading {
           color: var(--pey-color-text-muted);
           padding-block: var(--pey-space-8);
-        }
-        .markdown-body {
-          line-height: var(--pey-line-height-base);
-        }
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-          line-height: 1.3;
-        }
-        .markdown-body :is(h1, h2, h3, h4, h5, h6) .heading-anchor {
-          margin-inline-start: var(--pey-space-2);
-          opacity: 0;
-          text-decoration: none;
-          font-weight: 400;
-        }
-        .markdown-body :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor,
-        .markdown-body :is(h1, h2, h3, h4, h5, h6):focus-within .heading-anchor {
-          opacity: 1;
-        }
-        .page-toast {
-          position: fixed;
-          inset-block-end: var(--pey-space-6);
-          inset-inline: 0;
-          margin-inline: auto;
-          inline-size: fit-content;
-          padding: var(--pey-space-2) var(--pey-space-4);
-          border-radius: var(--pey-radius-md);
-          background-color: var(--pey-color-text);
-          color: var(--pey-color-canvas);
-          box-shadow: var(--pey-shadow-sm);
-          font-size: var(--pey-font-size-sm);
-        }
-        .markdown-body pre {
-          direction: ltr;
-          text-align: start;
-          background-color: var(--pey-color-surface);
-          border: 1px solid var(--pey-color-border);
-          border-radius: var(--pey-radius-md);
-          padding: var(--pey-space-4);
-          overflow-x: auto;
-          font-size: var(--pey-font-size-sm);
-          position: relative;
-        }
-        .markdown-body pre .copy-code-button {
-          position: absolute;
-          inset-block-start: var(--pey-space-2);
-          inset-inline-end: var(--pey-space-2);
-          opacity: 0;
-          font-family: var(--pey-font-family-base);
-          font-size: var(--pey-font-size-sm);
-          padding: var(--pey-space-1) var(--pey-space-3);
-          border: 1px solid var(--pey-color-border);
-          border-radius: var(--pey-radius-md);
-          background-color: var(--pey-color-canvas);
-          color: var(--pey-color-text);
-          cursor: pointer;
-        }
-        .markdown-body pre:hover .copy-code-button,
-        .markdown-body pre .copy-code-button:focus-visible {
-          opacity: 1;
-        }
-        .markdown-body pre .copy-code-button.is-success {
-          color: #059669;
-          border-color: #059669;
-        }
-        .markdown-body pre .copy-code-button.is-error {
-          color: var(--pey-color-status-error);
-          border-color: var(--pey-color-status-error);
-        }
-        @media print {
-          .markdown-body pre .copy-code-button,
-          .page-toast,
-          .toc-panel {
-            display: none;
-          }
-        }
-        .toc-panel {
-          display: none;
-        }
-        @media (min-width: 75rem) {
-          .toc-panel {
-            display: block;
-            position: fixed;
-            inset-block-start: 6rem;
-            inset-inline-end: var(--pey-space-6);
-            inline-size: 15rem;
-            max-block-size: calc(100vh - 8rem);
-            overflow-y: auto;
-            font-size: var(--pey-font-size-sm);
-            border-inline-start: 1px solid var(--pey-color-border);
-            padding-inline-start: var(--pey-space-4);
-          }
-          .layout {
-            padding-inline-end: 16rem;
-          }
-        }
-        .toc-title {
-          margin: 0 0 var(--pey-space-2);
-          font-weight: 600;
-        }
-        .toc-list,
-        .toc-list ul {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-        }
-        .toc-list ul {
-          padding-inline-start: var(--pey-space-4);
-        }
-        .toc-list ul:not(.is-open) {
-          display: none;
-        }
-        .toc-list li {
-          margin-block: var(--pey-space-1);
-        }
-        .toc-list a {
-          color: var(--pey-color-text-muted);
-          text-decoration: none;
-        }
-        .toc-list a:hover {
-          color: var(--pey-color-text);
-        }
-        .toc-list a.is-on-branch {
-          color: var(--pey-color-text);
-        }
-        .toc-list a.is-active {
-          color: var(--pey-color-accent);
-          font-weight: 600;
-        }
-        .toc-toggle {
-          border: none;
-          background: none;
-          padding: 0 var(--pey-space-1);
-          color: var(--pey-color-text-muted);
-          cursor: pointer;
-          font-size: inherit;
-        }
-        .toc-toggle[aria-expanded='true'] {
-          transform: rotate(90deg);
-          display: inline-block;
-        }
-        .markdown-body code {
-          font-family: ui-monospace, monospace;
-        }
-        .markdown-body table {
-          border-collapse: collapse;
-          inline-size: 100%;
-        }
-        .markdown-body .table-wrapper {
-          overflow-x: auto;
-        }
-        .markdown-body th, .markdown-body td {
-          border: 1px solid var(--pey-color-border);
-          padding: var(--pey-space-2) var(--pey-space-3);
-        }
-        .markdown-body img {
-          max-inline-size: 100%;
-        }
-        .markdown-body [class^='parsneshan-']:not(.parsneshan-poem):not(.parsneshan-verse):not(.parsneshan-hemistich) {
-          border-inline-start: 3px solid var(--pey-color-accent);
-          border-radius: var(--pey-radius-md);
-          background-color: var(--pey-color-surface);
-          padding: var(--pey-space-3) var(--pey-space-4);
-          margin-block: var(--pey-space-4);
-        }
-        .markdown-body .parsneshan-caution { border-inline-start-color: var(--pey-color-status-error); }
-        .markdown-body .parsneshan-warning { border-inline-start-color: #d97706; }
-        .markdown-body .parsneshan-important { border-inline-start-color: var(--pey-color-accent); }
-        .markdown-body .parsneshan-tip { border-inline-start-color: #059669; }
-        .markdown-body .parsneshan-note { border-inline-start-color: var(--pey-color-text-muted); }
-        .markdown-body .parsneshan-poem {
-          margin-block: var(--pey-space-6);
-          padding: var(--pey-space-4) var(--pey-space-6);
-          background-color: var(--pey-color-surface);
-          border-radius: var(--pey-radius-md);
-          display: grid;
-          gap: var(--pey-space-3);
-          justify-items: center;
-        }
-        .markdown-body .parsneshan-verse {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: var(--pey-space-8);
-          inline-size: 100%;
-          justify-items: center;
-        }
-        .markdown-body .parsneshan-hemistich {
-          text-align: center;
-        }
-        @media (max-width: 37.5rem) {
-          .markdown-body .parsneshan-verse {
-            grid-template-columns: minmax(0, 1fr);
-            gap: var(--pey-space-1);
-          }
-        }
-        .markdown-body .footnotes {
-          margin-block-start: var(--pey-space-8);
-          padding-block-start: var(--pey-space-4);
-          border-block-start: 1px solid var(--pey-color-border);
-          font-size: var(--pey-font-size-sm);
-        }
-        .markdown-body .data-footnote-backref {
-          text-decoration: none;
         }
         .pager {
           display: flex;
@@ -901,9 +423,10 @@ class DocsPage extends PeyElement {
         }
       </style>
       <div class="layout">
-        ${this.#renderSidebar()}
+        <div data-sidebar-slot></div>
         ${this.#renderState()}
       </div>
+      <div data-toc-slot></div>
     `;
   }
 }
