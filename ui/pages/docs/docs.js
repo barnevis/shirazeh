@@ -54,7 +54,7 @@ class DocsPage extends PeyElement {
   #t = null;
   #config = {};
   #state = { status: 'loading' };
-  #sidebarLinks = null;
+  #sidebar = null;
   #tocTree = [];
   #tocOpenIds = new Set();
   #tocActiveId = null;
@@ -111,7 +111,7 @@ class DocsPage extends PeyElement {
       this.#state = { status: 'ready', page };
       this.#applyDocumentTitle(page.documentTitle);
     }
-    this.#sidebarLinks = Array.isArray(sidebar) ? sidebar : null;
+    this.#sidebar = sidebar !== null && Array.isArray(sidebar?.tree) ? sidebar : null;
     this.requestRender({ preserve: false });
     // The base class flushes the render in a microtask; queueMicrotask is
     // FIFO, so this post-processing runs against the freshly rendered DOM.
@@ -321,6 +321,44 @@ class DocsPage extends PeyElement {
       return;
     }
 
+    const sidebarToggle = target.closest('button[data-sidebar-toggle]');
+    if (sidebarToggle !== null) {
+      event.preventDefault();
+      const key = sidebarToggle.dataset.sidebarToggle;
+      const isOpen = this.#sidebarOpenIds.has(key);
+      if (isOpen) {
+        this.#sidebarOpenIds.delete(key);
+      } else {
+        this.#sidebarOpenIds.add(key);
+      }
+      sidebarToggle.setAttribute('aria-expanded', String(!isOpen));
+      const listItem = sidebarToggle.closest('li');
+      listItem?.querySelector('.sidebar-submenu')?.classList.toggle('is-open', !isOpen);
+      return;
+    }
+
+    // Mobile drawer controls: hamburger opens, overlay closes.
+    const hamburger = target.closest('button[data-sidebar-hamburger]');
+    if (hamburger !== null) {
+      this.shadowRoot?.querySelector('aside[part="sidebar"]')?.classList.add('is-mobile-open');
+      this.shadowRoot?.querySelector('.sidebar-overlay')?.classList.add('is-visible');
+      return;
+    }
+    if (target.closest('[data-sidebar-overlay]') !== null) {
+      this.#closeMobileSidebar();
+      return;
+    }
+
+    // Navigating to a sidebar page re-opens its branch and closes the mobile
+    // drawer; the anchor's own navigation proceeds normally below.
+    const sidebarLink = target.closest('aside a[data-route]');
+    if (sidebarLink !== null) {
+      const route = sidebarLink.dataset.route;
+      this.#sidebarOpenIds.clear();
+      this.#openBranchTo(route, this.#sidebar?.tree ?? []);
+      this.#closeMobileSidebar();
+    }
+
     const anchor = target.closest('a');
     if (anchor === null) {
       return;
@@ -363,26 +401,66 @@ class DocsPage extends PeyElement {
     }
   }
 
+  // Sidebar: nested collapsible sections from the docs plugin's tree.
+  // Sections whose branch contains the current page start open; a plain
+  // parent (no own link) is a button, a link-parent is both link and toggle.
+  #sidebarOpenIds = new Set();
+  #sidebarEverRendered = false;
+
   #renderSidebar() {
-    if (this.#sidebarLinks === null) {
+    if (this.#sidebar === null) {
       return '<aside part="sidebar" hidden></aside>';
     }
 
     const currentPath = this.#path;
-    const items = this.#sidebarLinks.map((link) => {
-      const route = normalizeHref(link.href);
+    if (!this.#sidebarEverRendered) {
+      this.#sidebarEverRendered = true;
+      this.#openBranchTo(currentPath, this.#sidebar.tree);
+    }
+
+    const renderNodes = (nodes) => nodes.map((node) => {
+      const route = normalizeHref(node.href);
+      const hasChildren = node.children.length > 0;
       const isCurrent = route === currentPath ? ' aria-current="page"' : '';
-      const indentStyle = `margin-inline-start: ${(link.level - 1) * 0.9}rem`;
-      return `<li style="${indentStyle}"><a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(link.title)}</a></li>`;
+      const isOpen = this.#sidebarOpenIds.has(node.href);
+      const self = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(node.title)}</a>`;
+      const toggle = hasChildren
+        ? `<button type="button" class="sidebar-toggle-item" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}">›</button>`
+        : '';
+      const submenu = hasChildren
+        ? `<ul class="sidebar-submenu${isOpen ? ' is-open' : ''}">${renderNodes(node.children)}</ul>`
+        : '';
+      return `<li class="${hasChildren ? 'has-children' : ''}">${self}${toggle}${submenu}</li>`;
     }).join('');
 
     return `
+      <div class="sidebar-overlay" data-sidebar-overlay></div>
+      <button type="button" class="sidebar-hamburger" data-sidebar-hamburger aria-label="${escapeHtml(this.#t('shirazeh.sidebar.open'))}">☰</button>
       <aside part="sidebar">
         <nav aria-label="documentation">
-          <ul>${items}</ul>
+          <ul>${renderNodes(this.#sidebar.tree)}</ul>
         </nav>
       </aside>
     `;
+  }
+
+  #openBranchTo(path, nodes) {
+    for (const node of nodes) {
+      if (normalizeHref(node.href) === path || this.#openBranchTo(path, node.children)) {
+        this.#sidebarOpenIds.add(node.href);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Mobile drawer: the sidebar becomes a slide-in panel; clicking outside
+  // (on the overlay) closes it.
+  #closeMobileSidebar() {
+    this.shadowRoot?.querySelector('aside[part="sidebar"].is-mobile-open')
+      ?.classList.remove('is-mobile-open');
+    this.shadowRoot?.querySelector('.sidebar-overlay.is-visible')
+      ?.classList.remove('is-visible');
   }
 
   // The on-page table of contents: a fixed side panel (wide screens only)
@@ -501,6 +579,83 @@ class DocsPage extends PeyElement {
           padding: 0;
           display: grid;
           gap: var(--pey-space-1);
+        }
+        aside[part="sidebar"] li.has-children {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+        }
+        aside[part="sidebar"] li.has-children > a {
+          grid-column: 1;
+        }
+        aside[part="sidebar"] .sidebar-toggle-item {
+          grid-column: 2;
+          border: none;
+          background: none;
+          padding: 0 var(--pey-space-1);
+          color: var(--pey-color-text-muted);
+          cursor: pointer;
+          font-size: inherit;
+        }
+        aside[part="sidebar"] .sidebar-toggle-item[aria-expanded='true'] {
+          transform: rotate(90deg);
+          display: inline-block;
+        }
+        aside[part="sidebar"] .sidebar-submenu {
+          display: none;
+          padding-inline-start: var(--pey-space-4);
+          grid-column: 1 / -1;
+        }
+        aside[part="sidebar"] .sidebar-submenu.is-open {
+          display: grid;
+        }
+        .sidebar-overlay {
+          display: none;
+        }
+        .sidebar-overlay.is-visible {
+          display: block;
+        }
+        .sidebar-hamburger {
+          display: none;
+        }
+        /* Mobile: the sidebar becomes a slide-in drawer with an overlay. */
+        @media (max-width: 48rem) {
+          .sidebar-hamburger {
+            display: block;
+            position: fixed;
+            inset-block-start: var(--pey-space-4);
+            inset-inline-start: var(--pey-space-4);
+            z-index: 25;
+            border: 1px solid var(--pey-color-border);
+            border-radius: var(--pey-radius-md);
+            background-color: var(--pey-color-canvas);
+            color: var(--pey-color-text);
+            padding: var(--pey-space-1) var(--pey-space-3);
+            cursor: pointer;
+            font-size: 1rem;
+          }
+          aside[part="sidebar"] {
+            position: fixed;
+            inset-block: 0;
+            inset-inline-start: 0;
+            inline-size: min(80vw, 18rem);
+            background-color: var(--pey-color-canvas);
+            border-inline-end: 1px solid var(--pey-color-border);
+            padding: var(--pey-space-4);
+            transform: translateX(110%);
+            transition: transform var(--pey-duration-base) ease;
+            z-index: 30;
+          }
+          aside[part="sidebar"].is-mobile-open {
+            transform: translateX(0);
+          }
+          .sidebar-overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background-color: rgb(0 0 0 / 0.4);
+            z-index: 20;
+          }
         }
         aside[part="sidebar"] a {
           display: block;

@@ -18,9 +18,9 @@
       "methods": [
         {
           "name": "getSidebar",
-          "description": "Returns the parsed sidebar navigation tree. The sidebar markdown file is fetched once and cached; subsequent calls reuse the cache. Links are reported exactly as authored (href, label text as title, optional markdown title attribute as attrTitle, indent level); path-to-route mapping is the caller's concern.",
+          "description": "Returns the parsed sidebar navigation in two shapes: `links` is the flat level-annotated list, `tree` nests children under their parent by indent level (a child's level is greater than its parent's). The sidebar markdown file is fetched once and cached; subsequent calls reuse the cache. Links are reported exactly as authored (href, label text as title, optional markdown title attribute as attrTitle, indent level); path-to-route mapping is the caller's concern.",
           "params": [],
-          "returns": "Promise<SidebarLink[] | object> — SidebarLink { href: string, title: string, attrTitle: string|null, level: number } on success, or a standard Bonyan error object",
+          "returns": "Promise<{ links: SidebarLink[], tree: SidebarNode[] } | object> — SidebarLink { href: string, title: string, attrTitle: string|null, level: number }; SidebarNode { href, title, attrTitle, level, children: SidebarNode[] } on success, or a standard Bonyan error object",
           "errors": ["SIDEBAR_NOT_FOUND", "SIDEBAR_PARSE_FAILED", "DOC_RENDER_FAILED", "SERVICE_UNAVAILABLE"]
         },
         {

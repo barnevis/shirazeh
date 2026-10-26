@@ -123,6 +123,46 @@ export function neighborsForPath(links, path) {
 }
 
 /**
+ * Builds a sidebar tree from the flat level-annotated links.
+ *
+ * A link at level N becomes a child of the nearest preceding link at a level
+ * lower than N; malformed jumps still produce a sane tree (the same stack
+ * rule as the toc builder).
+ *
+ * @param {Array<{href: string, title: string, attrTitle: string|null, level: number}>} links Flat links.
+ * @returns {Array<object>} Tree roots, each node { href, title, attrTitle, level, children }.
+ */
+export function buildSidebarTree(links) {
+  if (!Array.isArray(links)) {
+    return [];
+  }
+
+  const roots = [];
+  const stack = [];
+
+  for (const link of links) {
+    if (!link || typeof link.href !== 'string') {
+      continue;
+    }
+
+    const node = { ...link, children: [] };
+
+    while (stack.length > 0 && stack[stack.length - 1].level >= link.level) {
+      stack.pop();
+    }
+
+    if (stack.length === 0) {
+      roots.push(node);
+    } else {
+      stack[stack.length - 1].children.push(node);
+    }
+    stack.push(node);
+  }
+
+  return roots;
+}
+
+/**
  * Resolves the browser document title for a path.
  *
  * Source chain: the sidebar link's title attribute (`attrTitle`), then the

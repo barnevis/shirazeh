@@ -10,6 +10,7 @@ import {
 import { createDocsError } from './error.js';
 import { createParsneshanOptions } from './parsneshan-extensions.js';
 import {
+  buildSidebarTree,
   documentTitleForPath,
   neighborsForPath,
   parseSidebar,
@@ -113,7 +114,8 @@ export function createDocsService({ config, publish }) {
       async getSidebar() {
         try {
           assertAvailable();
-          return await loadSidebarLinks();
+          const links = await loadSidebarLinks();
+          return { links, tree: buildSidebarTree(links) };
         } catch (error) {
           return isBonyanError(error) ? error : createDocsError(ERROR_CODES.SIDEBAR_PARSE_FAILED, 'The sidebar could not be loaded');
         }

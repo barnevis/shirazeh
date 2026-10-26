@@ -213,13 +213,16 @@ test('should_return_path_invalid_when_path_is_malformed', async () => {
   assert.equal(result.code, 'DOC_PATH_INVALID');
 });
 
-test('should_return_sidebar_links_when_get_sidebar_is_called', async () => {
+test('should_return_sidebar_links_and_tree_when_get_sidebar_is_called', async () => {
   const { docs } = createBoundDocs({ files: { './docs/_sidebar.md': SIDEBAR_MARKDOWN } });
 
-  const links = await docs.service.getSidebar();
+  const sidebar = await docs.service.getSidebar();
 
-  assert.equal(links.length, 3);
-  assert.deepEqual(links[0], { href: '/', title: 'خانه', attrTitle: null, level: 1 });
+  assert.equal(sidebar.links.length, 3);
+  assert.deepEqual(sidebar.links[0], { href: '/', title: 'خانه', attrTitle: null, level: 1 });
+  // - [خانه](/) → child راهنما → - [درباره](about) is a root sibling
+  assert.deepEqual(sidebar.tree.map((node) => node.href), ['/', 'about']);
+  assert.deepEqual(sidebar.tree[0].children.map((node) => node.href), ['guide']);
 });
 
 test('should_fetch_sidebar_once_when_get_sidebar_is_called_twice', async () => {

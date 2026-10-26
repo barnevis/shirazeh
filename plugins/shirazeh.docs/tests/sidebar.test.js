@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  buildSidebarTree,
   documentTitleForPath,
   neighborsForPath,
   normalizeHref,
@@ -168,4 +169,42 @@ test('should_return_heading_when_link_has_no_label', () => {
 
 test('should_return_empty_title_when_no_source_exists', () => {
   assert.equal(documentTitleForPath([], '/', ''), '');
+});
+
+test('should_build_nested_tree_when_levels_nest', () => {
+  const links = [
+    { href: '/', title: 'خانه', attrTitle: null, level: 1 },
+    { href: 'guide', title: 'راهنما', attrTitle: null, level: 2 },
+    { href: 'guide/config', title: 'پیکربندی', attrTitle: null, level: 3 },
+    { href: 'about', title: 'درباره', attrTitle: null, level: 1 },
+  ];
+
+  const tree = buildSidebarTree(links);
+
+  assert.deepEqual(tree.map((node) => node.href), ['/', 'about']);
+  assert.deepEqual(tree[0].children.map((node) => node.href), ['guide']);
+  assert.deepEqual(tree[0].children[0].children.map((node) => node.href), ['guide/config']);
+  assert.equal(tree[0].children[0].title, 'راهنما');
+});
+
+test('should_flatten_when_all_levels_equal', () => {
+  const links = [
+    { href: 'a', title: 'یک', attrTitle: null, level: 1 },
+    { href: 'b', title: 'دو', attrTitle: null, level: 1 },
+  ];
+
+  const tree = buildSidebarTree(links);
+
+  assert.deepEqual(tree.map((node) => node.href), ['a', 'b']);
+  assert.deepEqual(tree[0].children, []);
+});
+
+test('should_skip_invalid_links_when_building_tree', () => {
+  const tree = buildSidebarTree([{ title: 'بدون href', level: 1 }, { href: 'ok', title: 'درست', attrTitle: null, level: 1 }]);
+
+  assert.deepEqual(tree.map((node) => node.href), ['ok']);
+});
+
+test('should_return_empty_tree_when_input_is_not_an_array', () => {
+  assert.deepEqual(buildSidebarTree(null), []);
 });

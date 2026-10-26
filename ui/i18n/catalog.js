@@ -23,6 +23,7 @@ export default {
     'shirazeh.toc.title': 'در این صفحه',
     'shirazeh.theme.to-dark': 'گذر به تم تاریک',
     'shirazeh.theme.to-light': 'گذر به تم روشن',
+    'shirazeh.sidebar.open': 'گشودن فهرست مستندات',
   },
   en: {
     'shirazeh.app-name': 'Shirazeh',
@@ -44,5 +45,6 @@ export default {
     'shirazeh.toc.title': 'On this page',
     'shirazeh.theme.to-dark': 'Switch to dark theme',
     'shirazeh.theme.to-light': 'Switch to light theme',
+    'shirazeh.sidebar.open': 'Open documentation menu',
   },
 };

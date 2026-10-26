@@ -185,9 +185,11 @@ test('should_return_sidebar_through_bound_services_when_ui_calls_get_sidebar', a
   const { uiContext, shutdown } = await bootShirazeh();
 
   try {
-    const links = await uiContext.services['shirazeh.docs.service'].getSidebar();
-    assert.equal(links.length, 3);
-    assert.deepEqual(links[0], { href: '/', title: 'خانه', attrTitle: 'صفحه اصلی شیرازه', level: 1 });
+    const sidebar = await uiContext.services['shirazeh.docs.service'].getSidebar();
+    assert.equal(sidebar.links.length, 3);
+    assert.deepEqual(sidebar.links[0], { href: '/', title: 'خانه', attrTitle: 'صفحه اصلی شیرازه', level: 1 });
+    assert.deepEqual(sidebar.tree.map((node) => node.href), ['/', 'about']);
+    assert.deepEqual(sidebar.tree[0].children.map((node) => node.href), ['guide']);
   } finally {
     await shutdown();
   }
