@@ -74,6 +74,36 @@ export default {
     enabled: true,
   },
 
+  /**
+   * نام برنامه — در نوار بالا و عنوان زبانه مرورگر.
+   */
+  appName: 'شیرازه',
+
+  /**
+   * لوگوی کنار نام برنامه. برای فعال‌سازی، enabled را true و src را مسیر تصویر بگذارید.
+   */
+  logo: {
+    enabled: false,
+    src: '/assets/icon/logo.svg',
+    size: '32px',
+  },
+
+  /**
+   * فاویکون زبانه مرورگر.
+   */
+  favicon: {
+    enabled: false,
+    src: '',
+  },
+
+  /**
+   * پیوند گیت‌هاب در نوار بالا. برای نمایش، enabled را true و url را بگذارید.
+   */
+  githubCorner: {
+    enabled: false,
+    url: '',
+  },
+
   // کلیدهای بیشتری در نسخه‌های بعدی اضافه می‌شوند:
-  // appName، logo، favicon، codeCopy، title، notFoundPage…
+  // codeCopy، title…
 };

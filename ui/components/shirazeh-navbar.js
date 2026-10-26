@@ -1,5 +1,5 @@
-// Top navigation bar: application title, home link, theme toggle, and
-// language switch.
+// Top navigation bar: logo/brand, home link, theme toggle, language switch,
+// and the optional GitHub link.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
 import appCatalog from '../i18n/catalog.js';
@@ -12,6 +12,14 @@ const THEME_KEY = 'theme';
 const DIRECTION_BY_LANGUAGE = { fa: 'rtl', en: 'ltr' };
 const LANGUAGES = ['fa', 'en'];
 
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
 class ShirazehNavbar extends PeyElement {
   #sharedState = null;
   #i18n = null;
@@ -19,6 +27,9 @@ class ShirazehNavbar extends PeyElement {
   #fallbackPath = null;
   #themeController = null;
   #prefs = null;
+  #appName = '';
+  #logo = null;
+  #githubCorner = null;
   #theme = 'light';
   #unsubscribers = [];
 
@@ -27,6 +38,11 @@ class ShirazehNavbar extends PeyElement {
     this.#router = refs.router ?? null;
     this.#themeController = refs.themeController ?? null;
     this.#prefs = refs.prefs ?? null;
+    this.#appName = typeof refs.appName === 'string' && refs.appName.trim().length > 0
+      ? refs.appName
+      : null;
+    this.#logo = refs.logo ?? null;
+    this.#githubCorner = refs.githubCorner ?? null;
     this.#fallbackPath = typeof refs.fallbackPath === 'string' ? refs.fallbackPath : '/';
     this.#theme = this.#sharedState?.get(THEME_KEY) ?? 'light';
     this.#buildI18n(this.#sharedState?.get(LANGUAGE_KEY) ?? 'fa');
@@ -139,6 +155,17 @@ class ShirazehNavbar extends PeyElement {
     }).join('');
     const themeIcon = this.#theme === 'dark' ? '☀' : '🌙';
     const themeLabel = this.#theme === 'dark' ? t('shirazeh.theme.to-light') : t('shirazeh.theme.to-dark');
+    const appName = this.#appName ?? t('shirazeh.app-name');
+    const logo = this.#logo ?? {};
+    const logoHtml = logo.enabled === true && typeof logo.src === 'string' && logo.src.length > 0
+      ? `<img class="brand-logo" src="${escapeHtml(logo.src)}" alt="" style="inline-size: ${escapeHtml(logo.size ?? '32px')}">`
+      : '';
+    const github = this.#githubCorner ?? {};
+    const githubHtml = github.enabled === true && typeof github.url === 'string' && github.url.length > 0
+      ? `<a class="github-link" href="${escapeHtml(github.url)}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+           <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+         </a>`
+      : '';
 
     return `
       <style>
@@ -166,6 +193,18 @@ class ShirazehNavbar extends PeyElement {
         .brand strong {
           font-size: var(--pey-font-size-lg);
         }
+        .brand-logo {
+          align-self: center;
+          border-radius: var(--pey-radius-sm);
+        }
+        .github-link {
+          display: inline-flex;
+          align-items: center;
+          color: var(--pey-color-text);
+        }
+        .github-link:hover {
+          color: var(--pey-color-accent);
+        }
         .actions {
           display: flex;
           gap: var(--pey-space-2);
@@ -190,10 +229,12 @@ class ShirazehNavbar extends PeyElement {
       </style>
       <nav class="bar" aria-label="${t('shirazeh.app-name')}">
         <a class="brand" href="#/" data-home>
-          <strong>${t('shirazeh.app-name')}</strong>
+          ${logoHtml}
+          <strong>${escapeHtml(appName)}</strong>
           <span>${t('shirazeh.nav.home')}</span>
         </a>
         <div class="actions">
+          ${githubHtml}
           <button type="button" data-theme-toggle aria-label="${themeLabel}" title="${themeLabel}">${themeIcon}</button>
           ${languageButtons}
         </div>

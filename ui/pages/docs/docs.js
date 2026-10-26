@@ -73,6 +73,7 @@ class DocsPage extends PeyElement {
     this.#config = refs.config ?? {};
     this.#events = refs.events ?? null;
     this.#sharedState = refs.sharedState ?? null;
+    this.#appName = typeof refs.appName === 'string' && refs.appName.trim().length > 0 ? refs.appName : null;
     this.#path = routePathFromParams(refs.routeParams);
     this.#anchorTarget = typeof refs.routeQuery?.a === 'string' ? refs.routeQuery.a : null;
   }
@@ -82,6 +83,7 @@ class DocsPage extends PeyElement {
   #events = null;
   #sharedState = null;
   #unsubscribeTheme = null;
+  #appName = null;
 
   connectedCallback() {
     super.connectedCallback();
@@ -148,7 +150,7 @@ class DocsPage extends PeyElement {
   // title attribute → sidebar label → first heading), else the app name
   // alone for error and not-found states.
   #applyDocumentTitle(documentTitle) {
-    const appName = this.#t('shirazeh.app-name');
+    const appName = this.#appName ?? this.#t('shirazeh.app-name');
     if (typeof documentTitle === 'string' && documentTitle.length > 0) {
       document.title = `${documentTitle} | ${appName}`;
     } else {

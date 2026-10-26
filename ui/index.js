@@ -110,10 +110,25 @@ export const setup = createApplicationSetup({
         fallbackPath: resources.config.fallbackPath,
         themeController,
         prefs: resources.optional?.[PREFS_SERVICE] ?? null,
+        appName: resources.config.appName,
+        logo: resources.config.logo,
+        githubCorner: resources.config.githubCorner,
       },
     });
     shell.append(navbar);
     resources.navbar = navbar;
+
+    // Favicon: the configured icon overrides the default tag in index.html.
+    const favicon = resources.config.favicon ?? {};
+    if (favicon.enabled === true && typeof favicon.src === 'string' && favicon.src.length > 0) {
+      for (const existing of [...document.querySelectorAll('link[rel*="icon"]')]) {
+        existing.remove();
+      }
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.href = favicon.src;
+      document.head.append(link);
+    }
 
     // Stored preferences override the configured defaults right after the
     // first paint; the prefs service degrades to null when unavailable.
@@ -150,6 +165,7 @@ export const setup = createApplicationSetup({
         events: resources.events,
         t: i18n.t,
         format: i18n.format,
+        appName: resources.config.appName,
       },
       config: resources.config,
     });
