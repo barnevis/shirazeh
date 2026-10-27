@@ -408,19 +408,17 @@ class DocsPage extends PeyElement {
     }
 
     const page = this.#state.page;
-    const isRtl = (document.documentElement.dir || 'rtl') !== 'ltr';
-    // In RTL, previous sits to the right (chevron points right) and next to
-    // the left; the icons mirror in LTR.
-    const chevronRight = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+    // Physical layout per the requested design: previous at the LEFT end
+    // (chevron pointing left, before the name), next at the RIGHT end
+    // (chevron pointing right, after the name) — stable in both directions.
     const chevronLeft = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
-    const previousIcon = isRtl ? chevronRight : chevronLeft;
-    const nextIcon = isRtl ? chevronLeft : chevronRight;
+    const chevronRight = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
 
     const previous = page.previous
-      ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}" title="${escapeHtml(page.previous.title)}">${previousIcon}</a>`
+      ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}" title="${escapeHtml(page.previous.title)}">${chevronLeft}<span class="pager-title">${escapeHtml(page.previous.title)}</span></a>`
       : '<span class="pager-placeholder"></span>';
     const next = page.next
-      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}" title="${escapeHtml(page.next.title)}">${nextIcon}</a>`
+      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}" title="${escapeHtml(page.next.title)}"><span class="pager-title">${escapeHtml(page.next.title)}</span>${chevronRight}</a>`
       : '<span class="pager-placeholder"></span>';
 
     return `
@@ -545,18 +543,23 @@ class DocsPage extends PeyElement {
           gap: var(--pey-space-4);
           max-inline-size: 800px;
           margin: var(--pey-space-8) auto 0;
+          /* Physical placement: previous button at the left end, next at the
+             right end, stable in both UI directions. */
+          direction: ltr;
         }
         .pager-button {
           display: inline-flex;
           align-items: center;
-          justify-content: center;
-          inline-size: 44px;
-          block-size: 44px;
-          border-radius: 50%;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          border-radius: 999px;
           border: 1px solid var(--pey-color-border);
           background-color: var(--pey-color-canvas);
           color: var(--pey-color-text);
           cursor: pointer;
+          font-family: var(--pey-font-family-base);
+          font-size: var(--pey-font-size-sm);
+          max-inline-size: 100%;
           transition: color 0.2s, border-color 0.2s, background-color 0.2s;
         }
         .pager-button:hover {
@@ -569,12 +572,20 @@ class DocsPage extends PeyElement {
           outline-offset: 1px;
         }
         .pager-button svg {
-          inline-size: 20px;
-          block-size: 20px;
+          inline-size: 16px;
+          block-size: 16px;
+          flex-shrink: 0;
+        }
+        .pager-title {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-inline-size: 14rem;
         }
         .pager-placeholder {
-          inline-size: 44px;
-          block-size: 44px;
+          visibility: hidden;
+          min-inline-size: 40px;
+          block-size: 40px;
         }
         a:focus-visible {
           outline: 2px solid var(--pey-color-focus-ring);
