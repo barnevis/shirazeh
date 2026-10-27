@@ -58,15 +58,15 @@ test('should_render_brand_header_with_logo_and_name', async () => {
 });
 
 test('should_toggle_submenu_with_animation_classes', async () => {
-  const { shadow, sidebar } = await mount({ path: '/about' });
+  const { shadow } = await mount({ path: '/about' });
 
-  const toggle = shadow.querySelector('button.submenu-toggle');
-  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
-  toggle.click();
-  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  const chevron = shadow.querySelector('.submenu-arrow[data-sidebar-toggle]');
+  assert.equal(chevron.getAttribute('aria-expanded'), 'false');
+  chevron.click();
+  assert.equal(chevron.getAttribute('aria-expanded'), 'true');
   assert.equal(shadow.querySelectorAll('.sidebar-submenu.open').length, 1);
-  toggle.click();
-  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  chevron.click();
+  assert.equal(chevron.getAttribute('aria-expanded'), 'false');
 });
 
 test('should_navigate_through_router_when_link_clicked', async () => {

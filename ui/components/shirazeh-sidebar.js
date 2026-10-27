@@ -76,7 +76,16 @@ class ShirazehSidebar extends PeyElement {
       return;
     }
 
-    const toggle = target.closest('button[data-sidebar-toggle]');
+    // Chevron after the title (link parents): toggles the submenu instead of
+    // navigating — the click must not fall through to the anchor.
+    const chevron = target.closest('.submenu-arrow');
+    if (chevron !== null) {
+      event.preventDefault();
+      this.#toggleSubmenu(chevron);
+      return;
+    }
+
+    const toggle = target.closest('.submenu-toggle');
     if (toggle !== null) {
       event.preventDefault();
       this.#toggleSubmenu(toggle);
@@ -84,31 +93,24 @@ class ShirazehSidebar extends PeyElement {
     }
 
     // Collapse button: closes the drawer on mobile, collapses the column on
-    // desktop — the old body.sidebar-collapsed behavior.
+    // desktop; clicking again reopens — the old sidebar-collapsed toggle.
+    // State lives on the host class only: a requestRender here would wipe the
+    // shadow root and destroy the mounted component.
     if (target.closest('button[data-sidebar-collapse]') !== null) {
-      this.#collapsed = true;
-      this.classList.add('is-collapsed');
-      this.requestRender({ preserve: false });
+      this.#collapsed = !this.#collapsed;
+      this.classList.toggle('is-collapsed', this.#collapsed);
       return;
     }
 
-    // Mobile drawer controls: hamburger opens, overlay closes.
-    const hamburger = target.closest('button[data-sidebar-hamburger]');
-    if (hamburger !== null) {
-      this.#collapsed = false;
-      this.classList.remove('is-collapsed');
-      this.requestRender({ preserve: false });
-      return;
-    }
     if (target.closest('[data-sidebar-overlay]') !== null) {
       this.#collapsed = true;
       this.classList.add('is-collapsed');
-      this.requestRender({ preserve: false });
       return;
     }
 
     // Navigating to a sidebar page re-opens its branch and closes the drawer;
     // navigation itself goes through the router like every other chrome link.
+    // The fresh page mount re-applies the branch state from #openIds.
     const link = target.closest('a[data-route]');
     if (link !== null) {
       event.preventDefault();
@@ -120,7 +122,6 @@ class ShirazehSidebar extends PeyElement {
         this.classList.add('is-collapsed');
       }
       this.#router?.navigate?.(route);
-      this.requestRender({ preserve: false });
       return;
     }
   }
@@ -134,23 +135,39 @@ class ShirazehSidebar extends PeyElement {
       this.#openIds.add(key);
     }
     toggle.setAttribute('aria-expanded', String(!isOpen));
-    toggle.closest('li')?.querySelector('.sidebar-submenu')?.classList.toggle('open', !isOpen);
+    const listItem = toggle.closest('li');
+    listItem?.querySelector('.sidebar-submenu')?.classList.toggle('open', !isOpen);
+    listItem?.classList.toggle('open', !isOpen);
   }
 
   #renderNodes(nodes) {
     return nodes.map((node) => {
       const route = normalizeHref(node.href);
       const hasChildren = node.children.length > 0;
-      const isCurrent = route === this.#path ? ' class="active"' : '';
       const isOpen = this.#openIds.has(node.href);
-      const self = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(node.title)}</a>`;
-      const toggle = hasChildren
-        ? `<button type="button" class="submenu-toggle" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}"><span class="submenu-arrow"></span></button>`
+      const liClass = [
+        hasChildren ? 'has-submenu' : '',
+        hasChildren && isOpen ? 'open' : '',
+      ].filter(Boolean).join(' ');
+
+      // Chevron sits exactly after the title (old app layout): inside the
+      // link for link-parents, inside a full-width toggle for text parents.
+      const arrow = hasChildren
+        ? `<span class="submenu-arrow" role="button" tabindex="0" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}" aria-label="زیرمنو"></span>`
         : '';
+
+      let entry;
+      if (node.type === 'text') {
+        entry = `<button type="button" class="submenu-toggle" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}">${escapeHtml(node.title)}${arrow}</button>`;
+      } else {
+        const isCurrent = route === this.#path ? ' class="active"' : '';
+        entry = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(node.title)}${arrow}</a>`;
+      }
+
       const submenu = hasChildren
         ? `<ul class="sidebar-submenu${isOpen ? ' open' : ''}">${this.#renderNodes(node.children)}</ul>`
         : '';
-      return `<li class="${hasChildren ? 'has-submenu' : ''}${isOpen && hasChildren ? ' open' : ''}">${self}${toggle}${submenu}</li>`;
+      return `<li class="${liClass}">${entry}${submenu}</li>`;
     }).join('');
   }
 
@@ -283,15 +300,25 @@ class ShirazehSidebar extends PeyElement {
           max-block-size: 1000px;
         }
         .submenu-arrow {
-          margin-inline-start: auto;
+          /* Chevron hugs the title: small fixed gap after the label text. */
+          margin-inline-start: 0.5rem;
           transition: transform 0.3s ease;
           flex-shrink: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: var(--pey-color-text-muted);
         }
         .submenu-arrow::before {
           content: '›';
           display: inline-block;
           font-weight: bold;
         }
+        .sidebar-nav a:hover .submenu-arrow {
+          color: inherit;
+        }
+        li.has-submenu.open > a > .submenu-arrow,
         li.has-submenu.open > .submenu-toggle .submenu-arrow {
           transform: rotate(-90deg);
         }
