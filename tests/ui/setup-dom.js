@@ -20,6 +20,21 @@ globalThis.IntersectionObserver = class {
   disconnect() {}
 };
 
+// jsdom never fires load/error for <link rel=preload> elements, which would
+// leave PeyElement's stylesheet gate pending forever and block the first
+// contentful render. Simulate the browser: any preload link added to the
+// document head settles its load event on the next task.
+const preloadObserver = new dom.window.MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (node.tagName === 'LINK' && node.getAttribute('rel') === 'preload') {
+        setTimeout(() => node.dispatchEvent(new dom.window.Event('load')), 0);
+      }
+    }
+  }
+});
+preloadObserver.observe(document.head, { childList: true });
+
 export function createEventsRecorder() {
   const published = [];
   return {

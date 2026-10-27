@@ -416,8 +416,14 @@ class DocsPage extends PeyElement {
     const chevronLeft = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
     const chevronRight = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
 
-    const previousTitle = `<span class="pager-title">${escapeHtml(page.previous.title)}</span>`;
-    const nextTitle = `<span class="pager-title">${escapeHtml(page.next.title)}</span>`;
+    // Title fragments are guarded: previous/next are null at the ends of
+    // the sidebar chain (e.g. the last page has no next).
+    const previousTitle = page.previous
+      ? `<span class="pager-title">${escapeHtml(page.previous.title)}</span>`
+      : '';
+    const nextTitle = page.next
+      ? `<span class="pager-title">${escapeHtml(page.next.title)}</span>`
+      : '';
     const previous = page.previous
       ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}" title="${escapeHtml(page.previous.title)}">${isRtl ? chevronRight + previousTitle : previousTitle + chevronRight}</a>`
       : '<span class="pager-placeholder"></span>';
