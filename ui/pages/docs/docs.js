@@ -408,17 +408,20 @@ class DocsPage extends PeyElement {
     }
 
     const page = this.#state.page;
-    // Physical layout per the requested design: previous at the LEFT end
-    // (chevron pointing left, before the name), next at the RIGHT end
-    // (chevron pointing right, after the name) — stable in both directions.
+    // Pager centered under the prose: previous on the RIGHT, next on the
+    // LEFT (RTL reading), mirrored in LTR. The chevron sits toward the
+    // screen edge of each button, per the requested design.
+    const isRtl = (document.documentElement.dir || 'rtl') !== 'ltr';
     const chevronLeft = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
     const chevronRight = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
 
+    const previousTitle = `<span class="pager-title">${escapeHtml(page.previous.title)}</span>`;
+    const nextTitle = `<span class="pager-title">${escapeHtml(page.next.title)}</span>`;
     const previous = page.previous
-      ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}" title="${escapeHtml(page.previous.title)}">${chevronLeft}<span class="pager-title">${escapeHtml(page.previous.title)}</span></a>`
+      ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}" title="${escapeHtml(page.previous.title)}">${isRtl ? previousTitle + chevronLeft : chevronLeft + previousTitle}</a>`
       : '<span class="pager-placeholder"></span>';
     const next = page.next
-      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}" title="${escapeHtml(page.next.title)}"><span class="pager-title">${escapeHtml(page.next.title)}</span>${chevronRight}</a>`
+      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}" title="${escapeHtml(page.next.title)}">${isRtl ? chevronRight + nextTitle : nextTitle + chevronRight}</a>`
       : '<span class="pager-placeholder"></span>';
 
     return `
@@ -541,9 +544,8 @@ class DocsPage extends PeyElement {
           display: flex;
           justify-content: space-between;
           gap: var(--pey-space-4);
-          /* Physical placement: previous button at the left end, next at the
-             right end, stable in both UI directions. */
-          direction: ltr;
+          max-inline-size: 800px;
+          margin: var(--pey-space-8) auto 0;
         }
         .pager-button {
           display: inline-flex;
