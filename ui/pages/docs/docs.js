@@ -422,7 +422,7 @@ class DocsPage extends PeyElement {
       ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}" title="${escapeHtml(page.previous.title)}">${isRtl ? chevronRight + previousTitle : previousTitle + chevronRight}</a>`
       : '<span class="pager-placeholder"></span>';
     const next = page.next
-      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}" title="${escapeHtml(page.next.title)}">${isRtl ? chevronLeft + nextTitle : nextTitle + chevronLeft}</a>`
+      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}" title="${escapeHtml(page.next.title)}">${isRtl ? nextTitle + chevronLeft : nextTitle + chevronRight}</a>`
       : '<span class="pager-placeholder"></span>';
 
     return `
