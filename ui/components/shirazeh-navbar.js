@@ -10,7 +10,6 @@ const LANGUAGE_KEY = 'language';
 const DIRECTION_KEY = 'direction';
 const THEME_KEY = 'theme';
 const DIRECTION_BY_LANGUAGE = { fa: 'rtl', en: 'ltr' };
-const LANGUAGES = ['fa', 'en'];
 const ZONES = ['left', 'center', 'right'];
 
 function escapeHtml(text) {
@@ -288,10 +287,12 @@ class ShirazehNavbar extends PeyElement {
 
   render() {
     const t = this.#i18n?.t ?? ((key) => key);
-    const languageButtons = LANGUAGES.map((language) => {
-      const label = language === 'fa' ? t('shirazeh.nav.language-fa') : t('shirazeh.nav.language-en');
-      return `<button type="button" data-language="${language}">${label}</button>`;
-    }).join('');
+    // One toggle button showing the language it switches TO: the Persian UI
+    // offers "EN", the English UI offers "فا". Labels are fixed (language
+    // names are not translated content).
+    const currentLanguage = this.#i18n?.language ?? 'fa';
+    const targetLanguage = currentLanguage === 'fa' ? 'en' : 'fa';
+    const targetLabel = targetLanguage === 'en' ? 'EN' : 'فا';
     const themeIcon = this.#theme === 'dark' ? '☀' : '🌙';
     const themeLabel = this.#theme === 'dark' ? t('shirazeh.theme.to-light') : t('shirazeh.theme.to-dark');
     const appName = this.#appName ?? t('shirazeh.app-name');
@@ -482,7 +483,7 @@ class ShirazehNavbar extends PeyElement {
         <div class="actions">
           ${githubHtml}
           <button type="button" data-theme-toggle aria-label="${themeLabel}" title="${themeLabel}">${themeIcon}</button>
-          ${languageButtons}
+          <button type="button" data-language="${targetLanguage}" aria-label="${escapeHtml(t('shirazeh.nav.switch-language'))}" title="${escapeHtml(t('shirazeh.nav.switch-language'))}">${targetLabel}</button>
         </div>
       </nav>
     `;

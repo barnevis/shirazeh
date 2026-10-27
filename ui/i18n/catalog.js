@@ -6,8 +6,6 @@ export default {
   fa: {
     'shirazeh.app-name': 'شیرازه',
     'shirazeh.nav.home': 'خانه',
-    'shirazeh.nav.language-fa': 'فارسی',
-    'shirazeh.nav.language-en': 'English',
     'shirazeh.page.loading': 'در حال بارگذاری…',
     'shirazeh.page.not-found-title': 'صفحه پیدا نشد',
     'shirazeh.page.not-found-body': 'نشانی‌ای که وارد کرده‌اید وجود ندارد.',
@@ -21,6 +19,7 @@ export default {
     'shirazeh.code-copy.copied': 'رونوشت شد',
     'shirazeh.code-copy.copy-failed': 'خطا',
     'shirazeh.toc.title': 'در این صفحه',
+    'shirazeh.nav.switch-language': 'تغییر زبان',
     'shirazeh.theme.to-dark': 'گذر به تم تاریک',
     'shirazeh.theme.to-light': 'گذر به تم روشن',
     'shirazeh.sidebar.open': 'گشودن فهرست مستندات',
@@ -33,8 +32,6 @@ export default {
   en: {
     'shirazeh.app-name': 'Shirazeh',
     'shirazeh.nav.home': 'Home',
-    'shirazeh.nav.language-fa': 'فارسی',
-    'shirazeh.nav.language-en': 'English',
     'shirazeh.page.loading': 'Loading…',
     'shirazeh.page.not-found-title': 'Page not found',
     'shirazeh.page.not-found-body': 'The address you opened does not exist.',
@@ -48,6 +45,7 @@ export default {
     'shirazeh.code-copy.copied': 'Copied',
     'shirazeh.code-copy.copy-failed': 'Error',
     'shirazeh.toc.title': 'On this page',
+    'shirazeh.nav.switch-language': 'Switch language',
     'shirazeh.theme.to-dark': 'Switch to dark theme',
     'shirazeh.theme.to-light': 'Switch to light theme',
     'shirazeh.sidebar.open': 'Open documentation menu',
