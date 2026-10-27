@@ -408,12 +408,20 @@ class DocsPage extends PeyElement {
     }
 
     const page = this.#state.page;
+    const isRtl = (document.documentElement.dir || 'rtl') !== 'ltr';
+    // In RTL, previous sits to the right (chevron points right) and next to
+    // the left; the icons mirror in LTR.
+    const chevronRight = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+    const chevronLeft = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
+    const previousIcon = isRtl ? chevronRight : chevronLeft;
+    const nextIcon = isRtl ? chevronLeft : chevronRight;
+
     const previous = page.previous
-      ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}">${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}</a>`
-      : '<span></span>';
+      ? `<a href="#${escapeHtml(normalizeHref(page.previous.href))}" data-route="${escapeHtml(normalizeHref(page.previous.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.previous'))}: ${escapeHtml(page.previous.title)}" title="${escapeHtml(page.previous.title)}">${previousIcon}</a>`
+      : '<span class="pager-placeholder"></span>';
     const next = page.next
-      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}">${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}</a>`
-      : '<span></span>';
+      ? `<a href="#${escapeHtml(normalizeHref(page.next.href))}" data-route="${escapeHtml(normalizeHref(page.next.href))}" class="pager-button" aria-label="${escapeHtml(t('shirazeh.page.next'))}: ${escapeHtml(page.next.title)}" title="${escapeHtml(page.next.title)}">${nextIcon}</a>`
+      : '<span class="pager-placeholder"></span>';
 
     return `
       <div part="content" class="content">
@@ -537,15 +545,36 @@ class DocsPage extends PeyElement {
           gap: var(--pey-space-4);
           max-inline-size: 800px;
           margin: var(--pey-space-8) auto 0;
-          padding-block-start: var(--pey-space-4);
-          border-block-start: 1px solid var(--pey-color-border);
         }
-        .pager a {
-          color: var(--pey-color-secondary);
-          text-decoration: none;
+        .pager-button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          inline-size: 44px;
+          block-size: 44px;
+          border-radius: 50%;
+          border: 1px solid var(--pey-color-border);
+          background-color: var(--pey-color-canvas);
+          color: var(--pey-color-text);
+          cursor: pointer;
+          transition: color 0.2s, border-color 0.2s, background-color 0.2s;
         }
-        .pager a:hover {
-          text-decoration: underline;
+        .pager-button:hover {
+          color: var(--pey-color-accent);
+          border-color: var(--pey-color-accent);
+          background-color: var(--pey-color-surface);
+        }
+        .pager-button:focus-visible {
+          outline: 2px solid var(--pey-color-focus-ring);
+          outline-offset: 1px;
+        }
+        .pager-button svg {
+          inline-size: 20px;
+          block-size: 20px;
+        }
+        .pager-placeholder {
+          inline-size: 44px;
+          block-size: 44px;
         }
         a:focus-visible {
           outline: 2px solid var(--pey-color-focus-ring);
