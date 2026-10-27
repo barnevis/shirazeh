@@ -92,8 +92,8 @@ export default {
    * فاویکون زبانه مرورگر.
    */
   favicon: {
-    enabled: false,
-    src: '',
+    enabled: true,
+    src: './shirazeh.svg',
   },
 
   /**
@@ -102,6 +102,7 @@ export default {
   githubCorner: {
     enabled: false,
     url: '',
+    style: 'link', // یا 'corner' برای گوشه کلاسیک هشت‌پا
   },
 
   /**

@@ -1,6 +1,6 @@
 {
   "name": "shirazeh.ui",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "architecture": "0.11",
   "description": "Shirazeh documentation UI built with pey.webui",
   "dependencies": {
@@ -63,7 +63,12 @@
     },
     "githubCorner": {
       "enabled": false,
-      "url": ""
+      "url": "",
+      "style": "link"
+    },
+    "navbar": {
+      "sticky": true,
+      "scrollBehavior": "shrink"
     }
   }
 }

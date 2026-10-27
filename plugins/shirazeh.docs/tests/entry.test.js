@@ -103,7 +103,7 @@ test('should_match_manifest_contract_when_loaded', async () => {
   assert.equal(manifest.provides.length, 1);
   assert.equal(manifest.provides[0].name, 'shirazeh.docs.service');
   const methodNames = manifest.provides[0].methods.map((method) => method.name);
-  assert.deepEqual(methodNames, ['getSidebar', 'getPage', 'getRawMarkdown']);
+  assert.deepEqual(methodNames, ['getSidebar', 'getNavbar', 'getPage', 'getRawMarkdown']);
   assert.deepEqual(
     manifest.events.map((event) => event.name),
     ['docs:page-loaded'],

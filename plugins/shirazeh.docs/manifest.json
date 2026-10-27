@@ -29,6 +29,13 @@
           ]
         },
         {
+          "name": "getNavbar",
+          "description": "Returns the parsed navbar zones (left/center/right) from the configured navbarFile, or null when no navbar file is configured or it cannot be read. Zones contain typed items (link, text, divider) with optional cta/badge flags and nested submenu children. Cached after the first load.",
+          "params": [],
+          "returns": "Promise<{ zones: { left: NavbarItem[], center: NavbarItem[], right: NavbarItem[] } } | null>",
+          "errors": []
+        },
+        {
           "name": "getPage",
           "description": "Resolves a documentation route path (like '/guide/setup' or '/' for the home page) to a rendered page: fetches the underlying markdown document via the HTTP transport, renders it to sanitized HTML through the markdown service — with the parsneshan Persian dialect extensions injected per the `extensions` configuration — and returns the page with its table of contents, title, and previous/next links derived from the sidebar. `title` is the first h1/h2 heading text; `documentTitle` follows the sidebar title-attribute → sidebar label → heading chain and is intended for the browser tab title. When the document is missing and `notFoundPage` is configured, that document is rendered instead with `notFound: true` and no event. Publishes docs:page-loaded only on success.",
           "params": [
@@ -87,6 +94,7 @@
       "persianPoem": true,
       "persianFootnote": true
     },
-    "notFoundPage": null
+    "notFoundPage": null,
+    "navbarFile": null
   }
 }

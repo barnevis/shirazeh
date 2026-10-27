@@ -19,3 +19,4 @@ export const ERROR_CODES = Object.freeze({
 export const DEFAULT_DOCS_ROOT = './docs';
 export const DEFAULT_HOME_PAGE = 'README.md';
 export const DEFAULT_SIDEBAR_FILE = '_sidebar.md';
+export const DEFAULT_NAVBAR_FILE = null;

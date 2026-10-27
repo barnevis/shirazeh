@@ -3,12 +3,14 @@
 import {
   DEFAULT_DOCS_ROOT,
   DEFAULT_HOME_PAGE,
+  DEFAULT_NAVBAR_FILE,
   DEFAULT_SIDEBAR_FILE,
   ERROR_CODES,
   EVENT_NAMES,
 } from './constants.js';
 import { createDocsError } from './error.js';
 import { createParsneshanOptions } from './parsneshan-extensions.js';
+import { parseNavbar } from './navbar.js';
 import {
   buildSidebarTree,
   documentTitleForPath,
@@ -50,6 +52,7 @@ function normalizeConfig(config) {
     homePage: config.homePage || DEFAULT_HOME_PAGE,
     sidebarFile: config.sidebarFile || DEFAULT_SIDEBAR_FILE,
     notFoundPage: config.notFoundPage || null,
+    navbarFile: config.navbarFile || DEFAULT_NAVBAR_FILE,
   };
 }
 
@@ -62,12 +65,13 @@ function normalizeConfig(config) {
  * @returns {{service: object, bindDependencies: Function, deactivate: Function}} Service and lifecycle controls.
  */
 export function createDocsService({ config, publish }) {
-  const { docsRoot, homePage, sidebarFile, notFoundPage } = normalizeConfig(config);
+  const { docsRoot, homePage, sidebarFile, notFoundPage, navbarFile } = normalizeConfig(config);
   const parsneshanOptions = createParsneshanOptions(config.extensions);
   let available = true;
   let httpService = null;
   let markdownService = null;
   let sidebarCache = null;
+  let navbarCache = null;
 
   function assertAvailable() {
     if (!available) {
@@ -189,6 +193,35 @@ export function createDocsService({ config, publish }) {
           return { links, tree: buildSidebarTree(links) };
         } catch (error) {
           return isBonyanError(error) ? error : createDocsError(ERROR_CODES.SIDEBAR_PARSE_FAILED, 'The sidebar could not be loaded');
+        }
+      },
+
+      /**
+       * Returns the parsed navbar zones, or null when no navbar file is
+       * configured. The parsed result is cached.
+       *
+       * @returns {Promise<{zones: object}|null>} Zone structure or null.
+       */
+      async getNavbar() {
+        try {
+          assertAvailable();
+          if (navbarFile === null) {
+            return null;
+          }
+          if (navbarCache !== null) {
+            return navbarCache;
+          }
+
+          const http = requiredService(HTTP_SERVICE_NAME);
+          const result = await http.getText(`${docsRoot}/${navbarFile}`);
+          if (isBonyanError(result)) {
+            return null;
+          }
+
+          navbarCache = parseNavbar(result.body);
+          return navbarCache;
+        } catch (error) {
+          return isBonyanError(error) ? error : null;
         }
       },
 

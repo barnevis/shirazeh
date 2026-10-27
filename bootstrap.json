@@ -64,7 +64,8 @@
       "docsRoot": "./docs",
       "homePage": "README.md",
       "sidebarFile": "_sidebar.md",
-      "notFoundPage": "not-found.md"
+      "notFoundPage": "not-found.md",
+      "navbarFile": "config/navbar.md"
     },
     "ui": {
       "theme": "light",

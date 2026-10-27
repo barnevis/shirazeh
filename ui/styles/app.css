@@ -33,6 +33,18 @@ body {
   font-family: var(--pey-font-family-base);
 }
 
+/* Print: only the reading experience survives. Chrome (navbar), sidebar and
+   toc are component shadow trees, hidden from the page-level print sheet via
+   their host elements. */
+@media print {
+  shirazeh-navbar,
+  [data-sidebar-slot],
+  [data-toc-slot],
+  .boot-placeholder {
+    display: none !important;
+  }
+}
+
 .boot-placeholder {
   display: flex;
   align-items: center;

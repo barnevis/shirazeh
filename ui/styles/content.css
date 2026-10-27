@@ -184,10 +184,77 @@
   font-size: var(--pey-font-size-sm);
 }
 
+/* Export bar */
+.export-bar {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  margin-block-start: var(--pey-space-4);
+}
+.export-button {
+  font-family: var(--pey-font-family-base);
+  font-size: var(--pey-font-size-sm);
+  padding: var(--pey-space-1) var(--pey-space-3);
+  border: 1px solid var(--pey-color-border);
+  border-radius: var(--pey-radius-md);
+  background-color: var(--pey-color-canvas);
+  color: var(--pey-color-text);
+  cursor: pointer;
+}
+.export-button:hover {
+  border-color: var(--pey-color-accent);
+}
+.export-menu {
+  position: absolute;
+  inset-block-end: calc(100% + var(--pey-space-1));
+  inset-inline-end: 0;
+  min-inline-size: 10rem;
+  display: grid;
+  padding: var(--pey-space-1);
+  border: 1px solid var(--pey-color-border);
+  border-radius: var(--pey-radius-md);
+  background-color: var(--pey-color-canvas);
+  box-shadow: var(--pey-shadow-sm);
+  z-index: 5;
+}
+.export-menu[hidden] {
+  display: none;
+}
+.export-menu button {
+  font-family: var(--pey-font-family-base);
+  font-size: var(--pey-font-size-sm);
+  text-align: start;
+  padding: var(--pey-space-2) var(--pey-space-3);
+  border: none;
+  border-radius: var(--pey-radius-sm);
+  background: none;
+  color: var(--pey-color-text);
+  cursor: pointer;
+}
+.export-menu button:hover {
+  background-color: var(--pey-color-surface);
+}
+
 @media print {
   .markdown-body pre .copy-code-button,
   .page-toast,
-  .toc-panel {
+  .toc-panel,
+  .export-bar {
     display: none;
+  }
+  .markdown-body pre,
+  .markdown-body table,
+  .markdown-body img,
+  .markdown-body [class^='parsneshan-']:not(.parsneshan-poem):not(.parsneshan-verse):not(.parsneshan-hemistich) {
+    break-inside: avoid;
+  }
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3 {
+    break-after: avoid;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }

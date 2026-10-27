@@ -113,10 +113,29 @@ export const setup = createApplicationSetup({
         appName: resources.config.appName,
         logo: resources.config.logo,
         githubCorner: resources.config.githubCorner,
+        navbarZones: resources.navbarZones ?? null,
+        navbarConfig: resources.config.navbar ?? {},
       },
     });
     shell.append(navbar);
     resources.navbar = navbar;
+
+    // Rich navbar zones and the visually current path both arrive after the
+    // synchronous mount: zones from the async getNavbar, path from the
+    // router's changed events.
+    const docsService = resources.required[DOCS_SERVICE];
+    void Promise.resolve(docsService?.getNavbar?.()).then((navbar) => {
+      if (navbar !== null && navbar !== undefined) {
+        navbar.setZones(navbar);
+      }
+    }).catch(() => undefined);
+    resources.events.subscribe('router:changed', () => {
+      try {
+        navbar.setCurrentPath(resources.router.getCurrentRoute().path);
+      } catch {
+        // A route read failure only skips the active-link update.
+      }
+    });
 
     // Favicon: the configured icon overrides the default tag in index.html.
     const favicon = resources.config.favicon ?? {};
