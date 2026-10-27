@@ -30,11 +30,8 @@ class ShirazehNavbar extends PeyElement {
   #i18n = null;
   #router = null;
   #fallbackPath = null;
-  #themeController = null;
-  #prefs = null;
   #appName = '';
   #logo = null;
-  #githubCorner = null;
   #zones = null;
   #navbarConfig = {};
   #currentPath = '/';
@@ -46,13 +43,10 @@ class ShirazehNavbar extends PeyElement {
   onConnect(refs) {
     this.#sharedState = refs.sharedState ?? null;
     this.#router = refs.router ?? null;
-    this.#themeController = refs.themeController ?? null;
-    this.#prefs = refs.prefs ?? null;
     this.#appName = typeof refs.appName === 'string' && refs.appName.trim().length > 0
       ? refs.appName
       : null;
     this.#logo = refs.logo ?? null;
-    this.#githubCorner = refs.githubCorner ?? null;
     this.#zones = refs.navbarZones ?? null;
     this.#navbarConfig = refs.navbarConfig ?? {};
     this.#fallbackPath = typeof refs.fallbackPath === 'string' ? refs.fallbackPath : '/';
@@ -168,20 +162,6 @@ class ShirazehNavbar extends PeyElement {
       return;
     }
 
-    const languageButton = target.closest('button[data-language]');
-    if (languageButton !== null) {
-      this.#switchLanguage(languageButton.dataset.language);
-      return;
-    }
-
-    const themeButton = target.closest('button[data-theme-toggle]');
-    if (themeButton !== null) {
-      const next = this.#themeController?.currentTheme() === 'dark' ? 'light' : 'dark';
-      this.#themeController?.setTheme(next);
-      void this.#prefs?.set('theme', next);
-      return;
-    }
-
     const homeLink = target.closest('a[data-home]');
     if (homeLink !== null) {
       event.preventDefault();
@@ -267,18 +247,6 @@ class ShirazehNavbar extends PeyElement {
     }).join('');
   }
 
-  #switchLanguage(language) {
-    const direction = DIRECTION_BY_LANGUAGE[language];
-    if (direction === undefined || !this.#sharedState) {
-      return;
-    }
-
-    this.#sharedState.set(LANGUAGE_KEY, language);
-    this.#sharedState.set(DIRECTION_KEY, direction);
-    void this.#prefs?.set('language', language);
-    this.publishUIEvent('ui:language-changed', { language });
-  }
-
   #navigate(path) {
     if (this.#router && typeof this.#router.navigate === 'function') {
       this.#router.navigate(path);
@@ -287,28 +255,10 @@ class ShirazehNavbar extends PeyElement {
 
   render() {
     const t = this.#i18n?.t ?? ((key) => key);
-    // One toggle button showing the language it switches TO: the Persian UI
-    // offers "EN", the English UI offers "فا". Labels are fixed (language
-    // names are not translated content).
-    const currentLanguage = this.#i18n?.language ?? 'fa';
-    const targetLanguage = currentLanguage === 'fa' ? 'en' : 'fa';
-    const targetLabel = targetLanguage === 'en' ? 'EN' : 'فا';
-    const themeIcon = this.#theme === 'dark' ? '☀' : '🌙';
-    const themeLabel = this.#theme === 'dark' ? t('shirazeh.theme.to-light') : t('shirazeh.theme.to-dark');
     const appName = this.#appName ?? t('shirazeh.app-name');
     const logo = this.#logo ?? {};
     const logoHtml = logo.enabled === true && typeof logo.src === 'string' && logo.src.length > 0
       ? `<img class="brand-logo" src="${escapeHtml(logo.src)}" alt="" style="inline-size: ${escapeHtml(logo.size ?? '32px')}">`
-      : '';
-    const github = this.#githubCorner ?? {};
-    const githubHtml = github.enabled === true && typeof github.url === 'string' && github.url.length > 0
-      ? (github.style === 'corner'
-        ? `<a class="github-corner" href="${escapeHtml(github.url)}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
-             <svg viewBox="0 0 250 250" aria-hidden="true"><path d="M0 0 115 115h250V0Z"/><path class="octo-arm" d="M128.3 109c-14.5-9.3-9.3-19.4-9.3-19.4 3-6.9 1.5-11 1.5-11-1.3-6.6 2.9-2.3 3.9-1.7 4.6 2.7 7.4 10.1 7.4 10.1 5.6 13.5 14.6 10.1 18.1 7.7.4-4 .8-6.6 1-7.7-3.5-3.9-7.4-9.7-7.4-18.4 0-6.4 2-11.4 5.2-15.4-.5-.4-2.3-2.7 0-6.7 0 0 4.3 1.4 10.1 5.2 4.1-1.1 8.5-1.7 12.9-1.7s8.8.6 12.9 1.7c5.8-3.8 10.1-5.2 10.1-5.2 2.3 4 1.5 6.3.5 6.7 3.2 4 5.2 9 5.2 15.4 0 8.7-3.9 14.5-7.4 18.4.5.4 2.4 2.1 1 6.7-.1.1-4.5 8.9-19.4 9.3 2.6 2.2 4.9 6.4 4.9 12.9v19.2c0 2.1 1.5 4.6 5 3.8 30.7-10.2 52.8-39.2 52.8-73.2C250 55.7 194.3 0 125 0S0 55.7 0 124c0 34 22.1 63 52.8 73.2 3.5.8 5-1.7 5-3.8V169c-24.3 5.3-29.4-11.7-29.4-11.7-3.9-10-9.6-12.7-9.6-12.7-7.9-5.4.6-5.3.6-5.3 8.7.6 13.3 9 13.3 9 7.8 13.3 20.4 9.5 25.4 7.3.8-5.7 3-9.5 5.5-11.7-19.4-2.2-39.8-9.7-39.8-43.2 0-9.5 3.4-17.3 9-23.4-.9-2.2-3.9-11.1.9-23.1 0 0 7.3-2.3 23.9 8.9 6.9-1.9 14.4-2.9 21.8-3 7.4.1 14.9 1.1 21.8 3 16.6-11.2 23.9-8.9 23.9-8.9 4.8 12 1.8 20.9.9 23.1 5.6 6.1 9 13.9 9 23.4 0 33.6-20.5 41-40 43.2 3.1 2.7 5.9 8 5.9 16.1v23.9c0 2.1 1.4 4.6 5 3.8 30.6-10.3 52.7-39.2 52.7-73.3C250 55.7 194.3 0 125 0Z" fill="currentColor"/></svg>
-           </a>`
-        : `<a class="github-link" href="${escapeHtml(github.url)}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
-             <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-           </a>`)
       : '';
 
     return `
@@ -411,46 +361,10 @@ class ShirazehNavbar extends PeyElement {
           align-self: center;
           border-radius: var(--pey-radius-sm);
         }
-        .github-link {
-          display: inline-flex;
-          align-items: center;
-          color: var(--pey-color-text);
-        }
         .github-link:hover {
           color: var(--pey-color-accent);
         }
         /* Classic octocat corner (githubCorner.style === 'corner') */
-        .github-corner {
-          position: fixed;
-          inset-block-start: 0;
-          inset-inline-end: 0;
-          inline-size: 4.5rem;
-          block-size: 4.5rem;
-          color: var(--pey-color-canvas);
-          z-index: 40;
-        }
-        .github-corner svg {
-          inline-size: 100%;
-          block-size: 100%;
-          fill: var(--pey-color-text);
-        }
-        .github-corner .octo-arm {
-          transform-origin: 62% 35%;
-        }
-        .github-corner:hover .octo-arm {
-          animation: shirazeh-octo-wave 560ms ease-in-out;
-        }
-        @keyframes shirazeh-octo-wave {
-          0%, 100% { transform: rotate(0); }
-          20%, 60% { transform: rotate(-25deg); }
-          40%, 80% { transform: rotate(10deg); }
-        }
-        @media (max-width: 48rem) {
-          .github-corner {
-            inline-size: 3.4rem;
-            block-size: 3.4rem;
-          }
-        }
         .actions {
           display: flex;
           gap: var(--pey-space-2);
@@ -480,11 +394,6 @@ class ShirazehNavbar extends PeyElement {
           <strong>${escapeHtml(appName)}</strong>
           <span>${t('shirazeh.nav.home')}</span>
         </a>
-        <div class="actions">
-          ${githubHtml}
-          <button type="button" data-theme-toggle aria-label="${themeLabel}" title="${themeLabel}">${themeIcon}</button>
-          <button type="button" data-language="${targetLanguage}" aria-label="${escapeHtml(t('shirazeh.nav.switch-language'))}" title="${escapeHtml(t('shirazeh.nav.switch-language'))}">${targetLabel}</button>
-        </div>
       </nav>
     `;
   }

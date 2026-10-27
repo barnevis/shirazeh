@@ -129,7 +129,10 @@ class DocsPage extends PeyElement {
 
     const [page, sidebar] = await Promise.all([
       this.#docsService.getPage(path),
-      this.#docsService.getSidebar().catch(() => null),
+      this.#docsService.getSidebar().catch((error) => {
+        console.error('[app-page-docs] getSidebar failed:', error);
+        return null;
+      }),
     ]);
 
     // A newer route may have mounted while the fetch was in flight.
@@ -221,7 +224,8 @@ class DocsPage extends PeyElement {
             tree: this.#sidebar.tree,
             path: this.#path,
             router: this.#router,
-            openLabel: this.#t('shirazeh.sidebar.open'),
+            appName: this.#appName,
+            logo: this.#config.logo,
           },
         });
         sidebarSlot.append(sidebar);
@@ -407,7 +411,11 @@ class DocsPage extends PeyElement {
     const t = this.#t;
 
     if (this.#state.status === 'loading') {
-      return `<div part="content" class="content loading">${escapeHtml(t('shirazeh.page.loading'))}</div>`;
+      return `
+        <div part="content" class="content is-loading">
+          <div class="loading-message"><p>${escapeHtml(t('shirazeh.page.loading'))}</p></div>
+        </div>
+      `;
     }
 
     if (this.#state.status === 'error') {
@@ -415,10 +423,12 @@ class DocsPage extends PeyElement {
       const title = isNotFound ? t('shirazeh.page.not-found-title') : t('shirazeh.page.error-title');
       const body = isNotFound ? t('shirazeh.page.not-found-body') : escapeHtml(this.#state.code);
       return `
-        <div part="content" class="content">
-          <h1>${escapeHtml(title)}</h1>
-          <p>${body}</p>
-          <p><a href="#/" data-route="/">${escapeHtml(t('shirazeh.page.go-home'))}</a></p>
+        <div part="content" class="content is-error">
+          <div class="error-message" role="alert">
+            <p><strong>${escapeHtml(title)}</strong></p>
+            <p>${body}</p>
+            <p><a href="#/" data-route="/">${escapeHtml(t('shirazeh.page.go-home'))}</a></p>
+          </div>
         </div>
       `;
     }
@@ -432,12 +442,14 @@ class DocsPage extends PeyElement {
       : '<span></span>';
 
     return `
-      <article part="content" class="content markdown-body">${page.html}</article>
-      ${this.#exportBarHtml(page)}
-      <nav part="pager" class="pager" aria-label="pagination">
-        ${previous}
-        ${next}
-      </nav>
+      <div part="content" class="content">
+        <article part="content" class="prose markdown-body">${page.html}</article>
+        ${this.#exportBarHtml(page)}
+        <nav part="pager" class="pager" aria-label="pagination">
+          ${previous}
+          ${next}
+        </nav>
+      </div>
     `;
   }
 
@@ -449,9 +461,7 @@ class DocsPage extends PeyElement {
 
     return `
       <div class="export-bar">
-        <button type="button" class="export-button" data-export-toggle aria-haspopup="true" aria-expanded="false">
-          ⤓ ${escapeHtml(this.#t('shirazeh.export.download'))}
-        </button>
+        <button type="button" class="export-button" data-export-toggle aria-haspopup="true" aria-expanded="false" aria-label="${escapeHtml(this.#t('shirazeh.export.download'))}" title="${escapeHtml(this.#t('shirazeh.export.download'))}">⤓</button>
         <div class="export-menu" data-export-menu hidden>
           <button type="button" data-export="html">${escapeHtml(this.#t('shirazeh.export.html'))}</button>
           <button type="button" data-export="md">${escapeHtml(this.#t('shirazeh.export.md'))}</button>
@@ -532,44 +542,39 @@ class DocsPage extends PeyElement {
         :host {
           display: block;
         }
+        /* Old layout.css: flex row, sidebar in flow, content fills the rest */
         .layout {
-          display: grid;
-          grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
-          gap: var(--pey-space-8);
-          inline-size: min(100% - 2rem, 72rem);
-          margin-inline: auto;
-          padding-block: var(--pey-space-6) var(--pey-space-8);
+          display: flex;
+          min-block-size: 100vh;
         }
-        @media (max-width: 55rem) {
-          .layout {
-            grid-template-columns: minmax(0, 1fr);
-          }
-          [data-sidebar-slot] {
-            border-block-end: 1px solid var(--pey-color-border);
-            padding-block-end: var(--pey-space-4);
-          }
+        [data-sidebar-slot] {
+          display: contents;
         }
         .content {
+          flex-grow: 1;
           min-inline-size: 0;
+          padding: 1.5rem;
+          display: flex;
+          flex-direction: column;
         }
-        .content.loading {
-          color: var(--pey-color-text-muted);
-          padding-block: var(--pey-space-8);
+        .prose {
+          inline-size: 100%;
         }
         .pager {
           display: flex;
           justify-content: space-between;
           gap: var(--pey-space-4);
-          margin-block-start: var(--pey-space-8);
+          max-inline-size: 800px;
+          margin: var(--pey-space-8) auto 0;
           padding-block-start: var(--pey-space-4);
           border-block-start: 1px solid var(--pey-color-border);
         }
         .pager a {
-          color: var(--pey-color-accent);
+          color: var(--pey-color-secondary);
           text-decoration: none;
         }
-        a {
-          color: var(--pey-color-accent);
+        .pager a:hover {
+          text-decoration: underline;
         }
         a:focus-visible {
           outline: 2px solid var(--pey-color-focus-ring);

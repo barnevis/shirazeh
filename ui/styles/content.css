@@ -1,38 +1,109 @@
 /* Content-area styles for the documentation page (loaded into the page's
-   shadow root via PeyElement.stylesheetHref). Covers the rendered markdown
-   body and the display enhancements injected over it: heading anchors,
-   copy-code buttons, toasts, tables, the parsneshan dialect blocks, and
-   footnotes. Sidebar and TOC panel styles live inside their own components. */
+   shadow root via PeyElement.stylesheetHref). Visual port of the old
+   Shirazeh prose.css + messages.css: old palette, centered prose, colored
+   headings, dark code blocks, striped tables, and the spinner/error
+   messages. Sidebar and TOC panel styles live inside their own components. */
 
-.markdown-body {
-  line-height: var(--pey-line-height-base);
+.content {
+  padding: 1.5rem;
+}
+
+/* Prose container (old prose.css) */
+.prose {
+  max-inline-size: 800px;
+  margin-inline: auto;
 }
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
-  line-height: 1.3;
+  color: var(--pey-color-accent);
+  font-weight: 700;
 }
-.markdown-body h1,
-.markdown-body h2 {
+.markdown-body h1 {
+  font-size: 2.25rem;
+  margin-block-end: 1.5rem;
   border-block-end: 1px solid var(--pey-color-border);
-  padding-block-end: var(--pey-space-2);
+  padding-block-end: 0.5rem;
+}
+.markdown-body h2 {
+  font-size: 1.875rem;
+  margin-block-start: 2.5rem;
+  margin-block-end: 1rem;
+  border-block-end: 1px solid var(--pey-color-border);
+  padding-block-end: 0.5rem;
+}
+.markdown-body h3 {
+  font-size: 1.5rem;
+  margin-block-start: 2rem;
+  margin-block-end: 0.75rem;
+}
+.markdown-body p {
+  margin-block-end: 1.25rem;
+  font-size: 1.125rem;
+}
+.markdown-body ul,
+.markdown-body ol {
+  padding-inline-start: 1.5rem;
+  margin-block-end: 1.25rem;
+}
+.markdown-body li {
+  margin-block-end: 0.5rem;
+}
+.markdown-body a {
+  color: var(--pey-color-secondary);
+  text-decoration: none;
+}
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+.markdown-body strong {
+  color: var(--pey-color-heading);
+}
+.markdown-body blockquote {
+  border-inline-start: 4px solid var(--quote-border);
+  padding-inline-start: 1rem;
+  margin-block: 1.5rem;
+  font-style: italic;
+  color: var(--quote-text);
+}
+.markdown-body code {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9em;
+  font-family: var(--font-family-code);
 }
 .markdown-body img {
   max-inline-size: 100%;
+  block-size: auto;
+  border-radius: 0.5rem;
+  display: block;
+  margin: 2rem auto;
 }
 
-/* Code blocks and the copy button */
+/* Code blocks (old prose pre) */
 .markdown-body pre {
-  direction: ltr;
-  text-align: start;
-  background-color: var(--pey-color-surface);
-  border: 1px solid var(--pey-color-border);
-  border-radius: var(--pey-radius-md);
-  padding: var(--pey-space-4);
-  overflow-x: auto;
-  font-size: var(--pey-font-size-sm);
   position: relative;
+  background-color: rgb(31 41 55 / 0.7);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 1.1em;
+  overflow-x: auto;
+  margin-block-end: 1.5rem;
+  direction: ltr;
+  text-align: left;
+  border: none;
 }
+.markdown-body pre code {
+  padding: 0;
+  background-color: transparent;
+  border-radius: 0;
+  color: inherit;
+  font-family: var(--font-family-code);
+}
+
+/* Copy button (re-skinned on the old pre look) */
 .markdown-body pre .copy-code-button {
   position: absolute;
   inset-block-start: var(--pey-space-2);
@@ -56,11 +127,8 @@
   border-color: #059669;
 }
 .markdown-body pre .copy-code-button.is-error {
-  color: var(--pey-color-status-error);
-  border-color: var(--pey-color-status-error);
-}
-.markdown-body code {
-  font-family: ui-monospace, monospace;
+  color: var(--error-text);
+  border-color: var(--error-border);
 }
 
 /* Syntax highlighting labels and line scaffolding */
@@ -70,11 +138,11 @@
   inset-inline-start: var(--pey-space-3);
   font-family: var(--pey-font-family-base);
   font-size: var(--pey-font-size-sm);
-  color: var(--pey-color-text-muted);
+  color: #9ca3af;
   pointer-events: none;
 }
 .markdown-body pre .hljs-file-name {
-  color: var(--pey-color-text);
+  color: #e5e7eb;
 }
 .markdown-body pre code .hljs-line {
   display: block;
@@ -85,26 +153,46 @@
   display: inline-block;
   inline-size: 2ch;
   margin-inline-end: var(--pey-space-3);
-  color: var(--pey-color-text-muted);
+  color: #6b7280;
   text-align: end;
 }
 .markdown-body pre code .hljs-line-highlight {
-  background-color: var(--pey-color-surface);
-  outline: 1px solid var(--pey-color-border);
+  background-color: rgb(255 255 255 / 0.08);
+  outline: 1px solid rgb(255 255 255 / 0.15);
 }
 
-/* Tables */
-.markdown-body table {
-  border-collapse: collapse;
+/* Tables (old prose tables) */
+.markdown-body .table-wrapper {
+  margin: 2rem auto;
+  overflow-x: auto;
   inline-size: 100%;
 }
-.markdown-body .table-wrapper {
-  overflow-x: auto;
+.markdown-body table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: lining-nums tabular-nums;
 }
-.markdown-body th,
-.markdown-body td {
+.markdown-body thead tr {
+  background-color: var(--pey-color-surface);
+}
+.markdown-body th {
+  font-weight: 700;
+  color: var(--pey-color-heading);
+  padding: 0.75rem 1rem;
+  text-align: start;
+  white-space: nowrap;
   border: 1px solid var(--pey-color-border);
-  padding: var(--pey-space-2) var(--pey-space-3);
+}
+.markdown-body td {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--pey-color-border);
+  color: var(--pey-color-text);
+}
+.markdown-body tr:nth-child(even) {
+  background-color: rgb(0 0 0 / 0.02);
+}
+.markdown-body tr:hover {
+  background-color: var(--pey-color-border);
 }
 
 /* Heading anchors */
@@ -113,30 +201,31 @@
   opacity: 0;
   text-decoration: none;
   font-weight: 400;
+  color: var(--pey-color-text-muted);
 }
 .markdown-body :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor,
 .markdown-body :is(h1, h2, h3, h4, h5, h6):focus-within .heading-anchor {
   opacity: 1;
 }
 
-/* Parsneshan dialect blocks */
+/* Parsneshan dialect blocks (old parsneshan.css) */
 .markdown-body [class^='parsneshan-']:not(.parsneshan-poem):not(.parsneshan-verse):not(.parsneshan-hemistich) {
-  border-inline-start: 3px solid var(--pey-color-accent);
-  border-radius: var(--pey-radius-md);
+  border-inline-start: 4px solid var(--pey-color-accent);
+  border-radius: 0.5rem;
   background-color: var(--pey-color-surface);
   padding: var(--pey-space-3) var(--pey-space-4);
   margin-block: var(--pey-space-4);
 }
-.markdown-body .parsneshan-caution { border-inline-start-color: var(--pey-color-status-error); }
-.markdown-body .parsneshan-warning { border-inline-start-color: #d97706; }
-.markdown-body .parsneshan-important { border-inline-start-color: var(--pey-color-accent); }
-.markdown-body .parsneshan-tip { border-inline-start-color: #059669; }
-.markdown-body .parsneshan-note { border-inline-start-color: var(--pey-color-text-muted); }
+.markdown-body .parsneshan-caution { border-inline-start-color: var(--error-border); }
+.markdown-body .parsneshan-warning { border-inline-start-color: #f59e0b; }
+.markdown-body .parsneshan-important { border-inline-start-color: var(--secondary-color); }
+.markdown-body .parsneshan-tip { border-inline-start-color: var(--primary-color); }
+.markdown-body .parsneshan-note { border-inline-start-color: var(--quote-text); }
 .markdown-body .parsneshan-poem {
   margin-block: var(--pey-space-6);
   padding: var(--pey-space-4) var(--pey-space-6);
   background-color: var(--pey-color-surface);
-  border-radius: var(--pey-radius-md);
+  border-radius: 0.5rem;
   display: grid;
   gap: var(--pey-space-3);
   justify-items: center;
@@ -151,7 +240,7 @@
 .markdown-body .parsneshan-hemistich {
   text-align: center;
 }
-@media (max-width: 37.5rem) {
+@media (max-width: 600px) {
   .markdown-body .parsneshan-verse {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--pey-space-1);
@@ -169,6 +258,50 @@
   text-decoration: none;
 }
 
+/* Status messages (old messages.css) */
+@keyframes shirazeh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.content.is-loading,
+.content.is-error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-block-size: calc(100vh - var(--header-height, 60px) - 3rem);
+  padding: 1.5rem;
+}
+.loading-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--quote-text);
+  opacity: 0.8;
+}
+.loading-message::before {
+  content: '';
+  box-sizing: border-box;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--pey-color-border);
+  border-block-start-color: var(--pey-color-accent);
+  animation: shirazeh-spin 0.8s linear infinite;
+}
+.error-message {
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  max-inline-size: 500px;
+}
+
 /* Confirmation toast */
 .page-toast {
   position: fixed;
@@ -184,31 +317,34 @@
   font-size: var(--pey-font-size-sm);
 }
 
-/* Export bar */
+/* Export bar — floating like the old page exporter widget */
 .export-bar {
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  margin-block-start: var(--pey-space-4);
+  position: fixed;
+  inset-block-end: 1.25rem;
+  inset-inline-end: 1.25rem;
+  z-index: 999;
 }
 .export-button {
   font-family: var(--pey-font-family-base);
-  font-size: var(--pey-font-size-sm);
-  padding: var(--pey-space-1) var(--pey-space-3);
+  font-size: var(--pey-font-size-base);
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: 50%;
   border: 1px solid var(--pey-color-border);
-  border-radius: var(--pey-radius-md);
   background-color: var(--pey-color-canvas);
   color: var(--pey-color-text);
   cursor: pointer;
+  box-shadow: var(--pey-shadow-sm);
 }
 .export-button:hover {
+  color: var(--pey-color-accent);
   border-color: var(--pey-color-accent);
 }
 .export-menu {
   position: absolute;
-  inset-block-end: calc(100% + var(--pey-space-1));
+  inset-block-end: calc(100% + var(--pey-space-2));
   inset-inline-end: 0;
-  min-inline-size: 10rem;
+  min-inline-size: 11rem;
   display: grid;
   padding: var(--pey-space-1);
   border: 1px solid var(--pey-color-border);

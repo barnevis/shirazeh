@@ -1,48 +1,112 @@
-/* Shirazeh application-level styles (outside component shadow roots). */
+/* Shirazeh application styles — visual port of the old Shirazeh design.
+   The old palette lives on the old variable names AND on the --pey-* tokens
+   so every pey-webui component and shadow root follows it. */
 
+/* Structural variables (old variables.css) */
 :root {
-  /* Persian-friendly typography stack layered on the kit defaults. */
+  --sidebar-width: 280px;
+  --header-height: 60px;
+  /* Typography (old typography.css) */
+  --font-size-base: 16px;
+  --line-height-base: 1.7;
+  --font-family-code: ui-monospace, monospace;
+
+  /* Persian-friendly type stack on the kit default */
   --pey-font-family-base: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --pey-line-height-base: 1.7;
 }
 
-/* Dark theme: applied on <html data-theme="dark"> and on the app shell host
-   (which reflects the same attribute), overriding the kit's light tokens
-   wherever they cascade into shadow roots. */
+/* Light theme (old themes/light.css) mapped onto the kit tokens */
+:root,
+[data-theme='light'] {
+  --bg-color: #f9fafb;
+  --sidebar-bg: #f3f4f6;
+  --content-bg: #f9fafb;
+  --text-color: #374151;
+  --text-color-strong: #111827;
+  --primary-color: #10b981;
+  --secondary-color: #0ea5e9;
+  --border-color: #e5e7eb;
+  --code-bg: #e5e7eb;
+  --code-text: #1d4ed8;
+  --quote-border: #14b8a6;
+  --quote-text: #4b5563;
+  --error-bg: #fee2e2;
+  --error-border: #fca5a5;
+  --error-text: #b91c1c;
+
+  --pey-color-canvas: var(--bg-color);
+  --pey-color-surface: var(--sidebar-bg);
+  --pey-color-text: var(--text-color);
+  --pey-color-text-muted: var(--quote-text);
+  --pey-color-border: var(--border-color);
+  --pey-color-accent: var(--primary-color);
+  --pey-color-secondary: var(--secondary-color);
+  --pey-color-heading: var(--text-color-strong);
+  --pey-color-code-bg: var(--code-bg);
+  --pey-color-code-text: var(--code-text);
+  --pey-color-error: var(--error-text);
+  --pey-color-status-error: #b91c1c;
+}
+
+/* Dark theme (old themes/dark.css) */
 [data-theme='dark'] {
-  --pey-color-canvas: #111827;
-  --pey-color-surface: #1f2937;
-  --pey-color-text: #e5e7eb;
-  --pey-color-text-muted: #9ca3af;
-  --pey-color-border: #374151;
-  --pey-color-accent: #34d399;
+  --bg-color: #111827;
+  --sidebar-bg: #1f2937;
+  --content-bg: #111827;
+  --text-color: #d1d5db;
+  --text-color-strong: #f9fafb;
+  --primary-color: #6ee7b7;
+  --secondary-color: #22d3ee;
+  --border-color: #374151;
+  --code-bg: #374151;
+  --code-text: #fcd34d;
+  --quote-border: #14b8a6;
+  --quote-text: #9ca3af;
+  --error-bg: rgba(127, 29, 29, 0.5);
+  --error-border: #b91c1c;
+  --error-text: #fca5a5;
+
+  --pey-color-canvas: var(--bg-color);
+  --pey-color-surface: var(--sidebar-bg);
+  --pey-color-text: var(--text-color);
+  --pey-color-text-muted: var(--quote-text);
+  --pey-color-border: var(--border-color);
+  --pey-color-accent: var(--primary-color);
+  --pey-color-secondary: var(--secondary-color);
+  --pey-color-heading: var(--text-color-strong);
+  --pey-color-code-bg: var(--code-bg);
+  --pey-color-code-text: var(--code-text);
+  --pey-color-error: var(--error-text);
   --pey-color-status-error: #f87171;
-  --pey-color-focus-ring: rgba(52, 211, 153, 0.4);
-  --pey-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+html {
+  box-sizing: border-box;
+  direction: rtl;
+  overflow-x: hidden;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
 }
 
 html,
 body {
   margin: 0;
   padding: 0;
-  block-size: 100%;
+  min-block-size: 100%;
 }
 
 body {
-  background-color: var(--pey-color-canvas);
-  color: var(--pey-color-text);
   font-family: var(--pey-font-family-base);
-}
-
-/* Print: only the reading experience survives. Chrome (navbar), sidebar and
-   toc are component shadow trees, hidden from the page-level print sheet via
-   their host elements. */
-@media print {
-  shirazeh-navbar,
-  [data-sidebar-slot],
-  [data-toc-slot],
-  .boot-placeholder {
-    display: none !important;
-  }
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
 }
 
 .boot-placeholder {
@@ -50,6 +114,19 @@ body {
   align-items: center;
   justify-content: center;
   min-block-size: 100vh;
-  color: var(--pey-color-text-muted);
+  color: var(--quote-text);
   font-size: var(--pey-font-size-lg);
+}
+
+/* Print: only the reading experience survives. Chrome (navbar), sidebar and
+   toc are component shadow trees, hidden from the page-level print sheet via
+   their host elements. */
+@media print {
+  shirazeh-navbar,
+  shirazeh-actions,
+  [data-sidebar-slot],
+  [data-toc-slot],
+  .boot-placeholder {
+    display: none !important;
+  }
 }

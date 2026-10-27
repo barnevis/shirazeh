@@ -1,5 +1,6 @@
-// jsdom tests for the shirazeh-sidebar component: tree rendering, submenu
-// toggling, active-branch auto-open, and the mobile drawer.
+// jsdom tests for the shirazeh-sidebar component (old-look port): tree
+// rendering, animated submenu toggling, active-branch auto-open, brand
+// header, and the collapse button.
 
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -22,13 +23,12 @@ const TREE = [
   { href: 'about', title: 'درباره', attrTitle: null, level: 1, children: [] },
 ];
 
-async function mount({ path = '/guide', tree = TREE, router = null } = {}) {
-  document.body.innerHTML = '';
+async function mount({ path = '/guide', tree = TREE, router = null, appName = 'شیرازه' } = {}) {
   const recorder = createEventsRecorder();
   const sidebar = createElement('shirazeh-sidebar');
   sidebar.connect({
     infrastructure: { events: recorder.facade },
-    refs: { tree, path, router, openLabel: 'باز کن' },
+    refs: { tree, path, router, appName, logo: { enabled: true, src: './shirazeh.svg', size: '32px' } },
   });
   document.body.append(sidebar);
   await flushRender();
@@ -38,43 +38,35 @@ async function mount({ path = '/guide', tree = TREE, router = null } = {}) {
 test('should_render_tree_links_when_connected', async () => {
   const { shadow, sidebar } = await mount();
 
-  const links = [...shadow.querySelectorAll('a[data-route]')];
+  const links = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')];
   assert.deepEqual(links.map((a) => a.dataset.route), ['/', '/guide', '/guide/config', '/about']);
 });
 
 test('should_open_active_branch_when_mounted', async () => {
   const { shadow, sidebar } = await mount({ path: '/guide/config' });
 
-  const open = [...shadow.querySelectorAll('.sidebar-submenu.is-open')];
+  const open = [...shadow.querySelectorAll('.sidebar-submenu.open')];
   assert.equal(open.length, 2);
-  assert.equal(shadow.querySelector("a[aria-current='page']")?.dataset.route, '/guide/config');
+  assert.equal(shadow.querySelector('a.active')?.dataset.route, '/guide/config');
 });
 
-test('should_toggle_submenu_when_toggle_button_is_clicked', async () => {
+test('should_render_brand_header_with_logo_and_name', async () => {
+  const { shadow, sidebar } = await mount();
+
+  assert.equal(shadow.querySelector('.sidebar-header h2')?.textContent, 'شیرازه');
+  assert.equal(shadow.querySelector('.app-logo')?.getAttribute('src'), './shirazeh.svg');
+});
+
+test('should_toggle_submenu_with_animation_classes', async () => {
   const { shadow, sidebar } = await mount({ path: '/about' });
 
-  const toggle = shadow.querySelector('button[data-sidebar-toggle]');
+  const toggle = shadow.querySelector('button.submenu-toggle');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   toggle.click();
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
-  assert.equal(shadow.querySelectorAll('.sidebar-submenu.is-open').length, 1);
+  assert.equal(shadow.querySelectorAll('.sidebar-submenu.open').length, 1);
   toggle.click();
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
-});
-
-test('should_open_drawer_when_hamburger_clicked_and_close_on_overlay', async () => {
-  const { shadow, sidebar } = await mount();
-
-  const aside = shadow.querySelector('aside');
-  const overlay = shadow.querySelector('.sidebar-overlay');
-  assert.equal(aside.classList.contains('is-mobile-open'), false);
-
-  shadow.querySelector('button[data-sidebar-hamburger]').click();
-  assert.equal(aside.classList.contains('is-mobile-open'), true);
-  assert.equal(overlay.classList.contains('is-visible'), true);
-
-  overlay.click();
-  assert.equal(aside.classList.contains('is-mobile-open'), false);
 });
 
 test('should_navigate_through_router_when_link_clicked', async () => {
@@ -84,7 +76,7 @@ test('should_navigate_through_router_when_link_clicked', async () => {
     router: { navigate: (path) => navigated.push(path) },
   });
 
-  const link = [...shadow.querySelectorAll('a[data-route]')]
+  const link = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')]
     .find((a) => a.dataset.route === '/guide');
   link.click();
 

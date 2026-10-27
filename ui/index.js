@@ -10,6 +10,7 @@ import { TAG as APP_SHELL_TAG } from 'pey.webui/shell/app-shell';
 import { createApplicationSetup } from 'pey.webui/shell/create-application-setup';
 import { createSharedState } from 'pey.webui/shared-state';
 import './components/shirazeh-navbar.js';
+import './components/shirazeh-actions.js';
 import appCatalog from './i18n/catalog.js';
 import { createThemeController } from './theme.js';
 
@@ -101,41 +102,62 @@ export const setup = createApplicationSetup({
     document.body.append(shell);
     resources.shell = shell;
 
-    const navbar = document.createElement('shirazeh-navbar');
-    navbar.slot = 'extension';
-    navbar.connect({
+    // Old-look chrome: the floating action stack (theme + language toggles
+    // and the optional octocat corner) on the shell; the rich navbar renders
+    // only when explicitly enabled (the old app shipped it disabled).
+    const actions = document.createElement('shirazeh-actions');
+    actions.slot = 'extension-end';
+    actions.connect({
       infrastructure: { events: resources.events },
       refs: {
         sharedState,
-        fallbackPath: resources.config.fallbackPath,
         themeController,
         prefs: resources.optional?.[PREFS_SERVICE] ?? null,
-        appName: resources.config.appName,
-        logo: resources.config.logo,
         githubCorner: resources.config.githubCorner,
-        navbarZones: resources.navbarZones ?? null,
-        navbarConfig: resources.config.navbar ?? {},
       },
     });
-    shell.append(navbar);
-    resources.navbar = navbar;
+    shell.append(actions);
+    resources.actions = actions;
 
-    // Rich navbar zones and the visually current path both arrive after the
-    // synchronous mount: zones from the async getNavbar, path from the
-    // router's changed events.
     const docsService = resources.required[DOCS_SERVICE];
-    void Promise.resolve(docsService?.getNavbar?.()).then((parsedNavbar) => {
-      if (parsedNavbar !== null && parsedNavbar !== undefined) {
-        navbar.setZones(parsedNavbar);
-      }
-    }).catch(() => undefined);
     resources.events.subscribe('router:changed', () => {
       try {
-        navbar.setCurrentPath(resources.router.getCurrentRoute().path);
+        resources.currentPath = resources.router.getCurrentRoute().path;
       } catch {
-        // A route read failure only skips the active-link update.
+        // A route read failure only skips the active-path update.
       }
     });
+
+    if (resources.config.navbar?.enabled === true) {
+      const navbar = document.createElement('shirazeh-navbar');
+      navbar.slot = 'extension';
+      navbar.connect({
+        infrastructure: { events: resources.events },
+        refs: {
+          sharedState,
+          fallbackPath: resources.config.fallbackPath,
+          appName: resources.config.appName,
+          logo: resources.config.logo,
+          navbarZones: null,
+          navbarConfig: resources.config.navbar ?? {},
+        },
+      });
+      shell.append(navbar);
+      resources.navbar = navbar;
+
+      void Promise.resolve(docsService?.getNavbar?.()).then((parsedNavbar) => {
+        if (parsedNavbar !== null && parsedNavbar !== undefined) {
+          navbar.setZones(parsedNavbar);
+        }
+      }).catch(() => undefined);
+      resources.events.subscribe('router:changed', () => {
+        try {
+          navbar.setCurrentPath(resources.router.getCurrentRoute().path);
+        } catch {
+          // A route read failure only skips the active-link update.
+        }
+      });
+    }
 
     // Favicon: the configured icon overrides the default tag in index.html.
     const favicon = resources.config.favicon ?? {};

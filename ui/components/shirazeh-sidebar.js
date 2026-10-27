@@ -1,7 +1,9 @@
-// Sidebar navigation component: nested collapsible tree, active-branch
-// auto-open, and the mobile slide-in drawer (hamburger + click-outside
-// overlay). Receives the parsed sidebar tree and the current route path via
-// connect refs; navigates through the router service.
+// Sidebar navigation component — visual port of the old Shirazeh sidebar:
+// brand header (logo + app name), collapsible tree with animated submenus,
+// active link with a colored border, desktop collapse, and the mobile
+// drawer (hamburger + click-outside overlay). Receives the parsed sidebar
+// tree and the current route path via connect refs; navigates through the
+// router service.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
 
@@ -24,16 +26,28 @@ class ShirazehSidebar extends PeyElement {
   #tree = [];
   #path = '/';
   #router = null;
-  #openLabel = '';
+  #appName = null;
+  #logo = null;
   #openIds = new Set();
   #everRendered = false;
+  #collapsed = null;
 
   onConnect(refs) {
     this.#tree = Array.isArray(refs.tree) ? refs.tree : [];
     this.#path = typeof refs.path === 'string' ? refs.path : '/';
     this.#router = refs.router ?? null;
-    this.#openLabel = typeof refs.openLabel === 'string' ? refs.openLabel : '';
+    this.#appName = typeof refs.appName === 'string' && refs.appName.trim().length > 0
+      ? refs.appName
+      : null;
+    this.#logo = refs.logo ?? null;
     this.#openBranchTo(this.#path, this.#tree);
+    // Old behavior: the drawer starts closed on mobile, open on desktop.
+    if (this.#collapsed === null) {
+      const mobile = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(max-width: 767px)').matches
+        : false;
+      this.#collapsed = mobile;
+    }
   }
 
   #openBranchTo(path, nodes) {
@@ -44,6 +58,12 @@ class ShirazehSidebar extends PeyElement {
       }
     }
     return false;
+  }
+
+  #isMobile() {
+    return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(max-width: 767px)').matches
+      : false;
   }
 
   eventTypes() {
@@ -63,14 +83,27 @@ class ShirazehSidebar extends PeyElement {
       return;
     }
 
+    // Collapse button: closes the drawer on mobile, collapses the column on
+    // desktop — the old body.sidebar-collapsed behavior.
+    if (target.closest('button[data-sidebar-collapse]') !== null) {
+      this.#collapsed = true;
+      this.classList.add('is-collapsed');
+      this.requestRender({ preserve: false });
+      return;
+    }
+
     // Mobile drawer controls: hamburger opens, overlay closes.
     const hamburger = target.closest('button[data-sidebar-hamburger]');
     if (hamburger !== null) {
-      this.#openDrawer();
+      this.#collapsed = false;
+      this.classList.remove('is-collapsed');
+      this.requestRender({ preserve: false });
       return;
     }
     if (target.closest('[data-sidebar-overlay]') !== null) {
-      this.#closeDrawer();
+      this.#collapsed = true;
+      this.classList.add('is-collapsed');
+      this.requestRender({ preserve: false });
       return;
     }
 
@@ -82,7 +115,10 @@ class ShirazehSidebar extends PeyElement {
       const route = link.dataset.route;
       this.#openIds.clear();
       this.#openBranchTo(route, this.#tree);
-      this.#closeDrawer();
+      if (this.#isMobile()) {
+        this.#collapsed = true;
+        this.classList.add('is-collapsed');
+      }
       this.#router?.navigate?.(route);
       this.requestRender({ preserve: false });
       return;
@@ -98,162 +134,240 @@ class ShirazehSidebar extends PeyElement {
       this.#openIds.add(key);
     }
     toggle.setAttribute('aria-expanded', String(!isOpen));
-    toggle.closest('li')?.querySelector('.sidebar-submenu')?.classList.toggle('is-open', !isOpen);
-  }
-
-  #openDrawer() {
-    this.#aside()?.classList.add('is-mobile-open');
-    this.#overlay()?.classList.add('is-visible');
-  }
-
-  #closeDrawer() {
-    this.#aside()?.classList.remove('is-mobile-open');
-    this.#overlay()?.classList.remove('is-visible');
-  }
-
-  #aside() {
-    return this.shadowRoot?.querySelector('aside');
-  }
-
-  #overlay() {
-    return this.shadowRoot?.querySelector('.sidebar-overlay');
+    toggle.closest('li')?.querySelector('.sidebar-submenu')?.classList.toggle('open', !isOpen);
   }
 
   #renderNodes(nodes) {
     return nodes.map((node) => {
       const route = normalizeHref(node.href);
       const hasChildren = node.children.length > 0;
-      const isCurrent = route === this.#path ? ' aria-current="page"' : '';
+      const isCurrent = route === this.#path ? ' class="active"' : '';
       const isOpen = this.#openIds.has(node.href);
       const self = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(node.title)}</a>`;
       const toggle = hasChildren
-        ? `<button type="button" class="sidebar-toggle-item" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}">›</button>`
+        ? `<button type="button" class="submenu-toggle" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}"><span class="submenu-arrow"></span></button>`
         : '';
       const submenu = hasChildren
-        ? `<ul class="sidebar-submenu${isOpen ? ' is-open' : ''}">${this.#renderNodes(node.children)}</ul>`
+        ? `<ul class="sidebar-submenu${isOpen ? ' open' : ''}">${this.#renderNodes(node.children)}</ul>`
         : '';
-      return `<li class="${hasChildren ? 'has-children' : ''}">${self}${toggle}${submenu}</li>`;
+      return `<li class="${hasChildren ? 'has-submenu' : ''}${isOpen && hasChildren ? ' open' : ''}">${self}${toggle}${submenu}</li>`;
     }).join('');
   }
 
+  #brandHtml() {
+    const logo = this.#logo ?? {};
+    const logoHtml = logo.enabled === true && typeof logo.src === 'string' && logo.src.length > 0
+      ? `<img class="app-logo" src="${escapeHtml(logo.src)}" alt="" style="inline-size: ${escapeHtml(logo.size ?? '32px')}">`
+      : '';
+    const appName = this.#appName ?? 'شیرازه';
+    const hasBrand = logoHtml !== '' || this.#appName !== null;
+    if (!hasBrand) {
+      return '';
+    }
+    return `
+      <div class="sidebar-header">
+        <a class="app-title-link" href="#/" data-route="/">
+          ${logoHtml}
+          <h2>${escapeHtml(appName)}</h2>
+        </a>
+      </div>
+    `;
+  }
+
   render() {
+    const collapsed = this.#collapsed === true;
     return `
       <style>
         :host {
           display: block;
           min-inline-size: 0;
-        }
-        aside {
-          display: block;
-        }
-        aside[hidden] {
-          display: none;
-        }
-        ul {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          display: grid;
-          gap: var(--pey-space-1);
-        }
-        li.has-children {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) auto;
-          align-items: center;
-        }
-        li.has-children > a {
-          grid-column: 1;
-        }
-        .sidebar-toggle-item {
-          grid-column: 2;
-          border: none;
-          background: none;
-          padding: 0 var(--pey-space-1);
-          color: var(--pey-color-text-muted);
-          cursor: pointer;
-          font-size: inherit;
-        }
-        .sidebar-toggle-item[aria-expanded='true'] {
-          transform: rotate(90deg);
-          display: inline-block;
-        }
-        .sidebar-submenu {
-          display: none;
-          padding-inline-start: var(--pey-space-4);
-          grid-column: 1 / -1;
-        }
-        .sidebar-submenu.is-open {
-          display: grid;
-        }
-        a {
-          display: block;
-          padding: var(--pey-space-1) var(--pey-space-2);
-          border-radius: var(--pey-radius-sm);
-          color: var(--pey-color-text);
-          text-decoration: none;
-          font-size: var(--pey-font-size-sm);
-        }
-        a:hover {
-          background-color: var(--pey-color-surface);
-        }
-        a[aria-current='page'] {
-          font-weight: 600;
-          color: var(--pey-color-accent);
+          flex-shrink: 0;
         }
         .sidebar-overlay {
           display: none;
         }
-        .sidebar-overlay.is-visible {
-          display: block;
+        aside {
+          inline-size: var(--sidebar-width, 280px);
+          background-color: var(--pey-color-surface);
+          block-size: 100vh;
+          position: sticky;
+          inset-block-start: 0;
+          border-inline-end: 1px solid var(--pey-color-border);
+          transition: margin 0.3s ease;
+          z-index: 100;
+          display: flex;
+          flex-direction: column;
+          margin: 0;
         }
-        .sidebar-hamburger {
-          display: none;
+        :host(.is-collapsed) aside {
+          margin-inline-start: calc(-1 * var(--sidebar-width, 280px));
         }
-        /* Mobile: the sidebar becomes a slide-in drawer with an overlay. */
-        @media (max-width: 48rem) {
-          .sidebar-hamburger {
-            display: block;
-            position: fixed;
-            inset-block-start: var(--pey-space-4);
-            inset-inline-start: var(--pey-space-4);
-            z-index: 25;
-            border: 1px solid var(--pey-color-border);
-            border-radius: var(--pey-radius-md);
-            background-color: var(--pey-color-canvas);
-            color: var(--pey-color-text);
-            padding: var(--pey-space-1) var(--pey-space-3);
-            cursor: pointer;
-            font-size: 1rem;
+        .sidebar-header {
+          display: flex;
+          align-items: center;
+          padding: 0 1.5rem;
+          block-size: var(--header-height, 60px);
+          border-block-end: 1px solid var(--pey-color-border);
+          flex-shrink: 0;
+        }
+        .app-title-link {
+          text-decoration: none;
+          color: inherit;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          overflow: hidden;
+        }
+        .app-logo {
+          flex-shrink: 0;
+          align-self: center;
+        }
+        .sidebar-header h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          color: var(--pey-color-heading);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .sidebar-nav {
+          overflow-y: auto;
+          flex: 1;
+        }
+        .sidebar-nav ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        .sidebar-nav a,
+        .sidebar-nav .submenu-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          inline-size: 100%;
+          padding: 0.75rem 1.5rem;
+          color: var(--pey-color-text);
+          text-decoration: none;
+          border-inline-start: 3px solid transparent;
+          transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .sidebar-nav .submenu-toggle {
+          background: none;
+          border: none;
+          border-inline-start: 3px solid transparent;
+          font-family: inherit;
+          font-size: inherit;
+          cursor: pointer;
+          color: var(--pey-color-text);
+        }
+        .sidebar-nav a:hover,
+        .sidebar-nav .submenu-toggle:hover {
+          background-color: var(--pey-color-border);
+        }
+        .sidebar-nav a.active {
+          color: var(--pey-color-accent);
+          border-inline-start-color: var(--pey-color-accent);
+          background-color: color-mix(in srgb, var(--pey-color-accent) 10%, transparent);
+        }
+        .sidebar-submenu {
+          background-color: rgb(0 0 0 / 0.05);
+          max-block-size: 0;
+          overflow: hidden;
+          transition: max-block-size 0.3s ease-out;
+          padding-inline-start: 1rem;
+        }
+        .sidebar-submenu.open {
+          max-block-size: 1000px;
+        }
+        .submenu-arrow {
+          margin-inline-start: auto;
+          transition: transform 0.3s ease;
+          flex-shrink: 0;
+        }
+        .submenu-arrow::before {
+          content: '›';
+          display: inline-block;
+          font-weight: bold;
+        }
+        li.has-submenu.open > .submenu-toggle .submenu-arrow {
+          transform: rotate(-90deg);
+        }
+        .sidebar-collapse {
+          background: none;
+          border: none;
+          color: var(--pey-color-text);
+          cursor: pointer;
+          position: fixed;
+          inset-block-start: 10px;
+          inset-inline-start: 15px;
+          z-index: 101;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          inline-size: 44px;
+          block-size: 44px;
+          padding: 0;
+          border-radius: 50%;
+          transition: inset 0.3s ease, background-color 0.2s;
+        }
+        .sidebar-collapse:hover {
+          background-color: var(--pey-color-border);
+        }
+        .sidebar-collapse svg {
+          inline-size: 24px;
+          block-size: 24px;
+        }
+        @media (min-width: 768px) {
+          :host(:not(.is-collapsed)) .sidebar-collapse {
+            inset-inline-start: calc(var(--sidebar-width, 280px) - 50px);
           }
+        }
+        .sidebar-overlay {
+          position: fixed;
+          inset: 0;
+          background-color: rgb(0 0 0 / 0.5);
+          z-index: 99;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        /* Mobile: slide-in drawer over a dimmed page (old responsive.css). */
+        @media (max-width: 767px) {
           aside {
             position: fixed;
             inset-block: 0;
             inset-inline-start: 0;
-            inline-size: min(80vw, 18rem);
-            background-color: var(--pey-color-canvas);
-            border-inline-end: 1px solid var(--pey-color-border);
-            padding: var(--pey-space-4);
             margin: 0;
-            transform: translateX(110%);
-            transition: transform var(--pey-duration-base) ease;
-            z-index: 30;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
           }
-          aside.is-mobile-open {
+          :host(:dir(ltr)) aside {
+            transform: translateX(-100%);
+          }
+          :host(:not(.is-collapsed)) aside {
             transform: translateX(0);
           }
-          .sidebar-overlay.is-visible {
-            display: block;
-            position: fixed;
-            inset: 0;
-            background-color: rgb(0 0 0 / 0.4);
-            z-index: 20;
+          :host(.is-collapsed) aside {
+            margin-inline-start: 0;
+          }
+          :host(:not(.is-collapsed)) .sidebar-overlay {
+            opacity: 1;
+            visibility: visible;
           }
         }
       </style>
+      <button type="button" class="sidebar-collapse" data-sidebar-collapse aria-label="sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
       <div class="sidebar-overlay" data-sidebar-overlay></div>
-      <button type="button" class="sidebar-hamburger" data-sidebar-hamburger aria-label="${escapeHtml(this.#openLabel)}">☰</button>
       <aside part="sidebar"${this.#tree.length === 0 ? ' hidden' : ''}>
-        <nav aria-label="documentation">
+        ${this.#brandHtml()}
+        <nav class="sidebar-nav" aria-label="documentation">
           <ul>${this.#renderNodes(this.#tree)}</ul>
         </nav>
       </aside>
