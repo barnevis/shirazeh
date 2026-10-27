@@ -57,16 +57,29 @@ test('should_render_brand_header_with_logo_and_name', async () => {
   assert.equal(shadow.querySelector('.app-logo')?.getAttribute('src'), './shirazeh.svg');
 });
 
-test('should_toggle_submenu_by_row_click', async () => {
-  const { shadow } = await mount({ path: '/about' });
+test('should_toggle_submenu_when_chevron_clicked', async () => {
+  const navigated = [];
+  const { shadow, sidebar } = await mount({ path: '/about', router: { navigate: (p) => navigated.push(p) } });
 
-  const row = shadow.querySelector('a[data-sidebar-toggle]');
-  assert.equal(row.getAttribute('aria-expanded'), 'false');
-  row.click();
-  assert.equal(row.getAttribute('aria-expanded'), 'true');
+  const chevron = shadow.querySelector('.submenu-arrow[data-sidebar-toggle]');
+  assert.equal(chevron.getAttribute('aria-expanded'), 'false');
+  chevron.click();
+  assert.equal(chevron.getAttribute('aria-expanded'), 'true');
   assert.equal(shadow.querySelectorAll('.sidebar-submenu.open').length, 1);
-  row.click();
-  assert.equal(row.getAttribute('aria-expanded'), 'false');
+  chevron.click();
+  assert.equal(chevron.getAttribute('aria-expanded'), 'false');
+  assert.deepEqual(navigated, []);
+});
+
+test('should_navigate_when_parent_row_clicked', async () => {
+  const navigated = [];
+  const { shadow, sidebar } = await mount({ path: '/about', router: { navigate: (p) => navigated.push(p) } });
+
+  const parentLink = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')]
+    .find((a) => a.dataset.route === '/');
+  parentLink.click();
+
+  assert.deepEqual(navigated, ['/']);
 });
 
 test('should_navigate_through_router_when_leaf_link_clicked', async () => {
@@ -83,20 +96,20 @@ test('should_navigate_through_router_when_leaf_link_clicked', async () => {
   assert.deepEqual(navigated, ['/about']);
 });
 
-test('should_not_navigate_when_parent_row_is_clicked', async () => {
+test('should_open_branch_when_parent_row_navigates', async () => {
   const navigated = [];
-  const { shadow, sidebar } = await mount({
-    path: '/',
-    router: { navigate: (path) => navigated.push(path) },
-  });
+  const { shadow, sidebar } = await mount({ path: '/about', router: { navigate: (p) => navigated.push(p) } });
 
-  const parent = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')]
+  const parentLink = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')]
     .find((a) => a.dataset.route === '/');
-  parent.click();
+  parentLink.click();
 
-  assert.deepEqual(navigated, []);
-  // the '/' row starts open on the '/' path; the click closes it
-  assert.equal(parent.getAttribute('aria-expanded'), 'false');
+  assert.deepEqual(navigated, ['/']);
+  // the entry point feeds router:changed into setCurrentPath, which
+  // re-applies the open-branch state from #openIds
+  sidebar.setCurrentPath('/');
+  await flushRender();
+  assert.equal(shadow.querySelectorAll('.sidebar-submenu.open').length, 1);
 });
 
 test('should_render_hidden_aside_when_tree_is_empty', async () => {

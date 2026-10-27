@@ -103,9 +103,17 @@ class ShirazehSidebar extends PeyElement {
       return;
     }
 
-    // Parent rows (link or button carrying data-sidebar-toggle) toggle their
-    // submenu on a click anywhere in the row — no navigation.
-    const toggle = target.closest('[data-sidebar-toggle]');
+    // Chevron (parents with a link): toggles the submenu only — the click
+    // must not fall through to the surrounding anchor's navigation.
+    const chevron = target.closest('.submenu-arrow[data-sidebar-toggle]');
+    if (chevron !== null) {
+      event.preventDefault();
+      this.#toggleSubmenu(chevron);
+      return;
+    }
+
+    // Text parents (no own link): the whole row is the toggle.
+    const toggle = target.closest('.submenu-toggle[data-sidebar-toggle]');
     if (toggle !== null) {
       event.preventDefault();
       this.#toggleSubmenu(toggle);
@@ -129,12 +137,14 @@ class ShirazehSidebar extends PeyElement {
       return;
     }
 
-    // Leaf links navigate; the fresh page mount re-applies the branch state
-    // from #openIds.
+    // All row links navigate; the fresh page mount re-applies the branch
+    // state from #openIds (and closes the mobile drawer).
     const link = target.closest('a[data-route]');
     if (link !== null) {
       event.preventDefault();
       const route = link.dataset.route;
+      this.#openIds.clear();
+      this.#openBranchTo(route, this.#tree);
       if (this.#isMobile()) {
         this.#collapsed = true;
         this.#applyOffset();
@@ -169,13 +179,12 @@ class ShirazehSidebar extends PeyElement {
         hasChildren && isOpen ? 'open' : '',
       ].filter(Boolean).join(' ');
 
-      // Chevron sits in the gap between the title and the sidebar's inline
-      // edge (absolute at inline-start). For parents, the WHOLE row toggles
-      // the submenu: the entry itself carries data-sidebar-toggle.
+      // For link parents the chevron is its own toggle (clicking the row
+      // navigates to the page); for text parents the whole row toggles.
       const arrow = hasChildren
-        ? '<span class="submenu-arrow" aria-hidden="true"></span>'
+        ? `<span class="submenu-arrow" role="button" tabindex="0" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}" aria-controls="submenu-${escapeHtml(node.href)}" aria-label="باز و بسته کردن زیرمجموعه ${escapeHtml(node.title)}"></span>`
         : '';
-      const toggleAttr = hasChildren
+      const toggleAttr = node.type === 'text' && hasChildren
         ? ` data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}" aria-controls="submenu-${escapeHtml(node.href)}"`
         : '';
 
@@ -184,7 +193,7 @@ class ShirazehSidebar extends PeyElement {
         entry = `<button type="button" class="submenu-toggle"${toggleAttr}>${escapeHtml(node.title)}${arrow}</button>`;
       } else {
         const isCurrent = route === this.#path ? ' class="active"' : '';
-        entry = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}${toggleAttr}>${escapeHtml(node.title)}${arrow}</a>`;
+        entry = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(node.title)}${arrow}</a>`;
       }
 
       const submenu = hasChildren
