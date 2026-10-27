@@ -36,7 +36,10 @@ export default {
 | `appName` | `'شیرازه'` | نام برنامه در نوار بالا و عنوان زبانه |
 | `logo` | خاموش | لوگوی نوار بالا — `{ enabled, src, size }` |
 | `favicon` | خاموش | فاویکون زبانه — `{ enabled, src }` |
-| `githubCorner` | خاموش | پیوند گیت‌هاب در نوار بالا — `{ enabled, url }` |
+| `githubCorner` | خاموش | پیوند گیت‌هاب — `{ enabled, url, style: 'link' \| 'corner' }` |
+| `navbar` | جمع‌شونده | رفتار نوار بالا — `{ sticky, scrollBehavior: 'shrink' \| 'hide' \| 'normal' }`؛ محتوای نوار از `navbarFile` می‌آید |
+| `navbarFile` | `null` | پرونده مارک‌داون نوار بالا (نسبت به `docsRoot`)، مثل `config/navbar.md` |
+| `export` | روشن | دکمه خروجی صفحه (HTML خودکفا / مارک‌داون) — `{ enabled: true }` |
 | `extensions` | همه روشن | فعال/غیرفعال کردن دستور پارسنشان — شیءای با کلیدهای `admonitions`، `persianList`، `persianPoem` و `persianFootnote` (هرکدام `true`/`false`) |
 
 مثال خاموش‌کردن شعر و جعبه‌ها:

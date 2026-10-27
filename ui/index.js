@@ -124,9 +124,9 @@ export const setup = createApplicationSetup({
     // synchronous mount: zones from the async getNavbar, path from the
     // router's changed events.
     const docsService = resources.required[DOCS_SERVICE];
-    void Promise.resolve(docsService?.getNavbar?.()).then((navbar) => {
-      if (navbar !== null && navbar !== undefined) {
-        navbar.setZones(navbar);
+    void Promise.resolve(docsService?.getNavbar?.()).then((parsedNavbar) => {
+      if (parsedNavbar !== null && parsedNavbar !== undefined) {
+        navbar.setZones(parsedNavbar);
       }
     }).catch(() => undefined);
     resources.events.subscribe('router:changed', () => {
