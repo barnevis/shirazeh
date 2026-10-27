@@ -83,8 +83,8 @@ export default {
    * لوگوی کنار نام برنامه. برای فعال‌سازی، enabled را true و src را مسیر تصویر بگذارید.
    */
   logo: {
-    enabled: false,
-    src: '/assets/icon/logo.svg',
+    enabled: true,
+    src: './shirazeh.svg',
     size: '32px',
   },
 

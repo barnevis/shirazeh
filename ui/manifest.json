@@ -53,8 +53,8 @@
     },
     "appName": "شیرازه",
     "logo": {
-      "enabled": false,
-      "src": "",
+      "enabled": true,
+      "src": "./shirazeh.svg",
       "size": "32px"
     },
     "favicon": {
