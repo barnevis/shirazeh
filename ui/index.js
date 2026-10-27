@@ -11,6 +11,7 @@ import { createApplicationSetup } from 'pey.webui/shell/create-application-setup
 import { createSharedState } from 'pey.webui/shared-state';
 import './components/shirazeh-navbar.js';
 import './components/shirazeh-actions.js';
+import { TAG as SIDEBAR_TAG } from './components/shirazeh-sidebar.js';
 import appCatalog from './i18n/catalog.js';
 import { createThemeController } from './theme.js';
 
@@ -119,10 +120,33 @@ export const setup = createApplicationSetup({
     shell.append(actions);
     resources.actions = actions;
 
+    // Persistent sidebar: mounted once on the shell so it never re-mounts on
+    // navigation — only the page content swaps. Tree data and the active
+    // path arrive asynchronously.
+    const sidebar = document.createElement(SIDEBAR_TAG);
+    sidebar.slot = 'extension';
+    sidebar.connect({
+      infrastructure: { events: resources.events },
+      refs: {
+        router: resources.router,
+        path: '/',
+        appName: resources.config.appName,
+        logo: resources.config.logo,
+      },
+    });
+    shell.append(sidebar);
+    resources.sidebar = sidebar;
+
     const docsService = resources.required[DOCS_SERVICE];
+    void Promise.resolve(docsService?.getSidebar?.()).then((parsedSidebar) => {
+      if (parsedSidebar !== null && parsedSidebar !== undefined) {
+        sidebar.setTree(parsedSidebar.tree);
+      }
+    }).catch(() => undefined);
     resources.events.subscribe('router:changed', () => {
       try {
-        resources.currentPath = resources.router.getCurrentRoute().path;
+        const path = resources.router.getCurrentRoute().path;
+        sidebar.setCurrentPath(path);
       } catch {
         // A route read failure only skips the active-path update.
       }

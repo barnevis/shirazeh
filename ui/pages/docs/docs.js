@@ -5,7 +5,6 @@
 
 import { PeyElement } from 'pey.webui/base/pey-element';
 import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from './enhance-content.js';
-import { TAG as SIDEBAR_TAG } from '../../components/shirazeh-sidebar.js';
 import { TAG as TOC_TAG } from '../../components/shirazeh-toc.js';
 import {
   applyThemeInRoot,
@@ -69,7 +68,6 @@ class DocsPage extends PeyElement {
   #t = null;
   #config = {};
   #state = { status: 'loading' };
-  #sidebar = null;
   #toastTimer = null;
 
   onConnect(refs) {
@@ -127,13 +125,7 @@ class DocsPage extends PeyElement {
       return;
     }
 
-    const [page, sidebar] = await Promise.all([
-      this.#docsService.getPage(path),
-      this.#docsService.getSidebar().catch((error) => {
-        console.error('[app-page-docs] getSidebar failed:', error);
-        return null;
-      }),
-    ]);
+    const page = await this.#docsService.getPage(path);
 
     // A newer route may have mounted while the fetch was in flight.
     if (path !== this.#path) {
@@ -148,7 +140,6 @@ class DocsPage extends PeyElement {
       // A rendered not-found page gets the app name alone as tab title.
       this.#applyDocumentTitle(page.notFound === true ? null : page.documentTitle);
     }
-    this.#sidebar = sidebar !== null && Array.isArray(sidebar?.tree) ? sidebar : null;
     this.requestRender({ preserve: false });
     // The base class flushes the render in a microtask; queueMicrotask is
     // FIFO, so this post-render step runs against the freshly rendered DOM.
@@ -213,25 +204,8 @@ class DocsPage extends PeyElement {
   }
 
   #mountComponents() {
-    const sidebarSlot = this.shadowRoot?.querySelector('[data-sidebar-slot]');
-    if (sidebarSlot !== null && sidebarSlot !== undefined) {
-      sidebarSlot.replaceChildren();
-      if (this.#sidebar !== null) {
-        const sidebar = document.createElement(SIDEBAR_TAG);
-        sidebar.connect({
-          infrastructure: { events: this.#eventsFacade() },
-          refs: {
-            tree: this.#sidebar.tree,
-            path: this.#path,
-            router: this.#router,
-            appName: this.#appName,
-            logo: this.#config.logo,
-          },
-        });
-        sidebarSlot.append(sidebar);
-      }
-    }
-
+    // The sidebar is persistent chrome living on the app shell (it must not
+    // re-mount per navigation); only the per-page TOC mounts here.
     const tocSlot = this.shadowRoot?.querySelector('[data-toc-slot]');
     if (tocSlot !== null && tocSlot !== undefined) {
       tocSlot.replaceChildren();
@@ -547,9 +521,6 @@ class DocsPage extends PeyElement {
           display: flex;
           min-block-size: 100vh;
         }
-        [data-sidebar-slot] {
-          display: contents;
-        }
         .content {
           flex-grow: 1;
           min-inline-size: 0;
@@ -582,7 +553,6 @@ class DocsPage extends PeyElement {
         }
       </style>
       <div class="layout">
-        <div data-sidebar-slot></div>
         ${this.#renderState()}
       </div>
       <div data-toc-slot></div>

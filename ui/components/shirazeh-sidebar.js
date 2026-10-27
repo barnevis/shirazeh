@@ -48,6 +48,33 @@ class ShirazehSidebar extends PeyElement {
         : false;
       this.#collapsed = mobile;
     }
+    this.#applyOffset();
+  }
+
+  /** Replaces the parsed tree (async sidebar data) and re-renders. */
+  setTree(tree) {
+    this.#tree = Array.isArray(tree) ? tree : [];
+    this.#openBranchTo(this.#path, this.#tree);
+    this.requestRender({ preserve: false });
+  }
+
+  /** Updates the active route; keeps the sidebar persistent across pages. */
+  setCurrentPath(path) {
+    if (typeof path !== 'string' || path === this.#path) {
+      return;
+    }
+    this.#path = path;
+    this.#openBranchTo(path, this.#tree);
+    this.requestRender({ preserve: false });
+  }
+
+  #applyOffset() {
+    // The page content offsets itself through this custom property; mobile
+    // overrides it to 0 via its own media query.
+    document.documentElement.style.setProperty(
+      '--shirazeh-sidebar-offset',
+      this.#collapsed === true ? '0px' : 'var(--sidebar-width, 280px)',
+    );
   }
 
   #openBranchTo(path, nodes) {
@@ -91,6 +118,7 @@ class ShirazehSidebar extends PeyElement {
     // shadow root and destroy the mounted component.
     if (target.closest('button[data-sidebar-collapse]') !== null) {
       this.#collapsed = !this.#collapsed;
+      this.#applyOffset();
       this.classList.toggle('is-collapsed', this.#collapsed);
       return;
     }
@@ -109,6 +137,7 @@ class ShirazehSidebar extends PeyElement {
       const route = link.dataset.route;
       if (this.#isMobile()) {
         this.#collapsed = true;
+        this.#applyOffset();
         this.classList.add('is-collapsed');
       }
       this.#router?.navigate?.(route);
@@ -201,8 +230,11 @@ class ShirazehSidebar extends PeyElement {
           inline-size: var(--sidebar-width, 280px);
           background-color: var(--pey-color-surface);
           block-size: 100vh;
-          position: sticky;
-          inset-block-start: 0;
+          /* Fixed chrome: the sidebar persists across page navigations and
+             never scrolls with the content. */
+          position: fixed;
+          inset-block: 0;
+          inset-inline-start: 0;
           border-inline-end: 1px solid var(--pey-color-border);
           transition: margin 0.3s ease;
           z-index: 100;

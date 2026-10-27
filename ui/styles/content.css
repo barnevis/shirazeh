@@ -6,6 +6,13 @@
 
 .content {
   padding: 1.5rem;
+  /* Offset for the fixed sidebar; mobile stacks over it instead. */
+  margin-inline-start: var(--shirazeh-sidebar-offset, var(--sidebar-width, 280px));
+}
+@media (max-width: 767px) {
+  .content {
+    margin-inline-start: 0;
+  }
 }
 
 /* Prose container (old prose.css) */
