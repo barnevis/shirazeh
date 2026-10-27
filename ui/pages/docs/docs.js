@@ -541,8 +541,6 @@ class DocsPage extends PeyElement {
           display: flex;
           justify-content: space-between;
           gap: var(--pey-space-4);
-          max-inline-size: 800px;
-          margin: var(--pey-space-8) auto 0;
           /* Physical placement: previous button at the left end, next at the
              right end, stable in both UI directions. */
           direction: ltr;
@@ -556,6 +554,7 @@ class DocsPage extends PeyElement {
           border: 1px solid var(--pey-color-border);
           background-color: var(--pey-color-canvas);
           color: var(--pey-color-text);
+          text-decoration: none;
           cursor: pointer;
           font-family: var(--pey-font-family-base);
           font-size: var(--pey-font-size-sm);
