@@ -76,16 +76,9 @@ class ShirazehSidebar extends PeyElement {
       return;
     }
 
-    // Chevron after the title (link parents): toggles the submenu instead of
-    // navigating — the click must not fall through to the anchor.
-    const chevron = target.closest('.submenu-arrow');
-    if (chevron !== null) {
-      event.preventDefault();
-      this.#toggleSubmenu(chevron);
-      return;
-    }
-
-    const toggle = target.closest('.submenu-toggle');
+    // Parent rows (link or button carrying data-sidebar-toggle) toggle their
+    // submenu on a click anywhere in the row — no navigation.
+    const toggle = target.closest('[data-sidebar-toggle]');
     if (toggle !== null) {
       event.preventDefault();
       this.#toggleSubmenu(toggle);
@@ -108,15 +101,12 @@ class ShirazehSidebar extends PeyElement {
       return;
     }
 
-    // Navigating to a sidebar page re-opens its branch and closes the drawer;
-    // navigation itself goes through the router like every other chrome link.
-    // The fresh page mount re-applies the branch state from #openIds.
+    // Leaf links navigate; the fresh page mount re-applies the branch state
+    // from #openIds.
     const link = target.closest('a[data-route]');
     if (link !== null) {
       event.preventDefault();
       const route = link.dataset.route;
-      this.#openIds.clear();
-      this.#openBranchTo(route, this.#tree);
       if (this.#isMobile()) {
         this.#collapsed = true;
         this.classList.add('is-collapsed');
@@ -150,22 +140,26 @@ class ShirazehSidebar extends PeyElement {
         hasChildren && isOpen ? 'open' : '',
       ].filter(Boolean).join(' ');
 
-      // Chevron sits exactly after the title (old app layout): inside the
-      // link for link-parents, inside a full-width toggle for text parents.
+      // Chevron sits in the gap between the title and the sidebar's inline
+      // edge (absolute at inline-start). For parents, the WHOLE row toggles
+      // the submenu: the entry itself carries data-sidebar-toggle.
       const arrow = hasChildren
-        ? `<span class="submenu-arrow" role="button" tabindex="0" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}" aria-label="زیرمنو"></span>`
+        ? '<span class="submenu-arrow" aria-hidden="true"></span>'
+        : '';
+      const toggleAttr = hasChildren
+        ? ` data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}" aria-controls="submenu-${escapeHtml(node.href)}"`
         : '';
 
       let entry;
       if (node.type === 'text') {
-        entry = `<button type="button" class="submenu-toggle" data-sidebar-toggle="${escapeHtml(node.href)}" aria-expanded="${isOpen}">${escapeHtml(node.title)}${arrow}</button>`;
+        entry = `<button type="button" class="submenu-toggle"${toggleAttr}>${escapeHtml(node.title)}${arrow}</button>`;
       } else {
         const isCurrent = route === this.#path ? ' class="active"' : '';
-        entry = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}>${escapeHtml(node.title)}${arrow}</a>`;
+        entry = `<a href="#${route}" data-route="${escapeHtml(route)}"${isCurrent}${toggleAttr}>${escapeHtml(node.title)}${arrow}</a>`;
       }
 
       const submenu = hasChildren
-        ? `<ul class="sidebar-submenu${isOpen ? ' open' : ''}">${this.#renderNodes(node.children)}</ul>`
+        ? `<ul class="sidebar-submenu${isOpen ? ' open' : ''}" id="submenu-${escapeHtml(node.href)}">${this.#renderNodes(node.children)}</ul>`
         : '';
       return `<li class="${liClass}">${entry}${submenu}</li>`;
     }).join('');
@@ -270,6 +264,7 @@ class ShirazehSidebar extends PeyElement {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          position: relative;
         }
         .sidebar-nav .submenu-toggle {
           background: none;
@@ -300,23 +295,23 @@ class ShirazehSidebar extends PeyElement {
           max-block-size: 1000px;
         }
         .submenu-arrow {
-          /* Chevron hugs the title: small fixed gap after the label text. */
-          margin-inline-start: 0.5rem;
-          transition: transform 0.3s ease;
-          flex-shrink: 0;
+          /* Chevron in the gap between the sidebar's inline edge and the
+             title (the title text starts at 1.5rem padding). */
+          position: absolute;
+          inset-inline-start: 0.4rem;
+          inset-block: 0;
+          margin-block: auto;
+          block-size: 1rem;
+          inline-size: 1rem;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          cursor: pointer;
-          color: var(--pey-color-text-muted);
+          transition: transform 0.3s ease;
         }
         .submenu-arrow::before {
           content: '›';
           display: inline-block;
           font-weight: bold;
-        }
-        .sidebar-nav a:hover .submenu-arrow {
-          color: inherit;
         }
         li.has-submenu.open > a > .submenu-arrow,
         li.has-submenu.open > .submenu-toggle .submenu-arrow {

@@ -57,30 +57,46 @@ test('should_render_brand_header_with_logo_and_name', async () => {
   assert.equal(shadow.querySelector('.app-logo')?.getAttribute('src'), './shirazeh.svg');
 });
 
-test('should_toggle_submenu_with_animation_classes', async () => {
+test('should_toggle_submenu_by_row_click', async () => {
   const { shadow } = await mount({ path: '/about' });
 
-  const chevron = shadow.querySelector('.submenu-arrow[data-sidebar-toggle]');
-  assert.equal(chevron.getAttribute('aria-expanded'), 'false');
-  chevron.click();
-  assert.equal(chevron.getAttribute('aria-expanded'), 'true');
+  const row = shadow.querySelector('a[data-sidebar-toggle]');
+  assert.equal(row.getAttribute('aria-expanded'), 'false');
+  row.click();
+  assert.equal(row.getAttribute('aria-expanded'), 'true');
   assert.equal(shadow.querySelectorAll('.sidebar-submenu.open').length, 1);
-  chevron.click();
-  assert.equal(chevron.getAttribute('aria-expanded'), 'false');
+  row.click();
+  assert.equal(row.getAttribute('aria-expanded'), 'false');
 });
 
-test('should_navigate_through_router_when_link_clicked', async () => {
+test('should_navigate_through_router_when_leaf_link_clicked', async () => {
   const navigated = [];
   const { shadow, sidebar } = await mount({
     path: '/',
     router: { navigate: (path) => navigated.push(path) },
   });
 
-  const link = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')]
-    .find((a) => a.dataset.route === '/guide');
-  link.click();
+  const leaf = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')]
+    .find((a) => a.dataset.route === '/about');
+  leaf.click();
 
-  assert.deepEqual(navigated, ['/guide']);
+  assert.deepEqual(navigated, ['/about']);
+});
+
+test('should_not_navigate_when_parent_row_is_clicked', async () => {
+  const navigated = [];
+  const { shadow, sidebar } = await mount({
+    path: '/',
+    router: { navigate: (path) => navigated.push(path) },
+  });
+
+  const parent = [...shadow.querySelectorAll('.sidebar-nav a[data-route]')]
+    .find((a) => a.dataset.route === '/');
+  parent.click();
+
+  assert.deepEqual(navigated, []);
+  // the '/' row starts open on the '/' path; the click closes it
+  assert.equal(parent.getAttribute('aria-expanded'), 'false');
 });
 
 test('should_render_hidden_aside_when_tree_is_empty', async () => {
