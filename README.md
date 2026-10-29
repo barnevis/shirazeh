@@ -4,6 +4,7 @@
 [![AI](https://img.shields.io/badge/Built%20with-AI-blueviolet)](#)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Bonyan Architecture](https://img.shields.io/badge/bonyan-0.11-56c3bf)](https://github.com/barnevis/bonyan)
+<a href="docs/features.md"><img src="src/ui/assets/shirazeh-badge.svg" height="20" alt="شیرازه"></a>
 
 **شیرازه** یک مستندساز وب است: پوشه‌ای از پرونده‌های مارک‌داون را به یک سایت مستندات زنده تبدیل می‌کند — بدون ساخت، بدون پایگاه داده، فقط پرونده‌های استاتیک.
 
