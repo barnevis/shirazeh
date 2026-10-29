@@ -141,9 +141,6 @@ class DocsPage extends PeyElement {
       this.#applyDocumentTitle(page.notFound === true ? null : page.documentTitle);
     }
     this.requestRender({ preserve: false });
-    // The base class flushes the render in a microtask; queueMicrotask is
-    // FIFO, so this post-render step runs against the freshly rendered DOM.
-    queueMicrotask(() => this.#afterRender());
   }
 
   // The browser tab title: the page's resolved document title (sidebar
@@ -158,10 +155,12 @@ class DocsPage extends PeyElement {
     }
   }
 
-  // Runs after each render flush: wires the sidebar/TOC components, applies
-  // the display enhancements and syntax highlighting, and consumes a
-  // pending deep-link anchor.
-  #afterRender() {
+  // Base-class post-render hook: wires the TOC component, applies the
+  // display enhancements and syntax highlighting, and consumes a pending
+  // deep-link anchor. Runs after every flush — including the loading state,
+  // where the queries below find nothing and the hook is a no-op — and is
+  // re-run when the stylesheet gate defers the first contentful render.
+  afterRender() {
     this.#mountComponents();
     const content = this.shadowRoot?.querySelector('.markdown-body');
     if (content !== null && content !== undefined) {
@@ -173,12 +172,14 @@ class DocsPage extends PeyElement {
     }
 
     // A deep link (#/path?a=<heading id>) scrolls to its heading after the
-    // content and its anchors exist; consumed once per mount.
+    // content and its anchors exist; consumed only once actually found, so
+    // an earlier flush (loading state) keeps it pending.
     if (this.#anchorTarget !== null) {
-      const id = this.#anchorTarget;
-      this.#anchorTarget = null;
-      this.shadowRoot?.getElementById(decodeURIComponent(id))
-        ?.scrollIntoView({ behavior: 'smooth' });
+      const anchor = this.shadowRoot?.getElementById(decodeURIComponent(this.#anchorTarget));
+      if (anchor !== null && anchor !== undefined) {
+        this.#anchorTarget = null;
+        anchor.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   }
 

@@ -257,6 +257,7 @@ class PeyElement extends HTMLElement {
       this.#resetStylesheetState();
     }
     let snapshot = null;
+    let rendered = false;
     try {
       if (preserve && this.shadowRoot.childNodes.length) snapshot = snapshotMarkers(this.shadowRoot);
       const output = this.render();
@@ -269,6 +270,7 @@ class PeyElement extends HTMLElement {
       const markers = getMarkers(this.shadowRoot);
       validateMarkers(markers);
       this.#restore(snapshot, markers);
+      rendered = true;
     } catch (error) {
       this.#handleError(error, 'PEY_ELEMENT_RENDER_FAILED');
       this.shadowRoot.innerHTML = FALLBACK_MARKUP;
@@ -281,6 +283,15 @@ class PeyElement extends HTMLElement {
         // the error boundary down with it: the fallback renders without the sheet
         // and the apply failure is logged, never propagated.
         this.#log('PEY_ELEMENT_STYLESHEET_APPLY_FAILED', stylesheetError);
+      }
+    }
+    // A hook failure must not tear down the content that just rendered (the
+    // boundary above is for render() itself), so the hook call is isolated.
+    if (rendered) {
+      try {
+        this.afterRender();
+      } catch (hookError) {
+        this.#log('PEY_ELEMENT_AFTER_RENDER_FAILED', hookError);
       }
     }
   }
@@ -320,6 +331,18 @@ class PeyElement extends HTMLElement {
   }
 
   render() { return ''; }
+
+  /**
+   * Post-render hook, called synchronously after every successful contentful
+   * flush of this element's shadow root (including renders deferred by a
+   * still-loading stylesheet). The shadow root holds the markup `render()`
+   * just produced when this runs. The default implementation does nothing;
+   * overrides must tolerate being called once per flush, on every state the
+   * component renders (query for the markup you need instead of assuming a
+   * previous state), and must not throw.
+   * @returns {void}
+   */
+  afterRender() {}
 
   handleEvent(event) {
     void event;
