@@ -7,14 +7,14 @@
 // The script fails loudly when a bare import inside the vendored tree has no
 // import-map entry, so a missing package can never break the browser boot
 // silently again.
-// Run with: node scripts/build-import-map.mjs
+// Run with: node src/scripts/build-import-map.mjs
 
 import { readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const HTML_PATH = new URL('../index.html', import.meta.url);
-const VENDOR_DIR = new URL('../vendor/node_modules/', import.meta.url);
-const WEBUI_PACKAGE_PATH = new URL('../ui-kit/pey-webui/package.json', import.meta.url);
+const HTML_PATH = new URL('../../index.html', import.meta.url);
+const VENDOR_DIR = new URL('../../src/vendor/node_modules/', import.meta.url);
+const WEBUI_PACKAGE_PATH = new URL('../../src/ui-kit/package.json', import.meta.url);
 const IMPORT_MAP_MARKER = /<script type="importmap">[\s\S]*?<\/script>/;
 const BARE_IMPORT_PATTERN = /from\s+['"]([^'"][^'"]*)['"]|import\s*\(\s*['"]([^'"][^'"]*)['"]\s*\)/g;
 
@@ -100,7 +100,7 @@ async function buildWebuiImports() {
     if (subpath.startsWith('./templates/')) {
       continue;
     }
-    imports[`pey.webui${subpath.slice(1)}`] = `./ui-kit/pey-webui/${target.replace(/^\.\//, '')}`;
+    imports[`pey.webui${subpath.slice(1)}`] = `./src/ui-kit/${target.replace(/^\.\//, '')}`;
   }
   return imports;
 }
@@ -109,7 +109,7 @@ const vendorImports = await buildVendorImports();
 const imports = {
   ...vendorImports,
   ...(await buildWebuiImports()),
-  '@pey/core': './core/pey-core/index.js',
+  '@pey/core': './src/core/index.js',
 };
 
 // Completeness guard: every bare import in the vendored tree must resolve.

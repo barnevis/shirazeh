@@ -84,7 +84,7 @@ export default {
    */
   logo: {
     enabled: true,
-    src: './shirazeh.svg',
+    src: './src/ui/assets/shirazeh.svg',
     size: '32px',
   },
 
@@ -93,7 +93,7 @@ export default {
    */
   favicon: {
     enabled: true,
-    src: './shirazeh.svg',
+    src: './src/ui/assets/shirazeh.svg',
   },
 
   /**

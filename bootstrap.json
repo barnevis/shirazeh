@@ -9,38 +9,38 @@
     "storage": "IndexedDBAdapter"
   },
   "ui": {
-    "path": "./ui"
+    "path": "./src/ui"
   },
   "plugins": [
     {
       "name": "pey.storage",
       "version": "0.5.0",
-      "path": "./plugins/pey.storage"
+      "path": "./src/plugins/pey.storage"
     },
     {
       "name": "pey.router",
       "version": "1.1.0",
-      "path": "./plugins/pey.router"
+      "path": "./src/plugins/pey.router"
     },
     {
       "name": "shirazeh.http",
       "version": "0.1.0",
-      "path": "./plugins/shirazeh.http"
+      "path": "./src/plugins/shirazeh.http"
     },
     {
       "name": "pey.markdown",
       "version": "1.1.0",
-      "path": "./plugins/pey.markdown"
+      "path": "./src/plugins/pey.markdown"
     },
     {
       "name": "shirazeh.docs",
       "version": "0.3.0",
-      "path": "./plugins/shirazeh.docs"
+      "path": "./src/plugins/shirazeh.docs"
     },
     {
       "name": "shirazeh.prefs",
       "version": "0.1.0",
-      "path": "./plugins/shirazeh.prefs"
+      "path": "./src/plugins/shirazeh.prefs"
     }
   ],
   "config": {

@@ -11,12 +11,12 @@
     "micromark-util-character": "^2.0.0",
     "micromark-util-symbol": "^2.0.0",
     "micromark-util-types": "^2.0.0",
-    "pey.webui": "file:ui-kit/pey-webui"
+    "pey.webui": "file:src/ui-kit"
   },
   "scripts": {
-    "test": "node --test --experimental-test-module-mocks core/pey-core/tests/*.test.js plugins/pey.router/tests/*.test.js plugins/pey.router/tests/*/*.test.js plugins/pey.storage/tests/*.test.js plugins/pey.storage/tests/*/*.test.js plugins/pey.markdown/tests/*.test.js plugins/shirazeh.http/tests/*.test.js plugins/shirazeh.docs/tests/*.test.js plugins/shirazeh.prefs/tests/*.test.js tests/*.test.js tests/ui/*.test.js tests/integration/*.test.js",
+    "test": "node --test --experimental-test-module-mocks src/core/tests/*.test.js src/plugins/pey.router/tests/*.test.js src/plugins/pey.router/tests/*/*.test.js src/plugins/pey.storage/tests/*.test.js src/plugins/pey.storage/tests/*/*.test.js src/plugins/pey.markdown/tests/*.test.js src/plugins/shirazeh.http/tests/*.test.js src/plugins/shirazeh.docs/tests/*.test.js src/plugins/shirazeh.prefs/tests/*.test.js src/tests/*.test.js src/tests/ui/*.test.js src/tests/integration/*.test.js",
     "serve": "python3 scripts/serve.py",
-    "build:import-map": "node scripts/build-import-map.mjs"
+    "build:import-map": "node src/scripts/build-import-map.mjs"
   },
   "engines": {
     "node": ">=22"

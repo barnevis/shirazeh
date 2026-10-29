@@ -23,24 +23,34 @@
 
 ```
 shirazeh/
-  index.html               — نقطه ورود + نقشه ایمپورت (تولیدشده)
-  bootstrap.json           — پیکربندی بنیان (افزونه‌ها، آداپتورها، UI)
-  host/browser-host.js     — میزبان اجرای مرورگر (ConfigSource/EnvSource/ModuleLoader)
-  core/pey-core/           — هسته پی (وندورشده)
-  plugins/
-    pey.router/            — مسیریاب (وندورشده + آداپتور Hash محلی)
-    pey.markdown/          — مارک‌داون (وندورشده)
-    shirazeh.http/         — انتقال HTTP (جدید)
-    shirazeh.docs/         — منطق مستندات (جدید)
-  ui-kit/pey-webui/        — کیت رابط کاربری (وندورشده)
-  ui/                      — رابط کاربری شیرازه (manifest، صفحات، مؤلفه‌ها، i18n)
-  docs/                    — محتوای مستندات (نمونه)
-  vendor/                  — درخت وابستگی micromark برای مرورگر بدون بیلد
-  tests/integration/       — آزمون یکپارچه‌سازی با هسته واقعی
-  scripts/                 — اسکریپت ساخت نقشه ایمپورت
+├── index.html               — نقطه ورود + نقشه ایمپورت (تولیدشده)
+├── bootstrap.json           — پیکربندی بنیان (افزونه‌ها، آداپتورها، UI)
+├── package.json / LICENSE / CHANGELOG.md / README.md
+├── config/
+│   └── config.js            — پیکربندی کاربر (ظاهر و نحوه استفاده)
+├── docs/                    — محتوای مستندات + VENDORED.md
+├── imp/                     — اسناد داخلی (در گیت نیست)
+├── src/
+│   ├── core/                — هسته پی (وندورشده)
+│   ├── host/
+│   │   ├── browser-host.js  — میزبان مرورگر
+│   │   └── user-config.js   — ادغام پیکربندی کاربر
+│   ├── plugins/
+│   │   ├── pey.router/      — مسیریاب (وندور + آداپتور Hash)
+│   │   ├── pey.markdown/    — مارک‌داون (وندور)
+│   │   ├── pey.storage/     — ذخیره‌سازی (وندور)
+│   │   ├── shirazeh.http/   — انتقال HTTP
+│   │   ├── shirazeh.docs/   — منطق مستندات
+│   │   └── shirazeh.prefs/  — پایداری تنظیمات
+│   ├── scripts/             — سرور توسعه + ساخت نقشه ایمپورت
+│   ├── tests/               — آزمون‌های پروژه (واحد + یکپارچه)
+│   ├── ui/                  — رابط کاربری + assets (لوگو، فونت)
+│   ├── ui-kit/              — کیت رابط کاربری (وندور)
+│   └── vendor/              — وابستگی‌های وندور (micromark، highlight.js)
+└── node_modules/
 ```
 
-مبدأ و SHA نسخه‌های وندورشده در [VENDORED.md](VENDORED.md) ثبت شده است.
+مسیر مبدأ و نسخه بسته‌های وندورشده در [docs/VENDORED.md](docs/VENDORED.md) ثبت شده است.
 
 ## راه‌اندازی
 

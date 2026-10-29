@@ -9,7 +9,7 @@ import { readFile } from 'node:fs/promises';
 const FONTS_DIR = new URL('../ui/assets/fonts/', import.meta.url);
 const FONTS_CSS = new URL('../ui/styles/fonts.css', import.meta.url);
 const APP_CSS = new URL('../ui/styles/app.css', import.meta.url);
-const INDEX_HTML = new URL('../index.html', import.meta.url);
+const INDEX_HTML = new URL('../../index.html', import.meta.url);
 
 const FONT_WEIGHTS = ['Regular', 'Medium', 'Bold'];
 

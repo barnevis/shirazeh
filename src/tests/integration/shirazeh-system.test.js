@@ -7,9 +7,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
-import { PeyCore } from '../../core/pey-core/index.js';
+import { PeyCore } from '../../core/index.js';
 
-const PROJECT_ROOT = new URL('../../', import.meta.url);
+const PROJECT_ROOT = new URL('../../../', import.meta.url);
 
 const SAMPLE_FILES = {
   './docs/README.md': '# خانه\n\nمتن **مهم** و [لینک](guide)',
@@ -57,11 +57,11 @@ function createBootstrapConfig({ includeStorage = false } = {}) {
     architecture: '0.11',
     core: { name: 'pey.core', version: '0.2.0' },
     adapters: {},
-    ui: { path: './ui' },
+    ui: { path: './src/ui' },
     plugins: [
-      { name: 'shirazeh.http', version: '0.1.0', path: './plugins/shirazeh.http' },
-      { name: 'pey.markdown', version: '1.1.0', path: './plugins/pey.markdown' },
-      { name: 'shirazeh.docs', version: '0.3.0', path: './plugins/shirazeh.docs' },
+      { name: 'shirazeh.http', version: '0.1.0', path: './src/plugins/shirazeh.http' },
+      { name: 'pey.markdown', version: '1.1.0', path: './src/plugins/pey.markdown' },
+      { name: 'shirazeh.docs', version: '0.3.0', path: './src/plugins/shirazeh.docs' },
     ],
     config: {
       'shirazeh.http': {},
@@ -74,13 +74,13 @@ function createBootstrapConfig({ includeStorage = false } = {}) {
 
   if (includeStorage) {
     config.plugins.unshift(
-      { name: 'pey.storage', version: '0.5.0', path: './plugins/pey.storage' },
+      { name: 'pey.storage', version: '0.5.0', path: './src/plugins/pey.storage' },
     );
     // The in-memory adapter runs under Node (no IndexedDB there); the browser
     // uses IndexedDBAdapter, selected in bootstrap.json.
     config.adapters.storage = 'InMemoryAdapter';
     config.plugins.push(
-      { name: 'shirazeh.prefs', version: '0.1.0', path: './plugins/shirazeh.prefs' },
+      { name: 'shirazeh.prefs', version: '0.1.0', path: './src/plugins/shirazeh.prefs' },
     );
     config.config['pey.storage'] = {
       databaseName: 'shirazeh-integration-db',
@@ -111,7 +111,7 @@ function createInMemoryHost({ includeStorage = false } = {}) {
         return JSON.parse(await readFile(new URL(`${cleanRef}/manifest.json`, PROJECT_ROOT), 'utf8'));
       },
       async loadEntry(ref) {
-        if (ref === './ui') {
+        if (ref === './src/ui') {
           // A minimal fake UI that captures the Core-bound service map so the
           // test can call the real services exactly as the real UI would.
           return {

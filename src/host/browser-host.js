@@ -2,13 +2,15 @@
 // Sits outside Bonyan: prepares ConfigSource, EnvSource, and ModuleLoader
 // for the browser, constructs the platform-neutral Pey Core, and starts it.
 
-import { PeyCore } from '../core/pey-core/index.js';
+import { PeyCore } from '../core/index.js';
 import { applyUserConfig, loadUserConfig } from './user-config.js';
 
-const APP_ROOT = new URL('../', import.meta.url);
+// The application root is the repository root (index.html, bootstrap.json,
+// config/ and docs/ live there); everything else hangs under src/.
+const APP_ROOT = new URL('../../', import.meta.url);
 const MANIFEST_FILE = 'manifest.json';
 const ENTRY_FILE = 'index.js';
-const USER_CONFIG_URL = new URL('../config/config.js', import.meta.url).href;
+const USER_CONFIG_URL = new URL('../../config/config.js', import.meta.url).href;
 
 function toAbsoluteUrl(ref, fileName) {
   const cleanRef = typeof ref === 'string' ? ref.replace(/^\.\//, '').replace(/\/+$/, '') : '';
