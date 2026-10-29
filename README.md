@@ -64,9 +64,10 @@ shirazeh/
 پیش‌نیاز: Node.js نسخه ۲۲ یا بالاتر.
 
 ```bash
-# نصب وابستگی‌ها (ریزه: وابستگی‌های اجرایی وندور پارسنشان؛ افزونه مارک‌داون)
+# نصب وابستگی‌ها — افزونه‌های دارای وابستگی آزمونی (پارسنشان؛ fake-indexeddb)
 npm install
-cd src/plugins/pey.markdown && npm install --omit=dev && cd ../../..
+npm install --prefix src/plugins/pey.markdown
+npm install --prefix src/plugins/pey.storage
 
 # بازسازی وابستگی‌های مرورگری وندورشده (در گیت نیستند؛ از src/vendor/package.json)
 npm run vendor

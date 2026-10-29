@@ -39,7 +39,8 @@ jobs:
       - name: Install dependencies and run the test suite
         run: |
           npm install
-          cd src/plugins/pey.markdown && npm install --omit=dev && cd ../..
+          npm install --prefix src/plugins/pey.markdown
+          npm install --prefix src/plugins/pey.storage
           npm test
 
       - name: Verify the import map covers the rebuilt vendor tree
