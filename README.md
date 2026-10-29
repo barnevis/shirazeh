@@ -68,6 +68,9 @@ shirazeh/
 npm install
 cd src/plugins/pey.markdown && npm install --omit=dev && cd ../../..
 
+# بازسازی وابستگی‌های مرورگری وندورشده (در گیت نیستند؛ از src/vendor/package.json)
+npm run vendor
+
 # اجرای آزمون‌ها (کل مجموعه)
 npm test
 
@@ -99,7 +102,11 @@ npm run serve
 
 ## استقرار
 
-خروجی یک پوشه استاتیک است؛ کل پوشه پروژه را روی GitHub Pages، Netlify یا هر میزبان استاتیک دیگر قرار دهید. چون مسیریابی Hash است، نیازی به تنظیم SPA-fallback روی سرور نیست.
+خروجی یک پوشه استاتیک است و چون مسیریابی Hash است، نیازی به تنظیم SPA-fallback روی سرور نیست.
+
+**GitHub Pages:** پوشه `.github/workflows/deploy-pages.yml` همراه پروژه است — با هر push به `main` (یا اجرای دستی workflow) وابستگی‌های وندورشده بازتولید، آزمون‌ها اجرا و فقط پرونده‌های لازم سایت منتشر می‌شوند. کافی است در تنظیمات مخزن، Source صفحه‌ها را روی «GitHub Actions» بگذارید. انتشار مستقیم از ریشه برنچ کار نمی‌کند، چون `src/vendor/node_modules` (وابستگی‌های مرورگری) در مخزن گیت نیست و فقط در استقرار بازسازی می‌شود.
+
+**میزبان استاتیک دیگر:** محتوای همان استقرار Pages را می‌توانید محلی هم بسازید — `npm run vendor` و سپس کپی `index.html`، `bootstrap.json`، `config/`، `docs/` و `src/` (منهای `src/tests` و `src/scripts` و node_modules افزونه‌ها).
 
 ## توسعه
 

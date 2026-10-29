@@ -1,0 +1,63 @@
+# Deploys Shirazeh to GitHub Pages. The vendored browser dependencies under
+# src/vendor/node_modules are NOT in the repository — they are rebuilt here
+# from src/vendor/package.json (exact pins, see docs/VENDORED.md) before the
+# site files are collected, so the deploy artifact is self-contained and the
+# docs site keeps working offline once served.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rebuild vendored browser dependencies
+        run: npm run vendor
+
+      - name: Install dependencies and run the test suite
+        run: |
+          npm install
+          cd src/plugins/pey.markdown && npm install --omit=dev && cd ../..
+          npm test
+
+      - name: Verify the import map covers the rebuilt vendor tree
+        run: |
+          npm run build:import-map
+          git diff --exit-code index.html
+
+      - name: Collect site files
+        run: |
+          mkdir -p _site
+          cp -r index.html bootstrap.json config docs src _site/
+          rm -rf _site/src/tests _site/src/scripts _site/src/plugins/*/node_modules
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

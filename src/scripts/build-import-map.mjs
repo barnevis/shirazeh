@@ -1,6 +1,6 @@
 // Rebuilds the import-map block inside index.html.
 // Merges three sources:
-//   1. every package vendored under vendor/node_modules (resolved from each
+//   1. every package vendored under src/vendor/node_modules (resolved from each
 //      package.json exports, falling back to main/index.js)
 //   2. every export of the vendored pey.webui package (from its package.json)
 //   3. the @pey/core package entry
@@ -41,9 +41,14 @@ function resolveExportTarget(target) {
 }
 
 async function buildVendorImports() {
+  // The map covers exactly the pinned dependency list — npm may also drop
+  // never-imported transitive extras (debug, ms, devlop, @types) into
+  // node_modules; they must not grow the map (some have CJS-style main
+  // fields that are not valid browser targets).
+  const pinned = JSON.parse(await readFile(new URL('../package.json', VENDOR_DIR), 'utf8')).dependencies;
   const entries = {};
-  for (const name of await readdir(VENDOR_DIR)) {
-    const packageDir = new URL(name, VENDOR_DIR);
+  for (const name of Object.keys(pinned)) {
+    const packageDir = new URL(`${name}/`, VENDOR_DIR);
     if (!(await stat(packageDir)).isDirectory()) {
       continue;
     }
@@ -57,7 +62,7 @@ async function buildVendorImports() {
     if (target === null) {
       throw new Error(`Vendored package "${name}" has no resolvable entry`);
     }
-    entries[name] = `./vendor/node_modules/${name}/${target.replace(/^\.\//, '')}`;
+    entries[name] = `./src/vendor/node_modules/${name}/${target.replace(/^\.\//, '')}`;
   }
   return entries;
 }

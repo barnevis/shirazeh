@@ -10,9 +10,22 @@
 | pey-webui | https://github.com/peyjs/pey-webui | `801a3e70c6a4c63e60131c4e9c631485437419f4` | 2026-08-17 | `src/ui-kit/` |
 | pey-storage | https://github.com/peyjs/pey-storage | `9db2985a2331f3df40dc283cd8ef8a152dca28ed` | 2026-10-17 | `src/plugins/pey.storage/` |
 | highlight.js 11.9.0 | https://github.com/highlightjs/highlight.js (باندل UMD از cdnjs) | — (بارگیری نسخه) | 2026-10-27 | `src/vendor/highlight/` |
-| parsneshan | https://github.com/barnevis/parsneshan (برچسب v0.2.0) | — (کلون تگ) | 2026-10-26 | `vendor/node_modules/parsneshan/` |
+| parsneshan | https://github.com/barnevis/parsneshan | `cb8f0551fa7cd681c2b44d3449601a4497059e62` | 2026-10-26 | `src/vendor/node_modules/parsneshan/` (بازتولیدپذیر) |
 
-> بسته parsneshan (گویش مارک‌داون فارسی برای micromark) بدون کامیت‌های مفردِ تگ وندور شده است؛ آزمایش‌ها، بازیچه و سندهای بالادست آن در این کپی حذف شده‌اند. وابستگی‌های اجرایی micromark آن در مرورگر از نقشه ایمپورت `index.html` و در Node از `node_modules` ریشه (اعلام‌شده در `package.json` ریشه) حل می‌شوند.
+## بازتولیدپذیری درخت `src/vendor/node_modules/`
+
+این درخت **در مخزن گیت نیست** — از `src/vendor/package.json` بازتولید می‌شود:
+
+```bash
+npm run vendor          # معادل: npm install --prefix src/vendor
+```
+
+- همه وابستگی‌ها با نسخه دقیق (بدون `^`) پین شده‌اند و `src/vendor/package-lock.json` نصب را بازتولیدپذیر می‌کند.
+- `parsneshan` روی npm منتشر نشده و به‌صورت وابستگی گیت با SHA کامل بالا نصب می‌شود؛ پرونده `src/vendor/.npmrc` گزینه `allow-git` را برای npmهای جدید (که وابستگی‌های گیت را پیش‌فرض می‌بندند) تنظیم می‌کند.
+- درست‌بودن درخت با `npm run build:import-map` راستی‌آزمایی می‌شود: خروجی باید با نقشه ایمپورت کامیت‌شده `index.html` بایت‌به‌بایت یکسان باشد و آزمون `src/tests/import-map.test.js` موجودیت همه مقصدها را کنترل می‌کند.
+- نصب npm شامل چند بسته ترانزیتیو اضافه (مثل `debug`/`ms`/`devlop`/`@types`) است که هیچ import ESM به آن‌ها نیست و مدخلی در نقشه نمی‌گیرند.
+
+> بسته parsneshan (گویش مارک‌داون فارسی برای micromark) وندور شده است. وابستگی‌های اجرایی micromark آن در مرورگر از نقشه ایمپورت `index.html` و در Node از `node_modules` ریشه (اعلام‌شده در `package.json` ریشه) حل می‌شوند.
 
 ## تغییرات محلی نسبت به مبدأ
 

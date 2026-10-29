@@ -1,6 +1,6 @@
 {
   "name": "shirazeh",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "description": "شیرازه — مستندساز وب روی معماری بنیان و چارچوب پی",
@@ -15,7 +15,8 @@
   },
   "scripts": {
     "test": "node --test --experimental-test-module-mocks src/core/tests/*.test.js src/plugins/pey.router/tests/*.test.js src/plugins/pey.router/tests/*/*.test.js src/plugins/pey.storage/tests/*.test.js src/plugins/pey.storage/tests/*/*.test.js src/plugins/pey.markdown/tests/*.test.js src/plugins/shirazeh.http/tests/*.test.js src/plugins/shirazeh.docs/tests/*.test.js src/plugins/shirazeh.prefs/tests/*.test.js src/tests/*.test.js src/tests/ui/*.test.js src/tests/integration/*.test.js",
-    "serve": "python3 scripts/serve.py",
+    "serve": "python3 src/scripts/serve.py",
+    "vendor": "npm install --prefix src/vendor",
     "build:import-map": "node src/scripts/build-import-map.mjs"
   },
   "engines": {
