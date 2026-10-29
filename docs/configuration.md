@@ -37,6 +37,7 @@ export default {
 | `logo` | خاموش | لوگوی نوار بالا — `{ enabled, src, size }` |
 | `favicon` | خاموش | فاویکون زبانه — `{ enabled, src }` |
 | `githubCorner` | خاموش | پیوند گیت‌هاب — `{ enabled, url, style: 'link' \| 'corner' }` |
+| `languageToggle` | خاموش | دکمه شناور تغییر زبان (فارسی/انگلیسی) — `{ enabled: true }`؛ زبان پیش‌فرض رابط با کلید `language` تعیین می‌شود |
 | `navbar` | جمع‌شونده | رفتار نوار بالا — `{ sticky, scrollBehavior: 'shrink' \| 'hide' \| 'normal' }`؛ محتوای نوار از `navbarFile` می‌آید |
 | `navbarFile` | `null` | پرونده مارک‌داون نوار بالا (نسبت به `docsRoot`)، مثل `config/navbar.md` |
 | `export` | روشن | دکمه خروجی صفحه (HTML خودکفا / مارک‌داون) — `{ enabled: true }` |

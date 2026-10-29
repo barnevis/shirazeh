@@ -115,6 +115,7 @@ export const setup = createApplicationSetup({
         themeController,
         prefs: resources.optional?.[PREFS_SERVICE] ?? null,
         githubCorner: resources.config.githubCorner,
+        languageToggle: resources.config.languageToggle,
       },
     });
     shell.append(actions);
