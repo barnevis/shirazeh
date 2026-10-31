@@ -24,6 +24,16 @@
       ]
     },
     {
+      "name": "ui:export-requested",
+      "description": "The user picked an export format from the floating download button; the docs page owns the data and performs the download",
+      "data": [
+        {
+          "name": "format",
+          "type": "string — 'html' or 'md'"
+        }
+      ]
+    },
+    {
       "name": "ui:component-error",
       "description": "A component render or event handler failed and was contained by PeyElement",
       "data": [
