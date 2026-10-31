@@ -36,7 +36,7 @@ function createFakeSharedState(initial = {}) {
   };
 }
 
-async function mountActions({ languageToggle, sharedState = createFakeSharedState() } = {}) {
+async function mountActions({ languageToggle, sharedState = createFakeSharedState(), githubCorner = null } = {}) {
   const recorder = createEventsRecorder();
   const actions = createElement(TAG);
   actions.connect({
@@ -45,7 +45,7 @@ async function mountActions({ languageToggle, sharedState = createFakeSharedStat
       sharedState,
       themeController: null,
       prefs: null,
-      githubCorner: null,
+      githubCorner,
       languageToggle,
     },
   });
@@ -86,4 +86,36 @@ test('should_switch_language_and_direction_on_click', async () => {
   const button = shadow.querySelector('button[data-language]');
   assert.equal(button.dataset.language, 'fa');
   assert.equal(button.textContent.trim(), 'فا');
+});
+
+test('should_render_github_button_in_stack_when_style_is_button', async () => {
+  document.body.innerHTML = '';
+  const { shadow } = await mountActions({
+    githubCorner: { enabled: true, url: 'https://github.com/barnevis/shirazeh', style: 'button' },
+  });
+
+  const button = shadow.querySelector('.actions-stack a.github-button');
+  assert.equal(button !== null, true);
+  assert.equal(button.getAttribute('href'), 'https://github.com/barnevis/shirazeh');
+  assert.equal(shadow.querySelector('.github-corner'), null);
+});
+
+test('should_render_github_corner_when_style_is_corner', async () => {
+  document.body.innerHTML = '';
+  const { shadow } = await mountActions({
+    githubCorner: { enabled: true, url: 'https://github.com/barnevis/shirazeh', style: 'corner' },
+  });
+
+  assert.equal(shadow.querySelector('.actions-stack a.github-button'), null);
+  assert.equal(shadow.querySelector('.github-corner') !== null, true);
+});
+
+test('should_render_no_github_when_disabled', async () => {
+  document.body.innerHTML = '';
+  const { shadow } = await mountActions({
+    githubCorner: { enabled: false, url: 'https://github.com/barnevis/shirazeh', style: 'button' },
+  });
+
+  assert.equal(shadow.querySelector('.actions-stack a.github-button'), null);
+  assert.equal(shadow.querySelector('.github-corner'), null);
 });

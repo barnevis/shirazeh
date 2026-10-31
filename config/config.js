@@ -102,7 +102,7 @@ export default {
   githubCorner: {
     enabled: false,
     url: '',
-    style: 'link', // یا 'corner' برای گوشه کلاسیک هشت‌پا
+    style: 'button', // 'button': دکمه دایره‌ای کنار دکمه تم؛ 'corner': گوشه کلاسیک هشت‌پا
   },
 
   /**

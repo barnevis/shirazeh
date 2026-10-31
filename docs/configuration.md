@@ -36,7 +36,7 @@ export default {
 | `appName` | `'شیرازه'` | نام برنامه در نوار بالا و عنوان زبانه |
 | `logo` | خاموش | لوگوی نوار بالا — `{ enabled, src, size }` |
 | `favicon` | خاموش | فاویکون زبانه — `{ enabled, src }` |
-| `githubCorner` | خاموش | پیوند گیت‌هاب — `{ enabled, url, style: 'link' \| 'corner' }` |
+| `githubCorner` | خاموش | پیوند گیت‌هاب — `{ enabled, url, style: 'button' \| 'corner' }` (دکمه شناور کنار تم، یا گوشه کلاسیک هشت‌پا) |
 | `languageToggle` | خاموش | دکمه شناور تغییر زبان (فارسی/انگلیسی) — `{ enabled: true }`؛ زبان پیش‌فرض رابط با کلید `language` تعیین می‌شود |
 | `navbar` | جمع‌شونده | رفتار نوار بالا — `{ sticky, scrollBehavior: 'shrink' \| 'hide' \| 'normal' }`؛ محتوای نوار از `navbarFile` می‌آید |
 | `navbarFile` | `null` | پرونده مارک‌داون نوار بالا (نسبت به `docsRoot`)، مثل `../config/navbar.md` |

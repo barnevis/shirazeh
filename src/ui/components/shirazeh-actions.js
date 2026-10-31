@@ -11,6 +11,8 @@ const TAG = 'shirazeh-actions';
 const LANGUAGE_KEY = 'language';
 const DIRECTION_KEY = 'direction';
 const DIRECTION_BY_LANGUAGE = { fa: 'rtl', en: 'ltr' };
+// GitHub octocat mark (simple-icons), rendered inside the circular stack button.
+const GITHUB_MARK_PATH = 'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12';
 
 function escapeHtml(text) {
   return String(text)
@@ -126,7 +128,13 @@ class ShirazehActions extends PeyElement {
     const themeLabel = this.#theme === 'dark' ? t('shirazeh.theme.to-light') : t('shirazeh.theme.to-dark');
 
     const github = this.#githubCorner ?? {};
-    const githubHtml = github.enabled === true && typeof github.url === 'string' && github.url.length > 0
+    const githubEnabled = github.enabled === true && typeof github.url === 'string' && github.url.length > 0;
+    const githubButtonHtml = githubEnabled && github.style === 'button'
+      ? `<a class="github-button" href="${escapeHtml(github.url)}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${GITHUB_MARK_PATH}"/></svg>
+         </a>`
+      : '';
+    const githubHtml = githubEnabled && github.style !== 'button'
       ? `<a class="github-corner" href="${escapeHtml(github.url)}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
            <svg viewBox="0 0 250 250" aria-hidden="true">
              <path class="corner-bg" d="M0 0 115 115h250V0Z"/>
@@ -148,7 +156,8 @@ class ShirazehActions extends PeyElement {
           display: flex;
           gap: 0.5rem;
         }
-        .actions-stack button {
+        .actions-stack button,
+        .actions-stack .github-button {
           background: none;
           border: 1px solid transparent;
           border-radius: 50%;
@@ -165,7 +174,8 @@ class ShirazehActions extends PeyElement {
           font-family: var(--pey-font-family-base);
           font-size: 0.85rem;
         }
-        .actions-stack button:hover {
+        .actions-stack button:hover,
+        .actions-stack .github-button:hover {
           background-color: var(--pey-color-border);
         }
         .actions-stack svg {
@@ -221,6 +231,7 @@ class ShirazehActions extends PeyElement {
       </style>
       <div class="actions-stack">
         <button type="button" data-theme-toggle aria-label="${escapeHtml(themeLabel)}" title="${escapeHtml(themeLabel)}">${themeIcon}</button>
+        ${githubButtonHtml}
         ${languageButton}
       </div>
       ${githubHtml}
