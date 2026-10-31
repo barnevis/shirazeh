@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { JSDOM } from 'jsdom';
-import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from '../../ui/pages/docs/enhance-content.js';
+import { addAdmonitionLabels, addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from '../../ui/pages/docs/enhance-content.js';
 
 function createRoot(html) {
   const dom = new JSDOM(`<body>${html}</body>`);
@@ -195,4 +195,28 @@ test('should_return_zero_when_root_has_no_tables', () => {
 
 test('should_return_zero_when_root_is_missing', () => {
   assert.equal(wrapTables(null), 0);
+});
+
+test('should_prepend_the_admonition_label_as_first_line_in_its_own_box', () => {
+  const root = createRoot('<div class="parsneshan-warning"><p>متن هشدار</p></div><div class="parsneshan-note"><p>متن نکته</p></div><div class="parsneshan-poem"><p>شعر</p></div>');
+
+  const added = addAdmonitionLabels(root);
+
+  assert.equal(added, 2);
+  const warningLabel = root.querySelector('.parsneshan-warning .parsneshan-label');
+  assert.equal(warningLabel.textContent, 'هشدار');
+  // First line inside the box: the label precedes the body text.
+  assert.equal(root.querySelector('.parsneshan-warning').firstElementChild, warningLabel);
+  assert.equal(root.querySelector('.parsneshan-note .parsneshan-label').textContent, 'نکته');
+  // Poem is not an admonition box — untouched.
+  assert.equal(root.querySelector('.parsneshan-poem .parsneshan-label'), null);
+});
+
+test('should_not_duplicate_labels_when_applied_twice', () => {
+  const root = createRoot('<div class="parsneshan-tip"><p>متن</p></div>');
+
+  addAdmonitionLabels(root);
+  addAdmonitionLabels(root);
+
+  assert.equal(root.querySelectorAll('.parsneshan-tip .parsneshan-label').length, 1);
 });

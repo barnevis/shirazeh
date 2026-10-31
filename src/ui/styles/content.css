@@ -233,6 +233,19 @@
   padding: var(--pey-space-3) var(--pey-space-4);
   margin-block: var(--pey-space-4);
 }
+/* Admonition label line: the box name in its own accent color, 12px. */
+.markdown-body .parsneshan-label {
+  margin: 0 0 var(--pey-space-1);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.markdown-body .parsneshan-warning .parsneshan-label { color: var(--admonition-warning-accent); }
+.markdown-body .parsneshan-caution .parsneshan-label { color: var(--admonition-caution-accent); }
+.markdown-body .parsneshan-important .parsneshan-label { color: var(--admonition-important-accent); }
+.markdown-body .parsneshan-tip .parsneshan-label { color: var(--admonition-tip-accent); }
+.markdown-body .parsneshan-note .parsneshan-label { color: var(--admonition-note-accent); }
+
 /* GitHub alert palette: each box gets its own accent + background tint
    (tokens live in app.css with dark-theme overrides). */
 .markdown-body .parsneshan-caution {

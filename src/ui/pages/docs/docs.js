@@ -4,7 +4,7 @@
 // their own components; display enhancements in enhance-content.js.
 
 import { PeyElement } from 'pey.webui/base/pey-element';
-import { addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from './enhance-content.js';
+import { addAdmonitionLabels, addCodeCopyButtons, addHeadingAnchors, applyImageSizes, wrapTables } from './enhance-content.js';
 import { TAG as TOC_TAG } from '../../components/shirazeh-toc.js';
 import {
   applyThemeInRoot,
@@ -175,6 +175,7 @@ class DocsPage extends PeyElement {
     const content = this.shadowRoot?.querySelector('.markdown-body');
     if (content !== null && content !== undefined) {
       wrapTables(content);
+      addAdmonitionLabels(content);
       addHeadingAnchors(content, { path: this.#path });
       addCodeCopyButtons(content, { label: this.#t('shirazeh.code-copy.copy') });
       applyImageSizes(content);

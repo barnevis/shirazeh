@@ -146,6 +146,46 @@ export function addCodeCopyButtons(root, { label } = {}) {
  * @param {Element} root Rendered content root.
  * @returns {number} Number of wrapped tables.
  */
+// The parsneshan HTML extension wraps the box body only — the admonition
+// name (هشدار/احتیاط/…) is consumed by the syntax and never rendered. The
+// label line is a display concern, so the UI adds it: first line inside the
+// box, in the type's own accent color, 12px.
+const ADMONITION_LABELS = {
+  warning: 'هشدار',
+  caution: 'احتیاط',
+  important: 'مهم',
+  tip: 'راهنما',
+  note: 'نکته',
+};
+
+/**
+ * Prepends the admonition name as the first line of every parsneshan box.
+ * Idempotent: a box that already carries its label is left untouched.
+ *
+ * @param {Element} root Rendered content root.
+ * @returns {number} Number of labels added.
+ */
+export function addAdmonitionLabels(root) {
+  if (!root || typeof root.querySelectorAll !== 'function') {
+    return 0;
+  }
+
+  let added = 0;
+  for (const [className, label] of Object.entries(ADMONITION_LABELS)) {
+    for (const box of root.querySelectorAll(`.parsneshan-${className}`)) {
+      if (box.querySelector('.parsneshan-label') !== null) {
+        continue;
+      }
+      const labelElement = box.ownerDocument.createElement('p');
+      labelElement.className = 'parsneshan-label';
+      labelElement.textContent = label;
+      box.prepend(labelElement);
+      added += 1;
+    }
+  }
+  return added;
+}
+
 export function wrapTables(root) {
   if (!root || typeof root.querySelectorAll !== 'function') {
     return 0;
