@@ -39,7 +39,20 @@ class ShirazehToc extends PeyElement {
   connectedCallback() {
     super.connectedCallback();
     this.#tree = buildTocTree(this.#toc, this.#maxDepth);
+    // Sidebar parity: every parent starts open; the open state lives only in
+    // this set so re-renders keep manually closed submenus closed.
+    this.#openIds = new Set(this.#collectParentIds(this.#tree));
     this.#setupScrollspy();
+  }
+
+  #collectParentIds(nodes) {
+    const ids = [];
+    for (const node of nodes) {
+      if (node.children.length > 0) {
+        ids.push(node.id, ...this.#collectParentIds(node.children));
+      }
+    }
+    return ids;
   }
 
   disconnectedCallback() {
@@ -127,7 +140,8 @@ class ShirazehToc extends PeyElement {
       const listItem = toggle.closest('li');
       const submenu = listItem?.querySelector('ul');
       submenu?.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', String(submenu?.classList.contains('is-open') ?? false));
+      const isOpen = submenu?.classList.contains('is-open') ?? false;
+      toggle.setAttribute('aria-expanded', String(isOpen));
       return;
     }
 
@@ -149,14 +163,14 @@ class ShirazehToc extends PeyElement {
   #renderNodes(nodes) {
     return nodes.map((node) => {
       const hasChildren = node.children.length > 0;
-      const isOpen = this.#openIds.size === 0 || this.#openIds.has(node.id);
+      const isOpen = this.#openIds.has(node.id);
       const isActive = node.id === this.#activeId;
       const toggle = hasChildren
-        ? `<button type="button" class="toc-toggle" data-toc-toggle="${escapeHtml(node.id)}" aria-expanded="${isOpen}">›</button>`
+        ? `<button type="button" class="toc-toggle" data-toc-toggle="${escapeHtml(node.id)}" aria-expanded="${isOpen}" aria-controls="toc-submenu-${escapeHtml(node.id)}" aria-label="باز و بسته کردن زیرمجموعه ${escapeHtml(node.text)}">›</button>`
         : '';
       const link = `<a href="#${this.#path}?a=${encodeURIComponent(node.id)}" data-toc-link="${escapeHtml(node.id)}" class="${isActive ? 'is-active' : ''}">${escapeHtml(node.text)}</a>`;
       const children = hasChildren
-        ? `<ul class="${isOpen ? 'is-open' : ''}">${this.#renderNodes(node.children)}</ul>`
+        ? `<ul id="toc-submenu-${escapeHtml(node.id)}" class="${isOpen ? 'is-open' : ''}">${this.#renderNodes(node.children)}</ul>`
         : '';
       return `<li>${toggle}${link}${children}</li>`;
     }).join('');
@@ -222,10 +236,13 @@ class ShirazehToc extends PeyElement {
           color: var(--pey-color-text-muted);
           cursor: pointer;
           font-size: inherit;
-        }
-        .toc-toggle[aria-expanded='true'] {
-          transform: rotate(90deg);
           display: inline-block;
+          transition: transform 0.3s ease;
+        }
+        /* Sidebar parity: the chevron turns to point down when the submenu
+           is open. */
+        .toc-toggle[aria-expanded='true'] {
+          transform: rotate(-90deg);
         }
       </style>
       <aside class="toc-panel" part="toc">

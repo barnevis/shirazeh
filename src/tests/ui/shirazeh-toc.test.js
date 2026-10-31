@@ -88,3 +88,31 @@ test('should_scroll_via_heading_root_when_entry_clicked', async () => {
 
   assert.equal(scrolled, 1);
 });
+
+test('should_render_chevron_only_for_entries_with_children', async () => {
+  const { shadow } = await mount();
+  const toggles = shadow.querySelectorAll('button[data-toc-toggle]');
+  const links = shadow.querySelectorAll('a[data-toc-link]');
+  // Only parents carry a chevron; leaves render a link alone.
+  assert.equal(toggles.length < links.length, true);
+  for (const toggle of toggles) {
+    assert.equal(toggle.getAttribute('aria-controls')?.startsWith('toc-submenu-'), true);
+  }
+});
+
+test('should_keep_closed_submenus_closed_across_rerender', async () => {
+  const { tocElement, shadow } = await mount();
+  const toggle = shadow.querySelector('button[data-toc-toggle]');
+  const submenuId = toggle.getAttribute('aria-controls');
+  const submenu = shadow.getElementById(submenuId);
+  toggle.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  assert.equal(submenu.classList.contains('is-open'), false);
+
+  tocElement.requestRender({ preserve: false });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  const rerendered = tocElement.shadowRoot.getElementById(submenuId);
+  assert.equal(rerendered.classList.contains('is-open'), false);
+  assert.equal(tocElement.shadowRoot.querySelector('button[data-toc-toggle]')?.getAttribute('aria-expanded'), 'false');
+});
