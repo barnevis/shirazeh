@@ -226,7 +226,7 @@
 /* Parsneshan dialect blocks (old parsneshan.css) */
 /* :where() keeps this base rule at zero specificity — the per-type rules
    below must always win, otherwise every box shares one color. */
-.markdown-body :where([class^='parsneshan-']:not(.parsneshan-poem):not(.parsneshan-verse):not(.parsneshan-hemistich)) {
+.markdown-body :where([class^='parsneshan-']:not(.parsneshan-poem):not(.parsneshan-verse):not(.parsneshan-hemistich):not(.parsneshan-label)) {
   border-inline-start: 4px solid var(--pey-color-accent);
   border-radius: 0.5rem;
   background-color: var(--pey-color-surface);
@@ -234,10 +234,10 @@
   margin-block: var(--pey-space-4);
 }
 /* Admonition label line: the box name in its own accent color, 12px. */
+/* Plain colored text only — no box, no weight. */
 .markdown-body .parsneshan-label {
   margin: 0 0 var(--pey-space-1);
   font-size: 12px;
-  font-weight: 600;
   line-height: 1.6;
 }
 .markdown-body .parsneshan-warning .parsneshan-label { color: var(--admonition-warning-accent); }

@@ -23,6 +23,22 @@ test('should_color_each_admonition_type_with_its_own_accent_and_tint', () => {
   }
 });
 
+test('should_exclude_the_label_from_the_base_box_rule', () => {
+  // The label class also starts with "parsneshan-"; unwrapped it would
+  // inherit the box chrome (border/background/padding) and look like a
+  // nested quote box.
+  assert.match(contentCss, /:not\(\.parsneshan-label\)/);
+});
+
+test('should_keep_the_label_plain_colored_text', () => {
+  const rule = contentCss.match(/\.markdown-body \.parsneshan-label \{[^}]*\}/);
+  assert.ok(rule, 'label rule missing');
+  assert.doesNotMatch(rule[0], /font-weight/);
+  assert.doesNotMatch(rule[0], /background/);
+  assert.doesNotMatch(rule[0], /border/);
+  assert.match(rule[0], /font-size: 12px/);
+});
+
 test('should_keep_base_box_rule_below_per_type_specificity', () => {
   // The base rule carries three :not() selectors; unwrapped it would outrank
   // the per-type color rules and every box would share one color again.
