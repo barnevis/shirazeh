@@ -99,7 +99,11 @@
 /* Code blocks (old prose pre) */
 .markdown-body pre {
   position: relative;
-  background-color: rgb(31 41 55 / 0.7);
+  /* Solid GitHub-style block: the old 70%-alpha wash sat muddy on the light
+     canvas and starved the github-light token colors of contrast. */
+  background-color: var(--pre-bg);
+  color: var(--pre-text);
+  border: 1px solid var(--pre-border);
   padding: 1rem;
   border-radius: 0.5rem;
   font-size: 1.1em;
@@ -107,7 +111,6 @@
   margin-block-end: 1.5rem;
   direction: ltr;
   text-align: left;
-  border: none;
 }
 .markdown-body pre code {
   padding: 0;

@@ -47,6 +47,11 @@
   --admonition-caution-accent: #cf222e;
   --admonition-caution-bg: #ffebe9;
 
+  /* Fenced code blocks — GitHub light */
+  --pre-bg: #f6f8fa;
+  --pre-text: #24292f;
+  --pre-border: #d0d7de;
+
   --pey-color-canvas: var(--bg-color);
   --pey-color-surface: var(--sidebar-bg);
   --pey-color-text: var(--text-color);
@@ -90,6 +95,11 @@
   --admonition-warning-bg: #272115;
   --admonition-caution-accent: #f85149;
   --admonition-caution-bg: #25171c;
+
+  /* Fenced code blocks — GitHub dark */
+  --pre-bg: #161b22;
+  --pre-text: #e6edf3;
+  --pre-border: #30363d;
 
   --pey-color-canvas: var(--bg-color);
   --pey-color-surface: var(--sidebar-bg);
