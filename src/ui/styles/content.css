@@ -268,11 +268,9 @@
   border-inline-start-color: var(--admonition-note-accent);
   background-color: var(--admonition-note-bg);
 }
+/* The poem is plain prose — no box, no background. */
 .markdown-body .parsneshan-poem {
   margin-block: var(--pey-space-6);
-  padding: var(--pey-space-4) var(--pey-space-6);
-  background-color: var(--pey-color-surface);
-  border-radius: 0.5rem;
   display: grid;
   gap: var(--pey-space-3);
   justify-items: center;
