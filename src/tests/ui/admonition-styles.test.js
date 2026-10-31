@@ -23,10 +23,13 @@ test('should_color_each_admonition_type_with_its_own_accent_and_tint', () => {
   }
 });
 
-test('should_keep_boxes_compact_with_14px_body', () => {
+test('should_keep_boxes_compact_with_base_body_and_14px_label', () => {
   const base = contentCss.match(/\.markdown-body :where\(\[class\^='parsneshan-'\][^{]+\{[^}]*\}/);
   assert.ok(base, 'base admonition rule missing');
-  assert.match(base[0], /font-size: 14px/);
+  // Box body follows the prose base (16px); the label line is 14px.
+  assert.doesNotMatch(base[0], /font-size/);
+  const label = contentCss.match(/\.markdown-body \.parsneshan-label \{[^}]*\}/);
+  assert.match(label[0], /font-size: 14px/);
   // The global paragraph margin must not add a blank line inside the box.
   assert.match(contentCss, /> :last-child \{\n  margin-block-end: 0;/);
 });
@@ -44,7 +47,7 @@ test('should_keep_the_label_plain_colored_text', () => {
   assert.doesNotMatch(rule[0], /font-weight/);
   assert.doesNotMatch(rule[0], /background/);
   assert.doesNotMatch(rule[0], /border/);
-  assert.match(rule[0], /font-size: 12px/);
+  assert.match(rule[0], /font-size: 14px/);
 });
 
 test('should_keep_base_box_rule_below_per_type_specificity', () => {
