@@ -30,7 +30,7 @@ export default {
 | `theme` | `'light'` | تم رنگی — `'light'`، `'dark'` یا `'auto'` (پیروی از سیستم با به‌روزرسانی زنده) |
 | `docsRoot` | `'./docs'` | پوشه پرونده‌های مارک‌داون نسبت به ریشه سایت |
 | `homePage` | `'README.md'` | پرونده‌ای که برای مسیر `/` نمایش داده می‌شود |
-| `sidebarFile` | `'_sidebar.md'` | پرونده فهرست navigation |
+| `sidebarFile` | `'../config/sidebar.md'` | پرونده فهرست navigation (نسبت به `docsRoot`) |
 | `toc` | روشن، عمق ۳ | پنل «در این صفحه» — `{ enabled: true, maxDepth: 3 }` |
 | `highlight` | روشن | برجسته‌سازی نحوی کد — `{ enabled: true }` |
 | `appName` | `'شیرازه'` | نام برنامه در نوار بالا و عنوان زبانه |
@@ -39,7 +39,7 @@ export default {
 | `githubCorner` | خاموش | پیوند گیت‌هاب — `{ enabled, url, style: 'link' \| 'corner' }` |
 | `languageToggle` | خاموش | دکمه شناور تغییر زبان (فارسی/انگلیسی) — `{ enabled: true }`؛ زبان پیش‌فرض رابط با کلید `language` تعیین می‌شود |
 | `navbar` | جمع‌شونده | رفتار نوار بالا — `{ sticky, scrollBehavior: 'shrink' \| 'hide' \| 'normal' }`؛ محتوای نوار از `navbarFile` می‌آید |
-| `navbarFile` | `null` | پرونده مارک‌داون نوار بالا (نسبت به `docsRoot`)، مثل `config/navbar.md` |
+| `navbarFile` | `null` | پرونده مارک‌داون نوار بالا (نسبت به `docsRoot`)، مثل `../config/navbar.md` |
 | `export` | روشن | دکمه خروجی صفحه (HTML خودکفا / مارک‌داون) — `{ enabled: true }` |
 | `extensions` | همه روشن | فعال/غیرفعال کردن دستور پارسنشان — شیءای با کلیدهای `admonitions`، `persianList`، `persianPoem` و `persianFootnote` (هرکدام `true`/`false`) |
 

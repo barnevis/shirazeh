@@ -37,12 +37,12 @@ export default {
   /**
    * پرونده فهرست navigation کنار صفحه.
    */
-  sidebarFile: '_sidebar.md',
+  sidebarFile: '../config/sidebar.md',
 
   /**
    * صفحه اختصاصی «پیدا نشد» — پرونده مارک‌داونی که برای مسیرهای ناموجود رندر می‌شود.
    */
-  notFoundPage: 'not-found.md',
+  notFoundPage: '../config/404.md',
 
   /**
    * دستور پارسنشان (گویش مارک‌داون فارسی شیرازه).

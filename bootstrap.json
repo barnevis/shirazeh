@@ -63,9 +63,9 @@
     "shirazeh.docs": {
       "docsRoot": "./docs",
       "homePage": "README.md",
-      "sidebarFile": "_sidebar.md",
-      "notFoundPage": "not-found.md",
-      "navbarFile": "config/navbar.md"
+      "sidebarFile": "../config/sidebar.md",
+      "notFoundPage": "../config/404.md",
+      "navbarFile": "../config/navbar.md"
     },
     "ui": {
       "theme": "light",
