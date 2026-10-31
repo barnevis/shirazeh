@@ -35,6 +35,18 @@
   --error-border: #fca5a5;
   --error-text: #b91c1c;
 
+  /* Admonition boxes — GitHub alert palette (light) */
+  --admonition-note-accent: #0969da;
+  --admonition-note-bg: #ddf4ff;
+  --admonition-tip-accent: #1a7f37;
+  --admonition-tip-bg: #dafbe1;
+  --admonition-important-accent: #8250df;
+  --admonition-important-bg: #fbefff;
+  --admonition-warning-accent: #9a6700;
+  --admonition-warning-bg: #fff8c5;
+  --admonition-caution-accent: #cf222e;
+  --admonition-caution-bg: #ffebe9;
+
   --pey-color-canvas: var(--bg-color);
   --pey-color-surface: var(--sidebar-bg);
   --pey-color-text: var(--text-color);
@@ -66,6 +78,18 @@
   --error-bg: rgba(127, 29, 29, 0.5);
   --error-border: #b91c1c;
   --error-text: #fca5a5;
+
+  /* Admonition boxes — GitHub alert palette (dark) */
+  --admonition-note-accent: #4493f8;
+  --admonition-note-bg: #121d2f;
+  --admonition-tip-accent: #3fb950;
+  --admonition-tip-bg: #12261e;
+  --admonition-important-accent: #ab7df8;
+  --admonition-important-bg: #201b34;
+  --admonition-warning-accent: #d29922;
+  --admonition-warning-bg: #272115;
+  --admonition-caution-accent: #f85149;
+  --admonition-caution-bg: #25171c;
 
   --pey-color-canvas: var(--bg-color);
   --pey-color-surface: var(--sidebar-bg);

@@ -231,11 +231,28 @@
   padding: var(--pey-space-3) var(--pey-space-4);
   margin-block: var(--pey-space-4);
 }
-.markdown-body .parsneshan-caution { border-inline-start-color: var(--error-border); }
-.markdown-body .parsneshan-warning { border-inline-start-color: #f59e0b; }
-.markdown-body .parsneshan-important { border-inline-start-color: var(--secondary-color); }
-.markdown-body .parsneshan-tip { border-inline-start-color: var(--primary-color); }
-.markdown-body .parsneshan-note { border-inline-start-color: var(--quote-text); }
+/* GitHub alert palette: each box gets its own accent + background tint
+   (tokens live in app.css with dark-theme overrides). */
+.markdown-body .parsneshan-caution {
+  border-inline-start-color: var(--admonition-caution-accent);
+  background-color: var(--admonition-caution-bg);
+}
+.markdown-body .parsneshan-warning {
+  border-inline-start-color: var(--admonition-warning-accent);
+  background-color: var(--admonition-warning-bg);
+}
+.markdown-body .parsneshan-important {
+  border-inline-start-color: var(--admonition-important-accent);
+  background-color: var(--admonition-important-bg);
+}
+.markdown-body .parsneshan-tip {
+  border-inline-start-color: var(--admonition-tip-accent);
+  background-color: var(--admonition-tip-bg);
+}
+.markdown-body .parsneshan-note {
+  border-inline-start-color: var(--admonition-note-accent);
+  background-color: var(--admonition-note-bg);
+}
 .markdown-body .parsneshan-poem {
   margin-block: var(--pey-space-6);
   padding: var(--pey-space-4) var(--pey-space-6);
