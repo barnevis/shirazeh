@@ -103,7 +103,6 @@ export default {
   githubCorner: {
     enabled: true,
     url: 'https://github.com/barnevis/shirazeh',
-    style: 'button', // 'button': دکمه دایره‌ای کنار دکمه تم؛ 'corner': گوشه کلاسیک هشت‌پا
   },
 
   /**
