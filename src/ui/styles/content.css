@@ -231,6 +231,13 @@
   background-color: var(--pey-color-surface);
   padding: var(--pey-space-3) var(--pey-space-4);
   margin-block: var(--pey-space-4);
+  /* Box body is slightly smaller than prose (docs side-note convention). */
+  font-size: 14px;
+}
+/* No trailing blank line: the global paragraph margin must not pad the
+   inside of the box. */
+.markdown-body :where([class^='parsneshan-']:not(.parsneshan-poem):not(.parsneshan-verse):not(.parsneshan-hemistich):not(.parsneshan-label)) > :last-child {
+  margin-block-end: 0;
 }
 /* Admonition label line: the box name in its own accent color, 12px. */
 /* Plain colored text only — no box, no weight. */

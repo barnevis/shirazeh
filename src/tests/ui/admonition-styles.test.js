@@ -23,6 +23,14 @@ test('should_color_each_admonition_type_with_its_own_accent_and_tint', () => {
   }
 });
 
+test('should_keep_boxes_compact_with_14px_body', () => {
+  const base = contentCss.match(/\.markdown-body :where\(\[class\^='parsneshan-'\][^{]+\{[^}]*\}/);
+  assert.ok(base, 'base admonition rule missing');
+  assert.match(base[0], /font-size: 14px/);
+  // The global paragraph margin must not add a blank line inside the box.
+  assert.match(contentCss, /> :last-child \{\n  margin-block-end: 0;/);
+});
+
 test('should_exclude_the_label_from_the_base_box_rule', () => {
   // The label class also starts with "parsneshan-"; unwrapped it would
   // inherit the box chrome (border/background/padding) and look like a
