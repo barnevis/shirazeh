@@ -23,6 +23,13 @@ test('should_color_each_admonition_type_with_its_own_accent_and_tint', () => {
   }
 });
 
+test('should_keep_base_box_rule_below_per_type_specificity', () => {
+  // The base rule carries three :not() selectors; unwrapped it would outrank
+  // the per-type color rules and every box would share one color again.
+  const base = contentCss.match(/\.markdown-body :where\(\[class\^='parsneshan-'\][^\n]*\{/);
+  assert.ok(base, 'base admonition rule must be wrapped in :where()');
+});
+
 test('should_define_admonition_tokens_for_both_themes', () => {
   const light = appCss.match(/:root,\s*\[data-theme='light'\] \{[\s\S]*?\n\}/);
   const dark = appCss.match(/\[data-theme='dark'\] \{[\s\S]*?\n\}/);
