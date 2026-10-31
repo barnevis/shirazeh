@@ -40,7 +40,7 @@ export default {
 | `languageToggle` | خاموش | دکمه شناور تغییر زبان (فارسی/انگلیسی) — `{ enabled: true }`؛ زبان پیش‌فرض رابط با کلید `language` تعیین می‌شود |
 | `navbar` | جمع‌شونده | رفتار نوار بالا — `{ sticky, scrollBehavior: 'shrink' \| 'hide' \| 'normal' }`؛ محتوای نوار از `navbarFile` می‌آید |
 | `navbarFile` | `null` | پرونده مارک‌داون نوار بالا (نسبت به `docsRoot`)، مثل `../config/navbar.md` |
-| `export` | روشن | دکمه خروجی صفحه (HTML خودکفا / مارک‌داون) — `{ enabled: true }` |
+| `export` | روشن | دکمه دانلود در ردیف شناور (HTML خودکفا / مارک‌داون) — `{ enabled: true }` |
 | `extensions` | همه روشن | فعال/غیرفعال کردن دستور پارسنشان — شیءای با کلیدهای `admonitions`، `persianList`، `persianPoem` و `persianFootnote` (هرکدام `true`/`false`) |
 
 مثال خاموش‌کردن شعر و جعبه‌ها:
