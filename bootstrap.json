@@ -68,7 +68,7 @@
       "navbarFile": "../config/navbar.md"
     },
     "ui": {
-      "theme": "light",
+      "theme": "auto",
       "language": "fa",
       "direction": "rtl",
       "fallbackPath": "/",

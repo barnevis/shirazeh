@@ -27,7 +27,7 @@ export default {
 |---|---|---|
 | `language` | `'fa'` | زبان پیش‌فرض رابط (`'fa'` یا `'en'`) |
 | `direction` | `'rtl'` | جهت رابط (`'rtl'`، `'ltr'` یا `'auto'`) |
-| `theme` | `'light'` | تم رنگی — `'light'`، `'dark'` یا `'auto'` (پیروی از سیستم با به‌روزرسانی زنده) |
+| `theme` | `'auto'` | تم رنگی — `'auto'` تم سیستم کاربر را خودکار تشخیص می‌دهد (با به‌روزرسانی زنده)؛ `'light'`/`'dark'` ثابت |
 | `docsRoot` | `'./docs'` | پوشه پرونده‌های مارک‌داون نسبت به ریشه سایت |
 | `homePage` | `'README.md'` | پرونده‌ای که برای مسیر `/` نمایش داده می‌شود |
 | `sidebarFile` | `'../config/sidebar.md'` | پرونده فهرست navigation (نسبت به `docsRoot`) |
