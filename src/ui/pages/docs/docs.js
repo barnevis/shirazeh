@@ -185,7 +185,9 @@ class DocsPage extends PeyElement {
     // content and its anchors exist; consumed only once actually found, so
     // an earlier flush (loading state) keeps it pending.
     if (this.#anchorTarget !== null) {
-      const anchor = this.shadowRoot?.getElementById(decodeURIComponent(this.#anchorTarget));
+      // routeQuery values arrive already decoded by the router once; the id
+      // itself is percent-encoded verbatim, so look it up as-is.
+      const anchor = this.shadowRoot?.getElementById(this.#anchorTarget);
       if (anchor !== null && anchor !== undefined) {
         this.#anchorTarget = null;
         anchor.scrollIntoView({ behavior: 'smooth' });

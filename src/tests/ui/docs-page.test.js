@@ -37,7 +37,7 @@ const DEFAULT_PAGES = {
   '/about': { path: '/about', html: '<h1>درباره</h1>', toc: [{ id: 'b', level: 1, text: 'درباره' }], title: 'درباره', documentTitle: 'درباره', previous: { href: '/', title: 'خانه', attrTitle: null, level: 1 }, next: null },
 };
 
-async function mountPage({ path, pages = DEFAULT_PAGES }) {
+async function mountPage({ path, pages = DEFAULT_PAGES, routeQuery = {} }) {
   const recorder = createEventsRecorder();
   const docsPage = createElement('app-page-docs');
   docsPage.connect({
@@ -52,7 +52,7 @@ async function mountPage({ path, pages = DEFAULT_PAGES }) {
       format: () => '',
       appName: 'شیرازه',
       routeParams: path === '/' ? {} : { page: path.slice(1) },
-      routeQuery: {},
+      routeQuery,
     },
   });
   document.body.append(docsPage);
@@ -114,6 +114,62 @@ test('should_apply_post_render_enhancements_after_gated_render', async () => {
   // The mounted TOC reserves its fixed-panel width on the content column so
   // the prose centers between sidebar and TOC.
   assert.equal(shadow.querySelector('.content.has-toc') !== null, true);
+});
+
+test('should_scroll_to_heading_when_toc_entry_clicked', async () => {
+  document.body.innerHTML = '';
+  // pey.markdown emits heading ids percent-encoded; the toc carries them
+  // verbatim — the click must find the heading WITHOUT extra decoding.
+  const pages = {
+    '/': {
+      path: '/',
+      html: '<h1 id="user-content-h-%D8%AE%D8%A7%D9%86%D9%87">خانه</h1><h2 id="user-content-h-%D9%85%D9%82%D8%AF%D9%85%D9%87">مقدمه</h2>',
+      toc: [
+        { id: 'user-content-h-%D8%AE%D8%A7%D9%86%D9%87', level: 1, text: 'خانه' },
+        { id: 'user-content-h-%D9%85%D9%82%D8%AF%D9%85%D9%87', level: 2, text: 'مقدمه' },
+      ],
+      title: 'خانه', documentTitle: 'خانه', previous: null, next: null,
+    },
+  };
+  const mounted = await mountPage({ path: '/', pages });
+  const tocPanel = mounted.shadow.querySelector('[data-toc-slot] shirazeh-toc');
+  const link = tocPanel.shadowRoot.querySelector('a[data-toc-link="user-content-h-%D9%85%D9%82%D8%AF%D9%85%D9%87"]');
+  assert.equal(link !== null, true);
+
+  const heading = mounted.shadow.getElementById('user-content-h-%D9%85%D9%82%D8%AF%D9%85%D9%87');
+  assert.equal(heading !== null, true);
+  let scrolled = false;
+  heading.scrollIntoView = () => { scrolled = true; };
+
+  link.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  assert.equal(scrolled, true);
+});
+
+test('should_scroll_to_heading_on_deep_link_query', async () => {
+  document.body.innerHTML = '';
+  const scrolls = [];
+  const original = window.HTMLElement.prototype.scrollIntoView;
+  window.HTMLElement.prototype.scrollIntoView = function scrollIntoViewSpy() {
+    scrolls.push(this.id);
+  };
+  try {
+    await mountPage({
+      path: '/deep',
+      pages: {
+        '/deep': {
+          path: '/deep',
+          html: '<h1 id="user-content-h-%D9%86%D8%B4%D8%A7%D9%86%D9%87">نشانه</h1>',
+          toc: [{ id: 'user-content-h-%D9%86%D8%B4%D8%A7%D9%86%D9%87', level: 1, text: 'نشانه' }],
+          title: 'نشانه', documentTitle: 'نشانه', previous: null, next: null,
+        },
+      },
+      routeQuery: { a: 'user-content-h-%D9%86%D8%B4%D8%A7%D9%86%D9%87' },
+    });
+  } finally {
+    window.HTMLElement.prototype.scrollIntoView = original;
+  }
+  // The router decoded the query once; the id must be looked up verbatim.
+  assert.deepEqual(scrolls, ['user-content-h-%D9%86%D8%B4%D8%A7%D9%86%D9%87']);
 });
 
 test('should_not_reserve_toc_width_when_toc_does_not_mount', async () => {

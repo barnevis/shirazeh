@@ -134,7 +134,10 @@ class ShirazehToc extends PeyElement {
     const link = target.closest('a[data-toc-link]');
     if (link !== null) {
       event.preventDefault();
-      const headingId = decodeURIComponent(link.dataset.tocLink);
+      // The toc ids are the heading ids verbatim (pey.markdown emits them
+      // percent-encoded) — the router already decoded the query once, so no
+      // extra decoding here: getElementById must see the exact id.
+      const headingId = link.dataset.tocLink;
       // The headings live in the page's shadow root; getRootNode() reaches it
       // without coupling this component to the page element.
       this.#contentRoot?.getRootNode()?.getElementById?.(headingId)
