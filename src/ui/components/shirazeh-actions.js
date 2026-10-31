@@ -28,6 +28,9 @@ class ShirazehActions extends PeyElement {
   #prefs = null;
   #githubCorner = null;
   #languageToggle = null;
+  #exportConfig = null;
+  #exportMenuOpen = false;
+  #outsideClickListener = null;
   #i18n = null;
   #theme = 'light';
   #unsubscribers = [];
@@ -39,6 +42,7 @@ class ShirazehActions extends PeyElement {
     this.#githubCorner = refs.githubCorner ?? null;
     // The floating language toggle ships disabled; config/config.js opts in.
     this.#languageToggle = refs.languageToggle ?? null;
+    this.#exportConfig = refs.exportConfig ?? null;
     this.#theme = this.#sharedState?.get('theme') ?? 'light';
     const language = this.#sharedState?.get(LANGUAGE_KEY) ?? 'fa';
     this.#i18n = createI18n({ language, catalog: appCatalog });
@@ -46,6 +50,16 @@ class ShirazehActions extends PeyElement {
 
   connectedCallback() {
     super.connectedCallback();
+
+    // A click anywhere outside the export dropdown closes it; the component
+    // itself is removed from the composed path so its own clicks keep working.
+    this.#outsideClickListener = (event) => {
+      if (this.#exportMenuOpen && event instanceof MouseEvent
+        && !event.composedPath().includes(this)) {
+        this.#setExportMenu(false);
+      }
+    };
+    document.addEventListener('click', this.#outsideClickListener);
 
     if (this.#sharedState) {
       const unsubscribeTheme = this.#sharedState.subscribe('theme', (theme) => {
@@ -67,6 +81,10 @@ class ShirazehActions extends PeyElement {
   }
 
   disconnectedCallback() {
+    if (this.#outsideClickListener !== null) {
+      document.removeEventListener('click', this.#outsideClickListener);
+      this.#outsideClickListener = null;
+    }
     for (const unsubscribe of this.#unsubscribers.splice(0)) {
       try {
         unsubscribe();
@@ -94,6 +112,21 @@ class ShirazehActions extends PeyElement {
       return;
     }
 
+    const exportToggle = target.closest('button[data-export-toggle]');
+    if (exportToggle !== null) {
+      this.#setExportMenu(!this.#exportMenuOpen);
+      return;
+    }
+    const exportItem = target.closest('button[data-export]');
+    if (exportItem !== null) {
+      const format = exportItem.dataset.export;
+      if (format === 'html' || format === 'md') {
+        this.#setExportMenu(false);
+        this.publishUIEvent('ui:export-requested', { format });
+      }
+      return;
+    }
+
     const languageButton = target.closest('button[data-language]');
     if (languageButton !== null) {
       const language = languageButton.dataset.language;
@@ -106,6 +139,35 @@ class ShirazehActions extends PeyElement {
       void this.#prefs?.set('language', language);
       this.publishUIEvent('ui:language-changed', { language });
     }
+  }
+
+  // Page export (standalone HTML / markdown): the button lives in the
+  // floating stack, the export itself runs in the docs page which listens
+  // for the 'ui:export-requested' event.
+  #exportButtonHtml() {
+    if (this.#exportConfig?.enabled === false) {
+      return '';
+    }
+    const t = this.#i18n?.t ?? ((key) => key);
+    const icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="21" x2="19" y2="21"/></svg>';
+    return `
+        <div class="export-wrap" data-export-wrap>
+          <button type="button" data-export-toggle aria-haspopup="true" aria-expanded="${this.#exportMenuOpen}" aria-label="${escapeHtml(t('shirazeh.export.download'))}" title="${escapeHtml(t('shirazeh.export.download'))}">${icon}</button>
+          <div class="export-menu" data-export-menu${this.#exportMenuOpen ? '' : ' hidden'}>
+            <button type="button" data-export="html">${escapeHtml(t('shirazeh.export.html'))}</button>
+            <button type="button" data-export="md">${escapeHtml(t('shirazeh.export.md'))}</button>
+          </div>
+        </div>`;
+  }
+
+  #setExportMenu(open) {
+    this.#exportMenuOpen = open;
+    const menu = this.shadowRoot?.querySelector('[data-export-menu]');
+    const button = this.shadowRoot?.querySelector('[data-export-toggle]');
+    if (menu !== null && menu !== undefined) {
+      menu.hidden = !open;
+    }
+    button?.setAttribute('aria-expanded', String(open));
   }
 
   // The toggle shows the language it switches TO, not the active one.
@@ -223,6 +285,41 @@ class ShirazehActions extends PeyElement {
             block-size: 3.4rem;
           }
         }
+        .export-wrap {
+          position: relative;
+          display: flex;
+        }
+        .export-menu {
+          position: absolute;
+          inset-block-start: calc(100% + var(--pey-space-2));
+          inset-inline-end: 0;
+          min-inline-size: 11rem;
+          display: grid;
+          padding: var(--pey-space-1);
+          border: 1px solid var(--pey-color-border);
+          border-radius: var(--pey-radius-md);
+          background-color: var(--pey-color-canvas);
+          box-shadow: var(--pey-shadow-sm);
+          z-index: 1000;
+        }
+        .export-menu[hidden] {
+          display: none;
+        }
+        .export-menu button {
+          font-family: var(--pey-font-family-base);
+          font-size: var(--pey-font-size-sm);
+          text-align: start;
+          padding: var(--pey-space-2) var(--pey-space-3);
+          border: none;
+          border-radius: var(--pey-radius-sm);
+          background: none;
+          color: var(--pey-color-text);
+          cursor: pointer;
+          inline-size: 100%;
+        }
+        .export-menu button:hover {
+          background-color: var(--pey-color-surface);
+        }
         @media print {
           :host {
             display: none;
@@ -232,6 +329,7 @@ class ShirazehActions extends PeyElement {
       <div class="actions-stack">
         <button type="button" data-theme-toggle aria-label="${escapeHtml(themeLabel)}" title="${escapeHtml(themeLabel)}">${themeIcon}</button>
         ${githubButtonHtml}
+        ${this.#exportButtonHtml()}
         ${languageButton}
       </div>
       ${githubHtml}

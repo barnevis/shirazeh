@@ -87,11 +87,19 @@ class DocsPage extends PeyElement {
   #events = null;
   #sharedState = null;
   #unsubscribeTheme = null;
+  #unsubscribeExport = null;
   #appName = null;
 
   connectedCallback() {
     super.connectedCallback();
     this.#subscribeTheme();
+    // The floating download button (actions stack) asks for an export; the
+    // page owns the data and the download flow.
+    this.#unsubscribeExport = this.#events?.subscribe?.('ui:export-requested', (data) => {
+      if (this.isConnected && (data?.format === 'html' || data?.format === 'md')) {
+        void this.#runExport(data.format);
+      }
+    });
     this.#loadPage();
   }
 
@@ -99,6 +107,8 @@ class DocsPage extends PeyElement {
     clearTimeout(this.#toastTimer);
     this.#unsubscribeTheme?.();
     this.#unsubscribeTheme = null;
+    this.#unsubscribeExport?.();
+    this.#unsubscribeExport = null;
     super.disconnectedCallback();
   }
 
@@ -324,22 +334,6 @@ class DocsPage extends PeyElement {
       return;
     }
 
-    const exportButton = target.closest('[data-export]');
-    if (exportButton !== null) {
-      event.preventDefault();
-      await this.#runExport(exportButton.dataset.export);
-      return;
-    }
-    if (target.closest('[data-export-toggle]') !== null) {
-      const menu = this.shadowRoot?.querySelector('[data-export-menu]');
-      this.#setExportMenu(menu?.hidden !== false);
-      return;
-    }
-    if (this.shadowRoot?.querySelector('[data-export-menu]')?.hidden === false
-      && target.closest('.export-bar') === null) {
-      this.#closeExportMenu();
-    }
-
     const copyButton = target.closest('button.copy-code-button');
     if (copyButton !== null) {
       const code = copyButton.closest('pre')?.querySelector('code')?.textContent ?? '';
@@ -442,7 +436,6 @@ class DocsPage extends PeyElement {
     return `
       <div part="content" class="content">
         <article part="content" class="prose markdown-body">${page.html}</article>
-        ${this.#exportBarHtml(page)}
         <nav part="pager" class="pager" aria-label="pagination">
           ${previous}
           ${next}
@@ -451,44 +444,12 @@ class DocsPage extends PeyElement {
     `;
   }
 
-  // Export bar: dropdown with the standalone-HTML and markdown exports.
-  #exportBarHtml(page) {
-    if (this.#config.export?.enabled === false || page.notFound === true) {
-      return '';
-    }
-
-    return `
-      <div class="export-bar">
-        <button type="button" class="export-button" data-export-toggle aria-haspopup="true" aria-expanded="false" aria-label="${escapeHtml(this.#t('shirazeh.export.download'))}" title="${escapeHtml(this.#t('shirazeh.export.download'))}">⤓</button>
-        <div class="export-menu" data-export-menu hidden>
-          <button type="button" data-export="html">${escapeHtml(this.#t('shirazeh.export.html'))}</button>
-          <button type="button" data-export="md">${escapeHtml(this.#t('shirazeh.export.md'))}</button>
-        </div>
-      </div>
-    `;
-  }
-
-  #setExportMenu(open) {
-    const menu = this.shadowRoot?.querySelector('[data-export-menu]');
-    const button = this.shadowRoot?.querySelector('[data-export-toggle]');
-    if (menu === null || menu === undefined || button === null || button === undefined) {
-      return;
-    }
-    menu.hidden = !open;
-    button.setAttribute('aria-expanded', String(open));
-  }
-
-  #closeExportMenu() {
-    this.#setExportMenu(false);
-  }
-
   async #runExport(format) {
     const page = this.#state.status === 'ready' ? this.#state.page : null;
     if (page === null || this.#docsService === null) {
       return;
     }
 
-    this.#closeExportMenu();
     const fileName = buildExportFileName({
       documentTitle: page.documentTitle,
       appName: this.#appName ?? this.#t('shirazeh.app-name'),

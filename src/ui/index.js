@@ -116,6 +116,7 @@ export const setup = createApplicationSetup({
         prefs: resources.optional?.[PREFS_SERVICE] ?? null,
         githubCorner: resources.config.githubCorner,
         languageToggle: resources.config.languageToggle,
+        exportConfig: resources.config.export,
       },
     });
     shell.append(actions);

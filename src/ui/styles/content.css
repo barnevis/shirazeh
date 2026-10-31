@@ -332,65 +332,10 @@
   font-size: var(--pey-font-size-sm);
 }
 
-/* Export bar — floating like the old page exporter widget */
-.export-bar {
-  position: fixed;
-  inset-block-end: 1.25rem;
-  inset-inline-end: 1.25rem;
-  z-index: 999;
-}
-.export-button {
-  font-family: var(--pey-font-family-base);
-  font-size: var(--pey-font-size-base);
-  inline-size: 48px;
-  block-size: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--pey-color-border);
-  background-color: var(--pey-color-canvas);
-  color: var(--pey-color-text);
-  cursor: pointer;
-  box-shadow: var(--pey-shadow-sm);
-}
-.export-button:hover {
-  color: var(--pey-color-accent);
-  border-color: var(--pey-color-accent);
-}
-.export-menu {
-  position: absolute;
-  inset-block-end: calc(100% + var(--pey-space-2));
-  inset-inline-end: 0;
-  min-inline-size: 11rem;
-  display: grid;
-  padding: var(--pey-space-1);
-  border: 1px solid var(--pey-color-border);
-  border-radius: var(--pey-radius-md);
-  background-color: var(--pey-color-canvas);
-  box-shadow: var(--pey-shadow-sm);
-  z-index: 5;
-}
-.export-menu[hidden] {
-  display: none;
-}
-.export-menu button {
-  font-family: var(--pey-font-family-base);
-  font-size: var(--pey-font-size-sm);
-  text-align: start;
-  padding: var(--pey-space-2) var(--pey-space-3);
-  border: none;
-  border-radius: var(--pey-radius-sm);
-  background: none;
-  color: var(--pey-color-text);
-  cursor: pointer;
-}
-.export-menu button:hover {
-  background-color: var(--pey-color-surface);
-}
-
 @media print {
   .markdown-body pre .copy-code-button,
   .page-toast,
-  .toc-panel,
-  .export-bar {
+  .toc-panel {
     display: none;
   }
   .markdown-body pre,

@@ -36,7 +36,7 @@ function createFakeSharedState(initial = {}) {
   };
 }
 
-async function mountActions({ languageToggle, sharedState = createFakeSharedState(), githubCorner = null } = {}) {
+async function mountActions({ languageToggle, sharedState = createFakeSharedState(), githubCorner = null, exportConfig = null } = {}) {
   const recorder = createEventsRecorder();
   const actions = createElement(TAG);
   actions.connect({
@@ -47,6 +47,7 @@ async function mountActions({ languageToggle, sharedState = createFakeSharedStat
       prefs: null,
       githubCorner,
       languageToggle,
+      exportConfig,
     },
   });
   document.body.append(actions);
@@ -118,4 +119,40 @@ test('should_render_no_github_when_disabled', async () => {
 
   assert.equal(shadow.querySelector('.actions-stack a.github-button'), null);
   assert.equal(shadow.querySelector('.github-corner'), null);
+});
+
+test('should_render_export_menu_closed_by_default_and_open_on_toggle', async () => {
+  document.body.innerHTML = '';
+  const { shadow } = await mountActions({ exportConfig: { enabled: true } });
+
+  const toggle = shadow.querySelector('button[data-export-toggle]');
+  assert.equal(toggle !== null, true);
+  assert.equal(shadow.querySelector('.export-menu')?.hidden, true);
+
+  toggle.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  await flushRender();
+
+  assert.equal(shadow.querySelector('.export-menu')?.hidden, false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+});
+
+test('should_publish_export_request_and_close_menu_on_item_click', async () => {
+  document.body.innerHTML = '';
+  const { shadow, recorder } = await mountActions({ exportConfig: { enabled: true } });
+  shadow.querySelector('button[data-export-toggle]').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  await flushRender();
+
+  shadow.querySelector('button[data-export="md"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  await flushRender();
+
+  const request = recorder.published.find((entry) => entry.type === 'ui:export-requested');
+  assert.deepEqual(request?.data, { format: 'md' });
+  assert.equal(shadow.querySelector('.export-menu')?.hidden, true);
+});
+
+test('should_render_no_export_button_when_disabled', async () => {
+  document.body.innerHTML = '';
+  const { shadow } = await mountActions({ exportConfig: { enabled: false } });
+
+  assert.equal(shadow.querySelector('button[data-export-toggle]'), null);
 });
