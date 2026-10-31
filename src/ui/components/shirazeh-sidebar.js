@@ -325,12 +325,15 @@ class ShirazehSidebar extends PeyElement {
           border-inline-start-color: var(--pey-color-accent);
           background-color: color-mix(in srgb, var(--pey-color-accent) 10%, transparent);
         }
-        .sidebar-submenu {
+        /* Scoped under .sidebar-nav so the indent outranks the generic
+           sidebar-nav ul padding reset — every nesting level compounds on
+           top of its parent's indent. */
+        .sidebar-nav .sidebar-submenu {
           background-color: rgb(0 0 0 / 0.05);
           max-block-size: 0;
           overflow: hidden;
           transition: max-block-size 0.3s ease-out;
-          padding-inline-start: 1rem;
+          padding-inline-start: 1.5rem;
         }
         .sidebar-submenu.open {
           max-block-size: 1000px;

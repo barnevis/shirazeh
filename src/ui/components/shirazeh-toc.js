@@ -210,7 +210,9 @@ class ShirazehToc extends PeyElement {
           padding: 0;
         }
         ul ul {
-          padding-inline-start: var(--pey-space-4);
+          /* Each nesting level compounds, so subsections visibly belong to
+             their parent heading. */
+          padding-inline-start: 1.25rem;
         }
         ul ul:not(.is-open) {
           display: none;
