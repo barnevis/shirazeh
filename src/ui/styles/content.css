@@ -9,6 +9,14 @@
   /* Offset for the fixed sidebar; mobile stacks over it instead. */
   margin-inline-start: var(--shirazeh-sidebar-offset, var(--sidebar-width, 280px));
 }
+/* The TOC panel (≥75rem) is fixed chrome: reserve its width so the prose
+   centers between the sidebar and the TOC — and in the plain free space
+   whenever either of them is absent. */
+@media (min-width: 75rem) {
+  .content.has-toc {
+    padding-inline-end: calc(15rem + 2rem + 1.5rem); /* TOC + gap + panel inset */
+  }
+}
 @media (max-width: 767px) {
   .content {
     margin-inline-start: 0;

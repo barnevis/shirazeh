@@ -208,12 +208,14 @@ class DocsPage extends PeyElement {
     // The sidebar is persistent chrome living on the app shell (it must not
     // re-mount per navigation); only the per-page TOC mounts here.
     const tocSlot = this.shadowRoot?.querySelector('[data-toc-slot]');
+    const content = this.shadowRoot?.querySelector('.content');
+    let tocMounted = false;
     if (tocSlot !== null && tocSlot !== undefined) {
       tocSlot.replaceChildren();
       const page = this.#state.status === 'ready' ? this.#state.page : null;
       const tocConfig = this.#config.toc ?? {};
-      const content = this.shadowRoot?.querySelector('.markdown-body');
-      if (this.#tocEnabled() && page !== null && Array.isArray(page.toc) && page.toc.length >= TOC_MIN_HEADINGS && content) {
+      const markdownBody = this.shadowRoot?.querySelector('.markdown-body');
+      if (this.#tocEnabled() && page !== null && Array.isArray(page.toc) && page.toc.length >= TOC_MIN_HEADINGS && markdownBody) {
         const toc = document.createElement(TOC_TAG);
         toc.connect({
           infrastructure: { events: this.#eventsFacade() },
@@ -222,12 +224,17 @@ class DocsPage extends PeyElement {
             path: this.#path,
             maxDepth: tocConfig.maxDepth,
             title: this.#t('shirazeh.toc.title'),
-            contentRoot: content,
+            contentRoot: markdownBody,
           },
         });
         tocSlot.append(toc);
+        tocMounted = true;
       }
     }
+    // The TOC panel is fixed chrome: the content column reserves its width
+    // (content.css) so the prose stays centered between sidebar and TOC —
+    // and in the plain free space when the TOC (or sidebar) is absent.
+    content?.classList.toggle('has-toc', tocMounted);
   }
 
   // The real Event Bus facade flows through page refs, so the child

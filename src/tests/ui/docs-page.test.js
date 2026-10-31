@@ -111,4 +111,16 @@ test('should_apply_post_render_enhancements_after_gated_render', async () => {
   assert.equal(shadow.querySelector('.markdown-body .heading-anchor') !== null, true);
   assert.equal(shadow.querySelectorAll('.copy-code-button').length > 0, true);
   assert.equal(shadow.querySelector('[data-toc-slot] shirazeh-toc') !== null, true);
+  // The mounted TOC reserves its fixed-panel width on the content column so
+  // the prose centers between sidebar and TOC.
+  assert.equal(shadow.querySelector('.content.has-toc') !== null, true);
+});
+
+test('should_not_reserve_toc_width_when_toc_does_not_mount', async () => {
+  document.body.innerHTML = '';
+  const { shadow } = await mountPage({ path: '/' });
+
+  // Single heading → below TOC_MIN_HEADINGS: no TOC, no reserved width.
+  assert.equal(shadow.querySelector('[data-toc-slot] shirazeh-toc'), null);
+  assert.equal(shadow.querySelector('.content.has-toc'), null);
 });
