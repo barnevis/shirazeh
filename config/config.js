@@ -101,8 +101,8 @@ export default {
    * پیوند گیت‌هاب در نوار بالا. برای نمایش، enabled را true و url را بگذارید.
    */
   githubCorner: {
-    enabled: false,
-    url: '',
+    enabled: true,
+    url: 'https://github.com/barnevis/shirazeh',
     style: 'button', // 'button': دکمه دایره‌ای کنار دکمه تم؛ 'corner': گوشه کلاسیک هشت‌پا
   },
 

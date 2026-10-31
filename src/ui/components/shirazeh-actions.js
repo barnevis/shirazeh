@@ -191,17 +191,9 @@ class ShirazehActions extends PeyElement {
 
     const github = this.#githubCorner ?? {};
     const githubEnabled = github.enabled === true && typeof github.url === 'string' && github.url.length > 0;
-    const githubButtonHtml = githubEnabled && github.style === 'button'
+    const githubButtonHtml = githubEnabled
       ? `<a class="github-button" href="${escapeHtml(github.url)}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${GITHUB_MARK_PATH}"/></svg>
-         </a>`
-      : '';
-    const githubHtml = githubEnabled && github.style !== 'button'
-      ? `<a class="github-corner" href="${escapeHtml(github.url)}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
-           <svg viewBox="0 0 250 250" aria-hidden="true">
-             <path class="corner-bg" d="M0 0 115 115h250V0Z"/>
-             <path class="octo-body" d="M128.3 109c-14.5-9.3-9.3-19.4-9.3-19.4 3-6.9 1.5-11 1.5-11-1.3-6.6 2.9-2.3 3.9-1.7 4.6 2.7 7.4 10.1 7.4 10.1 5.6 13.5 14.6 10.1 18.1 7.7.4-4 .8-6.6 1-7.7-3.5-3.9-7.4-9.7-7.4-18.4 0-6.4 2-11.4 5.2-15.4-.5-.4-2.3-2.7 0-6.7 0 0 4.3 1.4 10.1 5.2 4.1-1.1 8.5-1.7 12.9-1.7s8.8.6 12.9 1.7c5.8-3.8 10.1-5.2 10.1-5.2 2.3 4 1.5 6.3.5 6.7 3.2 4 5.2 9 5.2 15.4 0 8.7-3.9 14.5-7.4 18.4.5.4 2.4 2.1 1 6.7-.1.1-4.5 8.9-19.4 9.3 2.6 2.2 4.9 6.4 4.9 12.9v19.2c0 2.1 1.5 4.6 5 3.8 30.7-10.2 52.8-39.2 52.8-73.2C250 55.7 194.3 0 125 0S0 55.7 0 124c0 34 22.1 63 52.8 73.2 3.5.8 5-1.7 5-3.8v-24.2c-24.3-5.3-29.4-11.7-29.4-11.7-3.9-10-9.6-12.7-9.6-12.7-7.9-5.4.6-5.3.6-5.3 8.7.6 13.3 9 13.3 9 7.8 13.3 20.4 9.5 25.4 7.3.8-5.7 3-9.5 5.5-11.7-19.4-2.2-39.8-9.7-39.8-43.2 0-9.5 3.4-17.3 9-23.4-.9-2.2-3.9-11.1.9-23.1 0 0 7.3-2.3 23.9 8.9 6.9-1.9 14.4-2.9 21.8-3 7.4.1 14.9 1.1 21.8 3 16.6-11.2 23.9-8.9 23.9-8.9 4.8 12 1.8 20.9.9 23.1 5.6 6.1 9 13.9 9 23.4 0 33.6-20.5 41-40 43.2 3.1 2.7 5.9 8 5.9 16.1v23.9c0 2.1 1.4 4.6 5 3.8 30.6-10.3 52.7-39.2 52.7-73.3C250 55.7 194.3 0 125 0Z" fill="currentColor"/>
-           </svg>
          </a>`
       : '';
 
@@ -249,77 +241,6 @@ class ShirazehActions extends PeyElement {
         :host([data-theme='dark']) .icon-moon { display: none; }
         :host([data-theme='light']) .icon-sun { display: none; }
         :host([data-theme='light']) .icon-moon { display: block; }
-        /* Classic octocat corner (old widgets.css colors) */
-        .github-corner {
-          position: fixed;
-          inset-block-start: 0;
-          inset-inline-end: 0;
-          inline-size: 4.5rem;
-          block-size: 4.5rem;
-          z-index: 999;
-        }
-        .github-corner svg {
-          inline-size: 100%;
-          block-size: 100%;
-        }
-        .github-corner .corner-bg {
-          fill: var(--pey-color-accent);
-        }
-        .github-corner .octo-body {
-          color: var(--pey-color-surface);
-        }
-        .github-corner .octo-arm {
-          transform-origin: 62% 35%;
-        }
-        .github-corner:hover .octo-arm {
-          animation: shirazeh-octo-wave 560ms ease-in-out;
-        }
-        @keyframes shirazeh-octo-wave {
-          0%, 100% { transform: rotate(0); }
-          20%, 60% { transform: rotate(-25deg); }
-          40%, 80% { transform: rotate(10deg); }
-        }
-        @media (max-width: 48rem) {
-          .github-corner {
-            inline-size: 3.4rem;
-            block-size: 3.4rem;
-          }
-        }
-        .export-wrap {
-          position: relative;
-          display: flex;
-        }
-        .export-menu {
-          position: absolute;
-          inset-block-start: calc(100% + var(--pey-space-2));
-          inset-inline-end: 0;
-          min-inline-size: 11rem;
-          display: grid;
-          padding: var(--pey-space-1);
-          border: 1px solid var(--pey-color-border);
-          border-radius: var(--pey-radius-md);
-          background-color: var(--pey-color-canvas);
-          box-shadow: var(--pey-shadow-sm);
-          z-index: 1000;
-        }
-        .export-menu[hidden] {
-          display: none;
-        }
-        .export-menu button {
-          font-family: var(--pey-font-family-base);
-          font-size: var(--pey-font-size-sm);
-          text-align: start;
-          padding: var(--pey-space-2) var(--pey-space-3);
-          border: none;
-          border-radius: var(--pey-radius-sm);
-          background: none;
-          color: var(--pey-color-text);
-          cursor: pointer;
-          inline-size: 100%;
-        }
-        .export-menu button:hover {
-          background-color: var(--pey-color-surface);
-        }
         @media print {
           :host {
             display: none;
@@ -332,7 +253,6 @@ class ShirazehActions extends PeyElement {
         ${this.#exportButtonHtml()}
         ${languageButton}
       </div>
-      ${githubHtml}
     `;
   }
 }

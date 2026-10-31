@@ -92,7 +92,7 @@ test('should_switch_language_and_direction_on_click', async () => {
 test('should_render_github_button_in_stack_when_style_is_button', async () => {
   document.body.innerHTML = '';
   const { shadow } = await mountActions({
-    githubCorner: { enabled: true, url: 'https://github.com/barnevis/shirazeh', style: 'button' },
+    githubCorner: { enabled: true, url: 'https://github.com/barnevis/shirazeh' },
   });
 
   const button = shadow.querySelector('.actions-stack a.github-button');
@@ -101,24 +101,13 @@ test('should_render_github_button_in_stack_when_style_is_button', async () => {
   assert.equal(shadow.querySelector('.github-corner'), null);
 });
 
-test('should_render_github_corner_when_style_is_corner', async () => {
-  document.body.innerHTML = '';
-  const { shadow } = await mountActions({
-    githubCorner: { enabled: true, url: 'https://github.com/barnevis/shirazeh', style: 'corner' },
-  });
-
-  assert.equal(shadow.querySelector('.actions-stack a.github-button'), null);
-  assert.equal(shadow.querySelector('.github-corner') !== null, true);
-});
-
 test('should_render_no_github_when_disabled', async () => {
   document.body.innerHTML = '';
   const { shadow } = await mountActions({
-    githubCorner: { enabled: false, url: 'https://github.com/barnevis/shirazeh', style: 'button' },
+    githubCorner: { enabled: false, url: 'https://github.com/barnevis/shirazeh' },
   });
 
   assert.equal(shadow.querySelector('.actions-stack a.github-button'), null);
-  assert.equal(shadow.querySelector('.github-corner'), null);
 });
 
 test('should_render_export_menu_closed_by_default_and_open_on_toggle', async () => {
