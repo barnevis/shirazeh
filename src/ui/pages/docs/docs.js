@@ -95,9 +95,11 @@ class DocsPage extends PeyElement {
     this.#subscribeTheme();
     // The floating download button (actions stack) asks for an export; the
     // page owns the data and the download flow.
-    this.#unsubscribeExport = this.#events?.subscribe?.('ui:export-requested', (data) => {
-      if (this.isConnected && (data?.format === 'html' || data?.format === 'md')) {
-        void this.#runExport(data.format);
+    this.#unsubscribeExport = this.#events?.subscribe?.('ui:export-requested', (event) => {
+      // The bus delivers the enriched event; the payload lives in event.data.
+      const format = event?.data?.format;
+      if (this.isConnected && (format === 'html' || format === 'md')) {
+        void this.#runExport(format);
       }
     });
     this.#loadPage();

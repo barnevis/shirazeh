@@ -241,6 +241,41 @@ class ShirazehActions extends PeyElement {
         :host([data-theme='dark']) .icon-moon { display: none; }
         :host([data-theme='light']) .icon-sun { display: none; }
         :host([data-theme='light']) .icon-moon { display: block; }
+        .export-wrap {
+          position: relative;
+          display: flex;
+        }
+        .export-menu {
+          position: absolute;
+          inset-block-start: calc(100% + var(--pey-space-2));
+          inset-inline-end: 0;
+          min-inline-size: 11rem;
+          display: grid;
+          padding: var(--pey-space-1);
+          border: 1px solid var(--pey-color-border);
+          border-radius: var(--pey-radius-md);
+          background-color: var(--pey-color-canvas);
+          box-shadow: var(--pey-shadow-sm);
+          z-index: 1000;
+        }
+        .export-menu[hidden] {
+          display: none;
+        }
+        .export-menu button {
+          font-family: var(--pey-font-family-base);
+          font-size: var(--pey-font-size-sm);
+          text-align: start;
+          padding: var(--pey-space-2) var(--pey-space-3);
+          border: none;
+          border-radius: var(--pey-radius-sm);
+          background: none;
+          color: var(--pey-color-text);
+          cursor: pointer;
+          inline-size: 100%;
+        }
+        .export-menu button:hover {
+          background-color: var(--pey-color-surface);
+        }
         @media print {
           :host {
             display: none;

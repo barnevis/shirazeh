@@ -37,17 +37,17 @@ const DEFAULT_PAGES = {
   '/about': { path: '/about', html: '<h1>درباره</h1>', toc: [{ id: 'b', level: 1, text: 'درباره' }], title: 'درباره', documentTitle: 'درباره', previous: { href: '/', title: 'خانه', attrTitle: null, level: 1 }, next: null },
 };
 
-async function mountPage({ path, pages = DEFAULT_PAGES, routeQuery = {} }) {
+async function mountPage({ path, pages = DEFAULT_PAGES, routeQuery = {}, events = null } = {}) {
   const recorder = createEventsRecorder();
   const docsPage = createElement('app-page-docs');
   docsPage.connect({
-    infrastructure: { events: recorder.facade },
+    infrastructure: { events: events ?? recorder.facade },
     refs: {
       services: { 'shirazeh.docs.service': createFakeDocsService(pages) },
       router: { navigate: () => {} },
       sharedState: null,
       config: {},
-      events: recorder.facade,
+      events: events ?? recorder.facade,
       t: (key) => key,
       format: () => '',
       appName: 'شیرازه',
@@ -170,6 +170,46 @@ test('should_scroll_to_heading_on_deep_link_query', async () => {
   }
   // The router decoded the query once; the id must be looked up verbatim.
   assert.deepEqual(scrolls, ['user-content-h-%D9%86%D8%B4%D8%A7%D9%86%D9%87']);
+});
+
+test('should_run_the_export_when_the_download_event_arrives', async () => {
+  document.body.innerHTML = '';
+  let exportHandler = null;
+  const events = {
+    publish: () => ({ success: true }),
+    subscribe: (type, handler) => {
+      if (type === 'ui:export-requested') exportHandler = handler;
+      return () => {};
+    },
+  };
+  const { shadow } = await mountPage({ path: '/', events });
+  assert.equal(typeof exportHandler, 'function');
+
+  // The bus delivers the enriched event; the payload lives in .data.
+  exportHandler({ type: 'ui:export-requested', data: { format: 'md' } });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  // The export flow ran far enough to surface its toast (jsdom cannot
+  // actually download; a failed download still proves the event wired up).
+  assert.equal(shadow.querySelector('.page-toast') !== null, true);
+});
+
+test('should_not_run_the_export_for_an_unknown_format', async () => {
+  document.body.innerHTML = '';
+  let exportHandler = null;
+  const events = {
+    publish: () => ({ success: true }),
+    subscribe: (type, handler) => {
+      if (type === 'ui:export-requested') exportHandler = handler;
+      return () => {};
+    },
+  };
+  const { shadow } = await mountPage({ path: '/', events });
+
+  exportHandler({ type: 'ui:export-requested', data: { format: 'pdf' } });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.equal(shadow.querySelector('.page-toast'), null);
 });
 
 test('should_not_reserve_toc_width_when_toc_does_not_mount', async () => {
