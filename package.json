@@ -17,12 +17,14 @@
     "test": "node --test --experimental-test-module-mocks src/core/tests/*.test.js src/plugins/pey.router/tests/*.test.js src/plugins/pey.router/tests/*/*.test.js src/plugins/pey.storage/tests/*.test.js src/plugins/pey.storage/tests/*/*.test.js src/plugins/pey.markdown/tests/*.test.js src/plugins/shirazeh.http/tests/*.test.js src/plugins/shirazeh.docs/tests/*.test.js src/plugins/shirazeh.prefs/tests/*.test.js src/tests/*.test.js src/tests/ui/*.test.js src/tests/integration/*.test.js",
     "serve": "python3 src/scripts/serve.py",
     "vendor": "npm install --prefix src/vendor",
-    "build:import-map": "node src/scripts/build-import-map.mjs"
+    "build:import-map": "node src/scripts/build-import-map.mjs",
+    "build:release": "node src/scripts/build-release.mjs"
   },
   "engines": {
     "node": ">=22"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "jsdom": "^30.1.3"
   }
 }
