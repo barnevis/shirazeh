@@ -1,8 +1,10 @@
 # Deploys Shirazeh to GitHub Pages. The vendored browser dependencies under
 # src/vendor/node_modules are NOT in the repository — they are rebuilt here
 # from src/vendor/package.json (exact pins, see docs/VENDORED.md) before the
-# site files are collected, so the deploy artifact is self-contained and the
-# docs site keeps working offline once served.
+# release bundle is built, so the deploy artifact is self-contained and the
+# docs site keeps working offline once served. The artifact is the minified
+# esbuild bundle from src/scripts/build-release.mjs — a transport-only step:
+# the authored code is unchanged, only the HTTP round-trip count drops.
 
 name: Deploy to GitHub Pages
 
@@ -48,17 +50,14 @@ jobs:
           npm run build:import-map
           git diff --exit-code index.html
 
-      - name: Collect site files
-        run: |
-          mkdir -p _site
-          cp -r index.html bootstrap.json config docs src _site/
-          rm -rf _site/src/tests _site/src/scripts _site/src/plugins/*/node_modules
+      - name: Build the release bundle
+        run: npm run build:release
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: dist
 
       - id: deployment
         uses: actions/deploy-pages@v4
