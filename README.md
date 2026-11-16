@@ -1,6 +1,6 @@
 # شیرازه
 
-[![version](https://img.shields.io/badge/version-0.4.0-blue)](#)
+[![version](https://img.shields.io/badge/version-0.4.1-blue)](#)
 [![AI](https://img.shields.io/badge/Built%20with-AI-blueviolet)](#)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Bonyan Architecture](https://img.shields.io/badge/bonyan-0.11-56c3bf)](https://github.com/barnevis/bonyan)
@@ -105,9 +105,9 @@ npm run serve
 
 خروجی یک پوشه استاتیک است و چون مسیریابی Hash است، نیازی به تنظیم SPA-fallback روی سرور نیست.
 
-**GitHub Pages:** پوشه `.github/workflows/deploy-pages.yml` همراه پروژه است — با هر push به `main` (یا اجرای دستی workflow) وابستگی‌های وندورشده بازتولید، آزمون‌ها اجرا و فقط پرونده‌های لازم سایت منتشر می‌شوند. کافی است در تنظیمات مخزن، Source صفحه‌ها را روی «GitHub Actions» بگذارید. انتشار مستقیم از ریشه برنچ کار نمی‌کند، چون `src/vendor/node_modules` (وابستگی‌های مرورگری) در مخزن گیت نیست و فقط در استقرار بازسازی می‌شود.
+**GitHub Pages:** پوشه `.github/workflows/deploy-pages.yml` همراه پروژه است — با هر push به `main` (یا اجرای دستی workflow) وابستگی‌های وندورشده بازتولید، آزمون‌ها اجرا، نقشه ایمپورت راستی‌آزمایی و سپس بسته انتشار با `npm run build:release` ساخته و منتشر می‌شود. کافی است در تنظیمات مخزن، Source صفحه‌ها را روی «GitHub Actions» بگذارید. انتشار مستقیم از ریشه برنچ کار نمی‌کند، چون `src/vendor/node_modules` (وابستگی‌های مرورگری) در مخزن گیت نیست و فقط در استقرار بازسازی می‌شود.
 
-**میزبان استاتیک دیگر:** محتوای همان استقرار Pages را می‌توانید محلی هم بسازید — `npm run vendor` و سپس کپی `index.html`، `bootstrap.json`، `config/`، `docs/` و `src/` (منهای `src/tests` و `src/scripts` و node_modules افزونه‌ها).
+**میزبان استاتیک دیگر:** بسته همان استقرار Pages را می‌توانید محلی هم بسازید — `npm run vendor` و سپس `npm run build:release`؛ پوشه `dist/` کامل است و کل آن را روی میزبان کپی کنید. این مرحله فقط انتقال است (esbuild همان کد را به چانک‌های مینیفای‌شده می‌بندد تا تعداد درخواست‌های شبکه از ~۱۹۲ ماژول به ~۱۵ چانک برسد) و حالت توسعه همچنان بدون ساخت با `npm run serve` اجرا می‌شود.
 
 ## توسعه
 
